@@ -1,0 +1,185 @@
+---
+import articles from '../../data/articles.json';
+
+const published = articles.filter((a) => a.status === 'published');
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Articles — AWENE</title>
+    <meta name="description" content="Articles AWENE sur la neuro-wellness en périménopause et ménopause." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+    <style is:inline>
+      *, *::before, *::after { box-sizing: border-box; }
+      html { height: 100%; }
+      body {
+        margin: 0; min-height: 100%;
+        font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        color: #2E2438; background: #FCFAF8; overflow-x: hidden;
+      }
+      .bg { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+      .orb { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
+      .orb-1 {
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, #D4B8F0 0%, #B088E8 100%);
+        top: -100px; right: -60px; opacity: 0.38;
+        animation: float1 20s ease-in-out infinite;
+      }
+      .orb-2 {
+        width: 400px; height: 400px;
+        background: radial-gradient(circle, #F8EEF5 0%, #E8C4E0 100%);
+        bottom: -80px; left: -80px; opacity: 0.32;
+        animation: float2 24s ease-in-out infinite;
+      }
+      @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-30px,25px) scale(1.04)} }
+      @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(40px,-30px) scale(1.06)} }
+      .header { position: relative; z-index: 10; padding: 22px 20px; }
+      .header-inner {
+        display: flex; align-items: center; justify-content: space-between;
+        max-width: 800px; margin: 0 auto;
+      }
+      .wordmark {
+        display: inline-flex; align-items: center; line-height: 0; text-decoration: none;
+      }
+      .wordmark img { height: 36px; width: auto; display: block; }
+      .back-link {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 0.875rem; font-weight: 500; color: #6E6478;
+        text-decoration: none; transition: color 200ms ease;
+      }
+      .back-link:hover { color: #6F3FD6; }
+      .back-arrow { display: inline-block; transition: transform 200ms ease; }
+      .back-link:hover .back-arrow { transform: translateX(-3px); }
+      .main { position: relative; z-index: 10; padding: 36px 20px 80px; }
+      .inner { max-width: 800px; margin: 0 auto; }
+      .page-header { margin-bottom: 40px; animation: fadeUp 0.7s ease both; }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+      .eyebrow {
+        display: inline-block; font-size: 0.73rem; font-weight: 500;
+        letter-spacing: 0.1em; text-transform: uppercase; color: #6E6478; margin: 0 0 14px;
+      }
+      .page-title {
+        font-family: 'Playfair Display', Georgia, serif; font-weight: 500;
+        font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1.1;
+        letter-spacing: -0.02em; color: #2E2438; margin: 0 0 10px;
+      }
+      .page-title em { font-style: italic; color: #6F3FD6; font-weight: 400; }
+      .page-sub { font-size: 0.88rem; color: #6E6478; margin: 0; font-weight: 300; line-height: 1.7; }
+      .articles-grid { display: grid; gap: 16px; animation: fadeUp 0.7s 0.08s ease both; }
+      .article-card {
+        display: block; text-decoration: none;
+        background: rgba(255,255,255,0.72);
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(232,223,240,0.8); border-radius: 18px;
+        padding: 22px 24px;
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+      }
+      .article-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(111,63,214,0.1);
+        border-color: rgba(111,63,214,0.25);
+      }
+      .card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+      .card-category {
+        font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+        color: #6F3FD6; background: rgba(111,63,214,0.08); border-radius: 999px; padding: 3px 10px;
+      }
+      .card-date { font-size: 0.78rem; color: #B8A8C8; font-weight: 300; }
+      .card-reading { font-size: 0.75rem; color: #C8B8D8; font-weight: 300; }
+      .card-title {
+        font-family: 'Playfair Display', Georgia, serif; font-weight: 500;
+        font-size: clamp(1.05rem, 2.2vw, 1.2rem); line-height: 1.38;
+        color: #2E2438; margin: 0 0 8px;
+      }
+      .card-excerpt { font-size: 0.85rem; color: #6E6478; margin: 0; line-height: 1.75; font-weight: 300; }
+      .card-footer { margin-top: 14px; display: flex; align-items: center; gap: 5px; }
+      .card-read { font-size: 0.8rem; font-weight: 600; color: #6F3FD6; letter-spacing: 0.02em; }
+      .card-arrow { color: #6F3FD6; transition: transform 200ms ease; }
+      .article-card:hover .card-arrow { transform: translateX(3px); }
+      .empty-state { text-align: center; padding: 60px 20px; color: #B8A8C8; font-size: 0.9rem; line-height: 1.7; }
+      .footer { position: relative; z-index: 10; padding: 28px 20px 36px; border-top: 1px solid rgba(232,223,240,0.7); }
+      .footer-inner { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+      .footer-brand { font-weight: 600; letter-spacing: 0.18em; color: #4B1F7A; font-size: 0.78rem; text-transform: uppercase; margin: 0; }
+      .footer-tagline { font-size: 0.75rem; color: #B8A8C8; margin: 0; font-weight: 300; }
+      @media (min-width: 640px) {
+        .header { padding: 30px 32px; }
+        .main { padding: 52px 32px 100px; }
+        .articles-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (min-width: 1024px) {
+        .header { padding: 36px 48px; }
+        .main { padding: 64px 48px 100px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .orb, .page-header, .articles-grid { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="wordmark"><img src="/awene-logo.png" alt="AWENE" /></a>
+        <a href="/" class="back-link">
+          <span class="back-arrow">←</span> Accueil
+        </a>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="inner">
+        <div class="page-header">
+          <p class="eyebrow">Ressources</p>
+          <h1 class="page-title">Nos <em>articles</em></h1>
+          <p class="page-sub">Neuro-wellness · Périménopause · Ménopause</p>
+        </div>
+
+        {published.length === 0 ? (
+          <div class="empty-state">
+            <p>Les articles arrivent bientôt.</p>
+          </div>
+        ) : (
+          <div class="articles-grid">
+            {published.map((article) => (
+              <a href={`/articles/${article.slug}`} class="article-card">
+                <div class="card-meta">
+                  {article.category && <span class="card-category">{article.category}</span>}
+                  <span class="card-date">{formatDate(article.publishedAt)}</span>
+                  {article.readingTime && <span class="card-reading">{article.readingTime} min</span>}
+                </div>
+                <h2 class="card-title">{article.title}</h2>
+                {article.excerpt && <p class="card-excerpt">{article.excerpt}</p>}
+                <div class="card-footer">
+                  <span class="card-read">Lire l'article</span>
+                  <svg class="card-arrow" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                    <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <p class="footer-brand">AWENE</p>
+        <p class="footer-tagline">Neuro-wellness en périménopause et ménopause</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,207 @@
+---
+import articles from '../../data/articles.json';
+
+const { slug } = Astro.params;
+const article = articles.find((a) => a.slug === slug && a.status === 'published');
+
+if (!article) {
+  return Astro.redirect('/articles');
+}
+
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{article.metaTitle || article.title} — AWENE</title>
+    <meta name="description" content={article.metaDescription || article.excerpt} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+    <style is:inline>
+      *, *::before, *::after { box-sizing: border-box; }
+      html { height: 100%; }
+      body {
+        margin: 0; min-height: 100%;
+        font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        color: #2E2438; background: #FCFAF8; overflow-x: hidden;
+      }
+      .bg { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+      .orb { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
+      .orb-1 {
+        width: 460px; height: 460px;
+        background: radial-gradient(circle, #D4B8F0 0%, #B088E8 100%);
+        top: -80px; right: -60px; opacity: 0.3;
+        animation: float1 22s ease-in-out infinite;
+      }
+      .orb-2 {
+        width: 360px; height: 360px;
+        background: radial-gradient(circle, #F8EEF5 0%, #E8C4E0 100%);
+        bottom: 10%; left: -80px; opacity: 0.28;
+        animation: float2 26s ease-in-out infinite;
+      }
+      @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-20px,18px) scale(1.03)} }
+      @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(30px,-24px) scale(1.04)} }
+      .header { position: relative; z-index: 10; padding: 22px 20px; }
+      .header-inner {
+        display: flex; align-items: center; justify-content: space-between;
+        max-width: 780px; margin: 0 auto;
+      }
+      .wordmark {
+        display: inline-flex; align-items: center; line-height: 0; text-decoration: none;
+      }
+      .wordmark img { height: 36px; width: auto; display: block; }
+      .back-link {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 0.875rem; font-weight: 500; color: #6E6478;
+        text-decoration: none; transition: color 200ms ease;
+      }
+      .back-link:hover { color: #6F3FD6; }
+      .back-arrow { display: inline-block; transition: transform 200ms ease; }
+      .back-link:hover .back-arrow { transform: translateX(-3px); }
+      .main { position: relative; z-index: 10; padding: 36px 20px 80px; }
+      .article-wrap { max-width: 680px; margin: 0 auto; animation: fadeUp 0.7s ease both; }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+      .article-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+      .meta-category {
+        font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
+        color: #6F3FD6; background: rgba(111,63,214,0.08); border-radius: 999px; padding: 3px 10px;
+      }
+      .meta-date { font-size: 0.78rem; color: #B8A8C8; font-weight: 300; }
+      .meta-reading { font-size: 0.75rem; color: #C8B8D8; font-weight: 300; }
+      .article-title {
+        font-family: 'Playfair Display', Georgia, serif; font-weight: 500;
+        font-size: clamp(1.7rem, 5vw, 2.8rem); line-height: 1.18;
+        letter-spacing: -0.02em; color: #2E2438; margin: 0 0 20px;
+      }
+      .article-excerpt {
+        font-family: 'Playfair Display', Georgia, serif; font-style: italic;
+        font-size: clamp(1rem, 2.2vw, 1.15rem); line-height: 1.7;
+        color: #4B1F7A; margin: 0 0 32px; font-weight: 400;
+        padding-bottom: 28px; border-bottom: 1px solid rgba(232,223,240,0.8);
+      }
+      .article-body {
+        font-size: 1rem; line-height: 1.85; color: #2E2438; font-weight: 300;
+      }
+      .article-body p { margin: 0 0 20px; }
+      .article-body h2 {
+        font-family: 'Playfair Display', Georgia, serif; font-weight: 500;
+        font-size: clamp(1.2rem, 3vw, 1.6rem); line-height: 1.25;
+        color: #2E2438; margin: 40px 0 16px; letter-spacing: -0.01em;
+      }
+      .article-body h3 {
+        font-family: 'DM Sans', sans-serif; font-weight: 600;
+        font-size: 1.05rem; color: #2E2438; margin: 32px 0 12px;
+      }
+      .article-body ul, .article-body ol {
+        margin: 0 0 20px; padding-left: 24px; color: #6E6478;
+      }
+      .article-body li { margin-bottom: 6px; line-height: 1.75; }
+      .article-body strong { color: #2E2438; font-weight: 600; }
+      .article-body em { font-style: italic; }
+      .article-body a { color: #6F3FD6; text-underline-offset: 3px; }
+      .article-body a:hover { opacity: 0.75; }
+      .references {
+        margin-top: 48px; padding-top: 28px;
+        border-top: 1px solid rgba(232,223,240,0.8);
+      }
+      .references-title {
+        font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em;
+        text-transform: uppercase; color: #B8A8C8; margin: 0 0 14px;
+      }
+      .references-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+      .references-list li { font-size: 0.8rem; color: #B8A8C8; font-weight: 300; }
+      .references-list a { color: #B8A8C8; text-decoration: underline; text-underline-offset: 2px; transition: color 200ms ease; }
+      .references-list a:hover { color: #6F3FD6; }
+      .article-nav { margin-top: 48px; padding-top: 28px; border-top: 1px solid rgba(232,223,240,0.8); }
+      .nav-back {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 0.875rem; font-weight: 600; color: #6F3FD6; text-decoration: none;
+        transition: gap 200ms ease;
+      }
+      .nav-back:hover { gap: 10px; }
+      .footer { position: relative; z-index: 10; padding: 28px 20px 36px; border-top: 1px solid rgba(232,223,240,0.7); margin-top: 48px; }
+      .footer-inner { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+      .footer-brand { font-weight: 600; letter-spacing: 0.18em; color: #4B1F7A; font-size: 0.78rem; text-transform: uppercase; margin: 0; }
+      .footer-tagline { font-size: 0.75rem; color: #B8A8C8; margin: 0; font-weight: 300; }
+      @media (min-width: 640px) {
+        .header { padding: 30px 32px; }
+        .main { padding: 52px 32px 100px; }
+      }
+      @media (min-width: 1024px) {
+        .header { padding: 36px 48px; }
+        .main { padding: 64px 48px 100px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .orb, .article-wrap { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="wordmark"><img src="/awene-logo.png" alt="AWENE" /></a>
+        <a href="/articles" class="back-link">
+          <span class="back-arrow">←</span> Articles
+        </a>
+      </div>
+    </header>
+
+    <main class="main">
+      <article class="article-wrap">
+        <div class="article-meta">
+          {article.category && <span class="meta-category">{article.category}</span>}
+          <span class="meta-date">{formatDate(article.publishedAt)}</span>
+          {article.readingTime && <span class="meta-reading">{article.readingTime} min de lecture</span>}
+        </div>
+
+        <h1 class="article-title">{article.title}</h1>
+
+        {article.excerpt && (
+          <p class="article-excerpt">{article.excerpt}</p>
+        )}
+
+        <div class="article-body" set:html={article.contentHtml} />
+
+        {article.references && article.references.length > 0 && (
+          <div class="references">
+            <p class="references-title">Sources</p>
+            <ul class="references-list">
+              {article.references.map((ref) => (
+                <li>
+                  <a href={ref.url} target="_blank" rel="noopener noreferrer">{ref.label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="article-nav">
+          <a href="/articles" class="nav-back">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M11.5 7h-9M6 3.5L2.5 7 6 10.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Tous les articles
+          </a>
+        </div>
+      </article>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <p class="footer-brand">AWENE</p>
+        <p class="footer-tagline">Neuro-wellness en périménopause et ménopause</p>
+      </div>
+    </footer>
+  </body>
+</html>

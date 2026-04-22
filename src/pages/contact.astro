@@ -1,0 +1,314 @@
+---
+// Contact page
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contact — AWENE</title>
+    <meta name="description" content="Contactez AWENE pour toute question sur la neuro-wellness en périménopause et ménopause." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://sibforms.com/forms/end-form/build/sib-styles.css" />
+    <style is:inline>
+      *, *::before, *::after { box-sizing: border-box; }
+      html { height: 100%; }
+      body {
+        margin: 0; min-height: 100%;
+        font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+        color: #2E2438; background: #FCFAF8; overflow-x: hidden;
+      }
+      .bg { position: fixed; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+      .orb { position: absolute; border-radius: 50%; filter: blur(80px); will-change: transform; }
+      .orb-1 {
+        width: 480px; height: 480px;
+        background: radial-gradient(circle, #C8A8F2 0%, #A070E0 100%);
+        top: -100px; right: -60px; opacity: 0.35;
+        animation: float1 20s ease-in-out infinite;
+      }
+      .orb-2 {
+        width: 380px; height: 380px;
+        background: radial-gradient(circle, #F8EEF5 0%, #E8C4E0 100%);
+        bottom: -60px; left: -80px; opacity: 0.3;
+        animation: float2 26s ease-in-out infinite;
+      }
+      @keyframes float1 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(-25px,20px) scale(1.04)} }
+      @keyframes float2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(35px,-28px) scale(1.05)} }
+
+      .header { position: relative; z-index: 10; padding: 22px 20px; }
+      .header-inner {
+        display: flex; align-items: center; justify-content: space-between;
+        max-width: 720px; margin: 0 auto;
+      }
+      .wordmark { display: inline-flex; align-items: center; line-height: 0; text-decoration: none; }
+      .wordmark img { height: 36px; width: auto; display: block; }
+      .back-link {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 0.875rem; font-weight: 500; color: #6E6478;
+        text-decoration: none; transition: color 200ms ease;
+      }
+      .back-link:hover { color: #6F3FD6; }
+      .back-arrow { display: inline-block; transition: transform 200ms ease; }
+      .back-link:hover .back-arrow { transform: translateX(-3px); }
+
+      .main { position: relative; z-index: 10; padding: 36px 20px 80px; }
+      .inner { max-width: 580px; margin: 0 auto; animation: fadeUp 0.7s ease both; }
+      @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+      .page-header { margin-bottom: 36px; }
+      .eyebrow {
+        display: inline-block; font-size: 0.73rem; font-weight: 500;
+        letter-spacing: 0.1em; text-transform: uppercase; color: #6E6478; margin: 0 0 14px;
+      }
+      .page-title {
+        font-family: 'Playfair Display', Georgia, serif; font-weight: 500;
+        font-size: clamp(1.9rem, 5.5vw, 2.8rem); line-height: 1.12;
+        letter-spacing: -0.02em; color: #2E2438; margin: 0 0 12px;
+      }
+      .page-title em { font-style: italic; color: #6F3FD6; font-weight: 400; }
+      .page-sub { font-size: 0.9rem; color: #6E6478; margin: 0; font-weight: 300; line-height: 1.75; }
+
+      /* ── Brevo form overrides ── */
+      .sib-form {
+        background: transparent !important;
+        padding: 0 !important;
+        text-align: left !important;
+      }
+      #sib-form-container { display: flex; flex-direction: column; gap: 0; }
+      #sib-container {
+        background: rgba(255,255,255,0.72) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border: 1px solid rgba(232,223,240,0.88) !important;
+        border-radius: 22px !important;
+        max-width: 100% !important;
+        padding: 32px 28px !important;
+        box-shadow: 0 4px 24px rgba(111,63,214,0.07) !important;
+        text-align: left !important;
+      }
+      #sib-form .sib-text-form-block p {
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.07em !important;
+        text-transform: uppercase !important;
+        color: #2E2438 !important;
+        margin: 0 0 20px !important;
+      }
+      #sib-form .entry__field {
+        border: none !important;
+        padding: 0 !important;
+      }
+      #sib-form .input {
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.95rem !important;
+        color: #2E2438 !important;
+        background: rgba(255,255,255,0.9) !important;
+        border: 1.5px solid #E8DFF0 !important;
+        border-radius: 12px !important;
+        padding: 13px 17px !important;
+        width: 100% !important;
+        outline: none !important;
+        transition: border-color 180ms ease, box-shadow 180ms ease !important;
+        -webkit-appearance: none !important;
+      }
+      #sib-form .input::placeholder { color: #B8A8C8 !important; font-family: 'DM Sans', sans-serif !important; }
+      #sib-container input:-ms-input-placeholder { color: #B8A8C8 !important; font-family: 'DM Sans', sans-serif !important; }
+      #sib-form .input:focus {
+        border-color: #6F3FD6 !important;
+        box-shadow: 0 0 0 3px rgba(111,63,214,0.12) !important;
+      }
+      #sib-form .entry__specification { display: none !important; }
+      #sib-form .sib-form-block { padding: 0 !important; margin-bottom: 14px !important; }
+      #sib-form .sib-form-block:last-child { margin-bottom: 0 !important; }
+      .sib-form-block__button {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 15px 28px !important;
+        background: linear-gradient(135deg, #7A4FE8 0%, #6030C8 100%) !important;
+        color: #fff !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-weight: 600 !important;
+        font-size: 1rem !important;
+        letter-spacing: 0.02em !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 20px rgba(111,63,214,0.35) !important;
+        transition: opacity 200ms ease, transform 150ms ease, box-shadow 200ms ease !important;
+        -webkit-font-smoothing: antialiased !important;
+        text-transform: none !important;
+        margin-top: 6px !important;
+      }
+      .sib-form-block__button:hover {
+        opacity: 0.92 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 6px 24px rgba(111,63,214,0.42) !important;
+      }
+      .sib-form-block__button:active { transform: translateY(0) !important; }
+      .sib-hide-loader-icon { display: none !important; }
+      #error-message, #success-message {
+        max-width: 100% !important;
+        border-radius: 12px !important;
+        font-family: 'DM Sans', sans-serif !important;
+        font-size: 0.9rem !important;
+        margin-bottom: 12px !important;
+      }
+      #success-message {
+        background-color: rgba(111,63,214,0.07) !important;
+        border-color: rgba(111,63,214,0.3) !important;
+        color: #4B1F7A !important;
+      }
+      #error-message {
+        background-color: rgba(246,139,44,0.08) !important;
+        border-color: rgba(246,139,44,0.3) !important;
+        color: #7A3A00 !important;
+      }
+      .sib-form-message-panel { border-radius: 12px !important; }
+
+      .alt-contact { margin-top: 18px; text-align: center; }
+      .alt-contact p { font-size: 0.82rem; color: #B8A8C8; margin: 0; font-weight: 300; }
+      .alt-contact a { color: #6F3FD6; text-decoration: none; font-weight: 500; transition: opacity 200ms ease; }
+      .alt-contact a:hover { opacity: 0.75; }
+
+      .footer { position: relative; z-index: 10; padding: 28px 20px 36px; border-top: 1px solid rgba(232,223,240,0.7); margin-top: 32px; }
+      .footer-inner { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+      .footer-brand { font-weight: 600; letter-spacing: 0.18em; color: #4B1F7A; font-size: 0.78rem; text-transform: uppercase; margin: 0; }
+      .footer-tagline { font-size: 0.75rem; color: #B8A8C8; margin: 0; font-weight: 300; }
+
+      @media (min-width: 640px) {
+        .header { padding: 30px 32px; }
+        .main { padding: 52px 32px 100px; }
+      }
+      @media (min-width: 1024px) {
+        .header { padding: 36px 48px; }
+        .main { padding: 64px 48px 100px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .orb, .inner { animation: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg" aria-hidden="true">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+    </div>
+
+    <header class="header">
+      <div class="header-inner">
+        <a href="/" class="wordmark"><img src="/awene-logo.png" alt="AWENE" /></a>
+        <a href="/" class="back-link">
+          <span class="back-arrow">←</span> Accueil
+        </a>
+      </div>
+    </header>
+
+    <main class="main">
+      <div class="inner">
+        <div class="page-header">
+          <p class="eyebrow">Nous contacter</p>
+          <h1 class="page-title">Une <em>question ?</em></h1>
+          <p class="page-sub">Écrivez-nous — nous vous répondrons dans les meilleurs délais.</p>
+        </div>
+
+        <div class="sib-form" style="text-align:center;background-color:transparent;">
+          <div id="sib-form-container" class="sib-form-container">
+            <div id="error-message" class="sib-form-message-panel" style="font-size:16px;text-align:left;font-family:'DM Sans',sans-serif;color:#661d1d;background-color:#ffeded;border-radius:12px;border-color:#ff4949;max-width:100%;display:none;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <span class="sib-form-message-panel__inner-text">Votre envoi a échoué. Veuillez réessayer.</span>
+              </div>
+            </div>
+            <div id="success-message" class="sib-form-message-panel" style="font-size:16px;text-align:left;font-family:'DM Sans',sans-serif;color:#085229;background-color:#e7faf0;border-radius:12px;border-color:#13ce66;max-width:100%;display:none;">
+              <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                <span class="sib-form-message-panel__inner-text">Votre message a bien été envoyé. Merci !</span>
+              </div>
+            </div>
+            <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:center;background-color:rgba(255,255,255,1);max-width:540px;border-radius:3px;border-width:1px;border-color:#C0CCD9;border-style:solid;direction:ltr">
+              <form id="sib-form" method="POST" action="https://f7375de8.sibforms.com/serve/MUIFAMMExL3IMdOi_voCJaTeeOIOWTuaxrtdYzIUtLByZ0GWEOj5j37QQKK__h3_djHh6l-hSlPP7MwCTEXSigW-f49TQe0evv79X90wNWdjoIeZpD56i6WYQK183y8_4o0FaG1PKYEN9xXkrYyaOX1YfePahS473bLCIMe1PK5p_u8g1O1gcdYsG6duX96nFPwIQjHG-b1Bo-9D" data-type="subscription">
+                <div style="padding:8px 0;">
+                  <div class="sib-form-block" style="font-size:16px;text-align:left;font-family:'DM Sans',sans-serif;color:#3C4858;background-color:transparent;">
+                    <div class="sib-text-form-block">
+                      <p>Envoyez-nous un message</p>
+                    </div>
+                  </div>
+                </div>
+                <div style="padding:8px 0;">
+                  <div class="sib-input sib-form-block">
+                    <div class="form__entry entry_block">
+                      <div class="form__label-row">
+                        <div class="entry__field">
+                          <input class="input" maxlength="200" type="text" id="NOM" name="NOM" autocomplete="name" placeholder="Votre nom" data-required="true" required />
+                        </div>
+                      </div>
+                      <label class="entry__error entry__error--primary" style="font-size:14px;text-align:left;font-family:'DM Sans',sans-serif;color:#661d1d;background-color:#ffeded;border-radius:8px;border-color:#ff4949;"></label>
+                    </div>
+                  </div>
+                </div>
+                <div style="padding:8px 0;">
+                  <div class="sib-input sib-form-block">
+                    <div class="form__entry entry_block">
+                      <div class="form__label-row">
+                        <div class="entry__field">
+                          <input class="input" type="email" id="EMAIL" name="EMAIL" autocomplete="email" placeholder="Votre adresse email" data-required="true" required />
+                        </div>
+                      </div>
+                      <label class="entry__error entry__error--primary" style="font-size:14px;text-align:left;font-family:'DM Sans',sans-serif;color:#661d1d;background-color:#ffeded;border-radius:8px;border-color:#ff4949;"></label>
+                    </div>
+                  </div>
+                </div>
+                <div style="padding:8px 0;">
+                  <div class="sib-form-block" style="text-align:left;">
+                    <button class="sib-form-block__button sib-form-block__button-with-loader" style="font-size:16px;text-align:center;font-weight:700;font-family:'DM Sans',sans-serif;color:#FFFFFF;background-color:#6F3FD6;border-radius:12px;border-width:0;" form="sib-form" type="submit">
+                      <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon" viewBox="0 0 512 512">
+                        <path d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z" />
+                      </svg>
+                      Envoyer le message
+                    </button>
+                  </div>
+                </div>
+                <input type="text" name="email_address_check" value="" class="input--hidden" />
+                <input type="hidden" name="locale" value="fr" />
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="alt-contact">
+          <p>Ou par email directement : <a href="mailto:contact@awene.net">contact@awene.net</a></p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <p class="footer-brand">AWENE</p>
+        <p class="footer-tagline">Neuro-wellness en périménopause et ménopause</p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      window.REQUIRED_CODE_ERROR_MESSAGE = 'Veuillez choisir un indicatif pays';
+      window.LOCALE = 'fr';
+      window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "L'information fournie est invalide. Veuillez vérifier le format.";
+      window.REQUIRED_ERROR_MESSAGE = "Ce champ est obligatoire.";
+      window.GENERIC_INVALID_MESSAGE = "L'information fournie est invalide. Veuillez vérifier le format.";
+      window.translation = {
+        common: {
+          selectedList: '{quantity} liste sélectionnée',
+          selectedLists: '{quantity} listes sélectionnées',
+          selectedOption: '{quantity} sélectionné',
+          selectedOptions: '{quantity} sélectionnés',
+        }
+      };
+      var AUTOHIDE = Boolean(0);
+    </script>
+    <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
+  </body>
+</html>

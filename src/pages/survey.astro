@@ -1,0 +1,817 @@
+---
+const radioCards = {
+  profile_stage: [
+    "Périménopause",
+    "Ménopause",
+    "Je ne sais pas"
+  ],
+  satisfaction_global: [
+    "Excellent",
+    "Très bien",
+    "Bien",
+    "Moyen",
+    "Insuffisant"
+  ],
+  expectations_met: [
+    "Oui, totalement",
+    "Partiellement",
+    "Pas du tout"
+  ],
+  explanations_clarity: [
+    "Très claire",
+    "Moyennement claire",
+    "Peu claire"
+  ],
+  content_relevance: [
+    "Très pertinent",
+    "Pertinent",
+    "Moyennement utile",
+    "Peu utile"
+  ],
+  masterclass_pace: [
+    "Très bien adapté",
+    "Trop rapide",
+    "Trop lent"
+  ],
+  impact_after_masterclass: [
+    "Beaucoup plus informée et confiante",
+    "Un peu plus éclairée",
+    "Pas vraiment changée"
+  ],
+  apply_advice: [
+    "Oui, immédiatement",
+    "Oui, en partie",
+    "Peut-être",
+    "Non"
+  ],
+  interested_in_support: [
+    "Oui, absolument",
+    "Oui, probablement",
+    "Peut-être",
+    "Non"
+  ],
+  preferred_format: [
+    "Programme en ligne",
+    "Accompagnement en groupe",
+    "Coaching individuel",
+    "Ateliers pratiques",
+    "Application en ligne",
+    "Je ne sais pas"
+  ]
+};
+
+const symptoms = [
+  "Fatigue",
+  "Troubles du sommeil",
+  "Prise de poids",
+  "Variations d’humeur",
+  "Bouffées de chaleur",
+  "Symptoms génito-urinaires",
+  "Autre"
+];
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AWENE | Formulaire de feedback masterclass</title>
+    <meta
+      name="description"
+      content="Formulaire de feedback AWENE pour la masterclass périménopause et ménopause."
+    />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero-card">
+        <div class="hero-copy">
+          <p class="eyebrow">AWENE Masterclass</p>
+          <h1>Votre retour nous aide à enrichir l’expérience autour de la périménopause et de la ménopause.</h1>
+          <p class="hero-text">
+            Merci de prendre quelques minutes pour partager votre ressenti. Vos réponses nous aident à améliorer le contenu, le rythme et les propositions d’accompagnement AWENE.
+          </p>
+        </div>
+      </section>
+
+      <section class="form-card">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Feedback form</p>
+            <h2>Partagez votre expérience AWENE</h2>
+          </div>
+        </div>
+
+        <form id="feedback-form" class="feedback-form" novalidate>
+          <section class="form-section">
+            <h3>1. Profil</h3>
+            <div class="field-stack">
+              <label class="field">
+                <span>Nom complet</span>
+                <input
+                  name="full_name"
+                  type="text"
+                  autocomplete="name"
+                  placeholder="Ex: Sarah Ben Ali"
+                />
+                <small class="field-help">Ex: Sarah Ben Ali</small>
+              </label>
+
+              <fieldset class="choice-group">
+                <legend>Où en êtes-vous aujourd’hui ? *</legend>
+                <div class="choice-grid">
+                  {radioCards.profile_stage.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="profile_stage" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <div class="field-grid">
+                <label class="field">
+                  <span>Âge *</span>
+                  <input
+                    name="age_text"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    max="120"
+                    step="1"
+                    placeholder="Ex: 45"
+                    required
+                  />
+                  <small class="field-help">Ex: 45</small>
+                </label>
+                <label class="field">
+                  <span>Ville / adresse *</span>
+                  <input name="address_text" type="text" placeholder="Ex: Tunis" required />
+                  <small class="field-help">Ex: Tunis</small>
+                </label>
+              </div>
+
+              <label class="field">
+                <span>Profession *</span>
+                <input name="profession_text" type="text" placeholder="Ex: Enseignante" required />
+                <small class="field-help">Ex: Enseignante</small>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3>2. Satisfaction</h3>
+            <div class="field-stack">
+              <fieldset class="choice-group">
+                <legend>Satisfaction globale *</legend>
+                <div class="choice-grid compact">
+                  {radioCards.satisfaction_global.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="satisfaction_global" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset class="choice-group">
+                <legend>Vos attentes ont-elles été satisfaites ? *</legend>
+                <div class="choice-grid compact">
+                  {radioCards.expectations_met.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="expectations_met" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3>3. Qualité</h3>
+            <div class="field-stack">
+              <fieldset class="choice-group">
+                <legend>Clarté des explications *</legend>
+                <div class="choice-grid compact">
+                  {radioCards.explanations_clarity.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="explanations_clarity" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset class="choice-group">
+                <legend>Pertinence du contenu *</legend>
+                <div class="choice-grid compact">
+                  {radioCards.content_relevance.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="content_relevance" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset class="choice-group">
+                <legend>Rythme de la masterclass *</legend>
+                <div class="choice-grid compact">
+                  {radioCards.masterclass_pace.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="masterclass_pace" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3>4. Impact</h3>
+            <div class="field-stack">
+              <fieldset class="choice-group">
+                <legend>Après la masterclass, comment vous sentez-vous ? *</legend>
+                <div class="choice-grid">
+                  {radioCards.impact_after_masterclass.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="impact_after_masterclass" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset class="choice-group">
+                <legend>Pensez-vous appliquer les conseils partagés ? *</legend>
+                <div class="choice-grid compact">
+                  {radioCards.apply_advice.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="apply_advice" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3>5. Symptômes</h3>
+            <div class="field-stack">
+              <fieldset class="choice-group">
+                <legend>Quels symptômes vous concernent actuellement ? *</legend>
+                <div class="choice-grid">
+                  {symptoms.map((value) => (
+                    <label class="choice-card checkbox-card">
+                      <input type="checkbox" name="symptoms" value={value} />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <label class="field">
+                <span>Autre symptôme</span>
+                <input name="symptoms_other" type="text" placeholder="Précisez si vous avez coché Autre" />
+                <small class="field-help">À remplir uniquement si vous avez sélectionné Autre.</small>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3>6. Intention</h3>
+            <div class="field-stack">
+              <fieldset class="choice-group">
+                <legend>Êtes-vous intéressée par un accompagnement AWENE ? *</legend>
+                <div class="choice-grid compact">
+                  {radioCards.interested_in_support.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="interested_in_support" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+
+              <fieldset class="choice-group">
+                <legend>Quel format vous conviendrait le mieux ? *</legend>
+                <div class="choice-grid">
+                  {radioCards.preferred_format.map((value) => (
+                    <label class="choice-card">
+                      <input type="radio" name="preferred_format" value={value} required />
+                      <span>{value}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3>7. Feedback</h3>
+            <div class="field-stack">
+              <label class="field">
+                <span>Qu’avez-vous le plus apprécié ?</span>
+                <textarea
+                  name="most_appreciated"
+                  rows="5"
+                  placeholder="Partagez ce qui vous a le plus aidée pendant la masterclass"
+                ></textarea>
+              </label>
+
+              <label class="field">
+                <span>Qu’aimeriez-vous améliorer ?</span>
+                <textarea
+                  name="improvement_suggestions"
+                  rows="5"
+                  placeholder="Dites-nous ce qui pourrait rendre l’expérience encore meilleure"
+                ></textarea>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <h3>8. Contact</h3>
+            <div class="field-stack">
+              <label class="field">
+                <span>Email *</span>
+                <input
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="Ex: contact@exemple.com"
+                  required
+                />
+                <small class="field-help">Pour recevoir le guide PDF par email.</small>
+              </label>
+
+              <label class="consent-row">
+                <input name="consent_to_contact" type="checkbox" />
+                <span>J’accepte d’être contactée par AWENE pour recevoir des informations et des nouveautés.</span>
+              </label>
+            </div>
+          </section>
+
+          <div id="form-feedback" class="form-feedback" role="status" aria-live="polite"></div>
+
+          <div class="cta-row">
+            <button id="submit-button" class="cta-button" type="submit">
+              <span class="button-label">Envoyer mon feedback</span>
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script is:inline>
+      const form = document.querySelector("#feedback-form");
+      const feedback = document.querySelector("#form-feedback");
+      const submitButton = document.querySelector("#submit-button");
+      const buttonLabel = submitButton?.querySelector(".button-label");
+
+      const requiredRadioGroups = [
+        "profile_stage",
+        "satisfaction_global",
+        "expectations_met",
+        "explanations_clarity",
+        "content_relevance",
+        "masterclass_pace",
+        "impact_after_masterclass",
+        "apply_advice",
+        "interested_in_support",
+        "preferred_format"
+      ];
+
+      const requiredTextFields = ["age_text", "address_text", "profession_text", "email"];
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      const setFeedback = (message, type) => {
+        if (!feedback) return;
+        feedback.textContent = message;
+        feedback.className = `form-feedback is-visible ${type === "error" ? "is-error" : "is-success"}`;
+      };
+
+      const clearFeedback = () => {
+        if (!feedback) return;
+        feedback.textContent = "";
+        feedback.className = "form-feedback";
+      };
+
+      const setLoading = (loading) => {
+        if (!submitButton || !buttonLabel) return;
+        submitButton.disabled = loading;
+        submitButton.setAttribute("aria-busy", String(loading));
+        buttonLabel.textContent = loading ? "Envoi en cours..." : "Envoyer mon feedback";
+      };
+
+      const getPayload = (formElement) => {
+        const formData = new FormData(formElement);
+
+        return {
+          full_name: String(formData.get("full_name") || "").trim(),
+          profile_stage: String(formData.get("profile_stage") || ""),
+          age_text: String(formData.get("age_text") || "").trim(),
+          address_text: String(formData.get("address_text") || "").trim(),
+          profession_text: String(formData.get("profession_text") || "").trim(),
+          satisfaction_global: String(formData.get("satisfaction_global") || ""),
+          expectations_met: String(formData.get("expectations_met") || ""),
+          explanations_clarity: String(formData.get("explanations_clarity") || ""),
+          content_relevance: String(formData.get("content_relevance") || ""),
+          masterclass_pace: String(formData.get("masterclass_pace") || ""),
+          impact_after_masterclass: String(formData.get("impact_after_masterclass") || ""),
+          apply_advice: String(formData.get("apply_advice") || ""),
+          symptoms: formData.getAll("symptoms").map((item) => String(item)),
+          symptoms_other: formData.getAll("symptoms").includes("Autre")
+            ? String(formData.get("symptoms_other") || "").trim()
+            : "",
+          interested_in_support: String(formData.get("interested_in_support") || ""),
+          preferred_format: String(formData.get("preferred_format") || ""),
+          most_appreciated: String(formData.get("most_appreciated") || "").trim(),
+          improvement_suggestions: String(formData.get("improvement_suggestions") || "").trim(),
+          email: String(formData.get("email") || "").trim(),
+          consent_to_contact: formData.get("consent_to_contact") === "on"
+        };
+      };
+
+      const validateClient = (payload) => {
+        for (const field of requiredTextFields) {
+          if (!payload[field]) {
+            return "Merci de compléter tous les champs requis.";
+          }
+        }
+
+        for (const field of requiredRadioGroups) {
+          if (!payload[field]) {
+            return "Merci de répondre à toutes les questions obligatoires.";
+          }
+        }
+
+        if (!payload.symptoms.length) {
+          return "Merci de sélectionner au moins un symptôme.";
+        }
+
+        if (!emailPattern.test(payload.email)) {
+          return "Merci de saisir une adresse email valide.";
+        }
+
+        if (!/^\d+$/.test(payload.age_text)) {
+          return "Merci de saisir un âge en chiffres uniquement.";
+        }
+
+        return "";
+      };
+
+      form?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearFeedback();
+
+        const payload = getPayload(form);
+        const clientError = validateClient(payload);
+
+        if (clientError) {
+          setFeedback(clientError, "error");
+          return;
+        }
+
+        try {
+          setLoading(true);
+
+          const response = await fetch("/api/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            setFeedback(result.error || "Une erreur est survenue. Merci de réessayer.", "error");
+            return;
+          }
+
+          form.reset();
+          setFeedback(result.message || "Votre feedback a bien été envoyé.", "success");
+        } catch (error) {
+          console.error("[awene-feedback] submit_failed", error);
+          setFeedback("Une erreur réseau est survenue. Merci de réessayer.", "error");
+        } finally {
+          setLoading(false);
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --purple: #9b5cff;
+    --pink: #f04fb9;
+    --coral: #ff7d4d;
+    --bg-pink: #fff4f8;
+    --bg-cream: #fffaf4;
+    --bg-purple: #faf7fb;
+    --text-primary: #3d3142;
+    --text-secondary: #5f5562;
+    --text-muted: #8a7d8f;
+    --shadow: 0 20px 50px rgba(240, 79, 185, 0.12);
+    --gradient: linear-gradient(135deg, #9b5cff 0%, #f04fb9 50%, #ff7d4d 100%);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--text-primary);
+    background:
+      radial-gradient(circle at top left, var(--bg-pink) 0%, var(--bg-pink) 28%, transparent 60%),
+      linear-gradient(180deg, var(--bg-cream) 0%, var(--bg-purple) 100%);
+  }
+
+  .page-shell {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 24px 0 56px;
+    display: grid;
+    gap: 20px;
+  }
+
+  .hero-card,
+  .form-card {
+    border-radius: 24px;
+    padding: 24px 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .hero-card {
+    display: grid;
+    gap: 20px;
+    background: var(--gradient);
+    color: var(--bg-cream);
+  }
+
+  .eyebrow,
+  .section-kicker {
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  .hero-copy h1,
+  .section-head h2 {
+    margin: 0;
+    line-height: 1.08;
+  }
+
+  .hero-copy h1 {
+    font-size: clamp(2.2rem, 6vw, 4.5rem);
+    max-width: 13ch;
+  }
+
+  .hero-text,
+  .section-note {
+    margin: 16px 0 0;
+    line-height: 1.7;
+  }
+
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .hero-pills span {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: var(--bg-cream);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .form-section,
+  .choice-card,
+  .field input,
+  .field textarea,
+  .consent-row,
+  .form-feedback {
+    border-radius: 20px;
+  }
+
+  .form-card {
+    background: var(--bg-cream);
+  }
+
+  .section-head {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .section-kicker {
+    color: var(--pink);
+  }
+
+  .section-head h2 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+  }
+
+  .section-note {
+    color: var(--text-secondary);
+  }
+
+  .feedback-form {
+    display: grid;
+    gap: 20px;
+  }
+
+  .form-section {
+    display: grid;
+    gap: 20px;
+    padding: 20px;
+    background: var(--bg-purple);
+  }
+
+  .form-section h3 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+
+  .field-stack,
+  .choice-group {
+    display: grid;
+    gap: 20px;
+  }
+
+  .choice-group {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .choice-group legend {
+    padding: 0;
+    font-weight: 600;
+  }
+
+  .choice-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .field-grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .choice-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--bg-cream);
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  .choice-card input {
+    margin-top: 3px;
+    accent-color: var(--purple);
+  }
+
+  .choice-card:has(input:checked) {
+    background: var(--bg-pink);
+    color: var(--text-primary);
+  }
+
+  .field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .field span {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    border: 2px solid var(--pink);
+    padding: 16px 18px;
+    background: #ffffff;
+    color: var(--text-primary);
+    resize: vertical;
+    font-size: 15px;
+    transition:
+      border-color 160ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--text-muted);
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    border-color: var(--pink);
+    box-shadow: 0 0 0 3px rgba(240, 79, 185, 0.15);
+  }
+
+  .field-help {
+    color: var(--text-muted);
+    font-size: 0.87rem;
+    line-height: 1.5;
+  }
+
+  .consent-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--bg-cream);
+    color: var(--text-secondary);
+  }
+
+  .consent-row input {
+    margin-top: 3px;
+    accent-color: var(--purple);
+  }
+
+  .form-feedback {
+    display: none;
+    padding: 18px 20px;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+
+  .form-feedback.is-visible {
+    display: block;
+  }
+
+  .form-feedback.is-success {
+    background: var(--bg-pink);
+    color: var(--text-primary);
+  }
+
+  .form-feedback.is-error {
+    background: rgba(255, 125, 77, 0.12);
+    color: var(--text-primary);
+  }
+
+  .cta-row {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cta-button {
+    width: min(100%, 360px);
+    border: 0;
+    border-radius: 999px;
+    padding: 18px 28px;
+    background: var(--gradient);
+    color: var(--bg-cream);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+
+  .cta-button:disabled {
+    cursor: wait;
+    opacity: 0.88;
+  }
+
+  @media (min-width: 768px) {
+    .page-shell {
+      padding: 40px 0 72px;
+      gap: 24px;
+    }
+
+    .hero-card,
+    .form-card {
+      padding: 32px;
+    }
+
+    .field-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .choice-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .choice-grid.compact {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+</style>
