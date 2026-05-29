@@ -1,26 +1,161 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* AWENE Color System */
+  --color-purple-primary: #6F3FD6;
+  --color-purple-deep: #4B1F7A;
+  --color-lavender-soft: #F3ECFB;
+  --color-blush-light: #F8EEF5;
+  --color-offwhite: #FCFAF8;
+  --color-orange-accent: #F68B2C;
+  --color-text-dark: #2E2438;
+  --color-text-muted: #6E6478;
+  --color-border-soft: #E8DFF0;
+
+  /* Typography */
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+
+  /* Spacing scale */
+  --spacing-section: 6rem;
+  --spacing-section-sm: 3.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #FCFAF8;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255, 223, 206, 0.46) 0%, rgba(255, 223, 206, 0.18) 16%, transparent 34%),
+    radial-gradient(circle at 84% 12%, rgba(220, 203, 255, 0.52) 0%, rgba(220, 203, 255, 0.24) 22%, transparent 42%),
+    radial-gradient(circle at 14% 88%, rgba(228, 208, 250, 0.34) 0%, rgba(228, 208, 250, 0.14) 20%, transparent 38%),
+    radial-gradient(circle at 82% 74%, rgba(245, 232, 247, 0.2) 0%, rgba(245, 232, 247, 0.08) 18%, transparent 36%),
+    linear-gradient(180deg, rgba(255,255,255,0.86) 0%, rgba(252,250,248,0.96) 100%);
+  background-attachment: fixed;
+  color: #2E2438;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-playfair), Georgia, serif;
+  line-height: 1.2;
+  color: #2E2438;
+}
+
+main {
+  position: relative;
+  z-index: 0;
+}
+
+.awene-emphasis {
+  font-style: italic;
+  font-weight: 500;
+  background: linear-gradient(135deg, #6F3FD6 0%, #8B52E8 52%, #4B1F7A 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Smooth transitions for interactive elements */
+a, button {
+  transition: all 0.2s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F3ECFB;
+}
+::-webkit-scrollbar-thumb {
+  background: #6F3FD6;
+  border-radius: 3px;
+}
+
+/* Selection color */
+::selection {
+  background: #F3ECFB;
+  color: #4B1F7A;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid #6F3FD6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.cms-content {
+  color: #2E2438;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
+
+.cms-content > * + * {
+  margin-top: 1.25rem;
+}
+
+.cms-content h2,
+.cms-content h3,
+.cms-content h4 {
+  color: #2E2438;
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 2.5rem;
+}
+
+.cms-content h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.cms-content h3 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.cms-content a {
+  color: #6F3FD6;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.cms-content ul,
+.cms-content ol {
+  padding-left: 1.5rem;
+}
+
+.cms-content ul {
+  list-style: disc;
+}
+
+.cms-content ol {
+  list-style: decimal;
+}
+
+.cms-content blockquote {
+  border-left: 4px solid #F68B2C;
+  color: #4B1F7A;
+  font-size: 1.2rem;
+  padding-left: 1.25rem;
+}
+
+.cms-content img {
+  border-radius: 1.5rem;
+  height: auto;
+  max-width: 100%;
 }
