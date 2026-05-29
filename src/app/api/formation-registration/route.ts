@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 
 const CMS_API_BASE =
   process.env.WORDPRESS_API_URL ??
-  process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
+  process.env.NEXT_PUBLIC_WORDPRESS_API_URL ??
+  "https://cms.awene.net/wp-json/wp/v2";
 
 function restUrl(path: string) {
   if (!CMS_API_BASE) {

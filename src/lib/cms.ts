@@ -2,7 +2,8 @@ import type { Locale } from "@/lib/i18n";
 
 const CMS_API_BASE =
   process.env.WORDPRESS_API_URL ??
-  process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
+  process.env.NEXT_PUBLIC_WORDPRESS_API_URL ??
+  "https://cms.awene.net/wp-json/wp/v2";
 
 const CMS_REVALIDATE_SECONDS = 300;
 
@@ -303,6 +304,60 @@ function tagSlugs(post: WpPost) {
   return terms(post)
     .filter((item) => item.taxonomy === "post_tag" && item.slug)
     .map((item) => item.slug!);
+}
+
+function localeMarkers(post: WpPost): Locale[] {
+  const markers = new Set<Locale>();
+  const acfLocale = acfString(post, ["lang", "locale", "language"]).toLowerCase();
+
+  if (acfLocale === "fr" || acfLocale === "en" || acfLocale === "ar") {
+    markers.add(acfLocale);
+  }
+
+  for (const term of terms(post)) {
+    const slug = term.slug?.toLowerCase() ?? "";
+
+    if (
+      slug === "fr" ||
+      slug.startsWith("fr-") ||
+      slug.endsWith("-fr") ||
+      slug.includes("-fr-")
+    ) {
+      markers.add("fr");
+    }
+
+    if (
+      slug === "en" ||
+      slug.startsWith("en-") ||
+      slug.endsWith("-en") ||
+      slug.includes("-en-") ||
+      slug.includes("english")
+    ) {
+      markers.add("en");
+    }
+
+    if (
+      slug === "ar" ||
+      slug.startsWith("ar-") ||
+      slug.endsWith("-ar") ||
+      slug.includes("-ar-") ||
+      slug.includes("arab")
+    ) {
+      markers.add("ar");
+    }
+  }
+
+  return [...markers];
+}
+
+function matchesLocale(post: WpPost, locale: Locale) {
+  const markers = localeMarkers(post);
+
+  if (markers.length === 0) {
+    return locale === "fr";
+  }
+
+  return markers.includes(locale);
 }
 
 function firstTermName(post: WpPost, taxonomies: string[]) {
@@ -788,7 +843,7 @@ export async function getArticles(limit = 100, locale?: Locale) {
     status: "publish",
   });
 
-  const filteredPosts = locale ? posts.filter((post) => tagSlugs(post).includes(locale)) : posts;
+  const filteredPosts = locale ? posts.filter((post) => matchesLocale(post, locale)) : posts;
 
   return filteredPosts.map(toArticle);
 }

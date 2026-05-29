@@ -3,6 +3,7 @@ import { getArticles, getFormations } from "@/lib/cms";
 import { localizedPath } from "@/lib/i18n";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://awene.net";
+export const dynamic = "force-dynamic";
 
 const staticCanonicalRoutes = [
   "/",
