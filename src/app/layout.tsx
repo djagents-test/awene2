@@ -70,11 +70,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${playfair.variable}`} data-scroll-behavior="smooth">
-      <Script
-        src="https://analytics.ahrefs.com/analytics.js"
-        data-key={AHREFS_ANALYTICS_KEY}
-        strategy="afterInteractive"
-      />
+      <head>
+        <script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key={AHREFS_ANALYTICS_KEY}
+          async
+        />
+      </head>
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`}
         strategy="afterInteractive"
