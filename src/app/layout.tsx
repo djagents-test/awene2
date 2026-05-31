@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 
 const META_PIXEL_ID = "4228205960762852";
 const GOOGLE_TAG_ID = "G-77KN5YJ39D";
+const AHREFS_ANALYTICS_KEY = "TcLOOogWTAV6YbTnOA3Xrg";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -69,6 +70,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} ${playfair.variable}`} data-scroll-behavior="smooth">
+      <Script
+        src="https://analytics.ahrefs.com/analytics.js"
+        data-key={AHREFS_ANALYTICS_KEY}
+        strategy="afterInteractive"
+      />
       <Script
         src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`}
         strategy="afterInteractive"

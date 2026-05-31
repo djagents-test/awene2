@@ -1,6 +1,5 @@
 import { type ReactNode } from "react";
 import Container from "@/components/ui/Container";
-import PlaceholderVisual from "@/components/ui/PlaceholderVisual";
 import EditorialImageBlock from "@/components/ui/EditorialImageBlock";
 import type { EditorialImagePlacement } from "@/lib/editorialImageReferences";
 
@@ -83,22 +82,14 @@ export default function PageHero({
             {children}
           </div>
 
-          {visual && (
+          {visual && visualPlacement && (
             <div className="lg:justify-self-end">
-              {visualPlacement ? (
-                <EditorialImageBlock
-                  placement={visualPlacement}
-                  variant={visualVariant}
-                  tone={visualTone}
-                  className="aspect-[4/4.5] w-full max-w-[31rem]"
-                />
-              ) : (
-                <PlaceholderVisual
-                  variant={visualVariant}
-                  tone={visualTone}
-                  className="aspect-[4/4.5] w-full max-w-[31rem]"
-                />
-              )}
+              <EditorialImageBlock
+                placement={visualPlacement}
+                variant={visualVariant}
+                tone={visualTone}
+                className="aspect-[4/4.5] w-full max-w-[31rem]"
+              />
             </div>
           )}
         </div>

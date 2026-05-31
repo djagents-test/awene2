@@ -7,9 +7,9 @@ import Entreprises from "@/components/sections/CTABand";
 import FAQ from "@/components/sections/FAQ";
 
 export const metadata: Metadata = {
-  title: "AWENE | Coaching ménopause et périménopause : Comprendre, Réguler, Incarner",
+  title: "AWENE | Coaching périménopause et ménopause, comprendre son corps autrement",
   description:
-    "Bouffées de chaleur, fatigue, brouillard mental, sommeil perturbé : ce n'est pas une fatalité. AWENE accompagne les femmes en périménopause et ménopause avec une approche scientifique et humaine. En ligne, région MENA et au-delà.",
+    "AWENE accompagne les femmes en périménopause et ménopause avec une approche scientifique, humaine et apaisée. Comprendre les hormones, les symptômes et le système nerveux pour avancer avec plus de clarté.",
   keywords: [
     "coaching ménopause",
     "coaching périménopause",

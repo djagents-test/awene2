@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import ArticlesList from "@/app/articles/ArticlesList";
+import AboutPage, { type AboutPageContent } from "@/components/pages/AboutPage";
 import ContactPage from "@/components/contact/ContactPage";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
@@ -18,6 +20,72 @@ type LocalizedPageProps = {
 };
 
 type PrefixedLocale = Exclude<Locale, "fr">;
+
+const aboutPageContentEn: AboutPageContent = {
+  heroEyebrow: "About",
+  heroTitle: (
+    <>
+      <span
+        style={{
+          background: "linear-gradient(135deg, #F68B2C 0%, #6F3FD6 100%)",
+          WebkitBackgroundClip: "text",
+          backgroundClip: "text",
+          color: "transparent",
+        }}
+      >
+        AWENE
+      </span>{" "}
+      , why this approach exists.
+    </>
+  ),
+  beliefEyebrow: "OUR CONVICTION",
+  beliefTitle: "What we believe",
+  beliefParagraphs: [
+    "Perimenopause and menopause are not diseases. Nor are they years to be endured in silence, with hot flashes, chronic fatigue, brain fog, sleep disruption, or unexplained weight gain.",
+    "They are real biological transitions: documented, understandable, and possible to move through with the right tools.",
+    "AWENE was born from a simple conviction: every woman deserves to understand what is happening in her body, her hormones, her nervous system, her symptoms, and to have access to serious support grounded in science and adapted to her reality.",
+  ],
+  beliefAnchor: "Not generalities. Not promises. Concrete answers.",
+  quote:
+    "Every woman deserves to understand her body, her hormones, her symptoms, and to have access to serious support, grounded in science and adapted to her reality.",
+  notSectionTitleLines: ["Not", "ANOTHER", "WELLNESS", "PLATFORM."],
+  notSectionBullets: [
+    "AWENE is not intuitive coaching.",
+    "It is not positive thinking.",
+    "It is not miracle solutions.",
+  ],
+  notSectionConclusion:
+    "AWENE is a rigorous integrative approach that starts from the body, biology, hormones, and the real life of each woman.",
+  companionEyebrow: "YOUR GUIDE",
+  companionTitle: "Amira Medimagh",
+  companionCredentials: (
+    <>
+      Physician. Public health expert.
+      <br />
+      Certified coach.
+    </>
+  ),
+  companionBio: [
+    "Amira Medimagh is a physician with a Master's in public health and more than 20 years of international public health experience, particularly in sexual and reproductive health, HIV/AIDS, and women's rights in Tunisia and across the MENA region.",
+    "Since 2025, she has been a certified integrative health and nutrition coach through the Institute for Integrative Nutrition (United States), and a certified perimenopause and menopause coach through the Integrative Women's Health Institute.",
+    "She is currently training in polyvagal theory and female longevity in order to integrate the most up-to-date approaches in neuroscience, hormonal health, and women's health into her support.",
+  ],
+  companionImageAlt: "Portrait of Amira Medimagh",
+  pathTitle: "Why this path",
+  pathBody:
+    "After two decades working on health systems, Amira made a choice: to move closer to women individually. Not statistics. Not programs. Real women, with real bodies, real symptoms, and real lives. AWENE is that bridge between the rigor of public health and the closeness of human support.",
+  distinctionTitle: "What sets her apart",
+  distinctionBody:
+    "Not just another coach. A physician who supports. The difference is not the title. It is the ability to read what your body is saying, the hormonal signals, the nervous-system patterns, the biological mechanisms behind your symptoms, with precision. And to help you respond to them with humanity.",
+  supportImageAlt: "A woman supporting another woman in a moment of emotional support",
+  certificationsTitle: "Training and certifications",
+  certifications: [
+    "Doctor of Medicine",
+    "Master's in Public Health",
+    "Certified Coach in Integrative Health & Nutrition, Institute for Integrative Nutrition (IIN), USA",
+    "Certified Perimenopause & Menopause Coach, Integrative Women's Health Institute (IWHI)",
+  ],
+};
 
 function assertLocale(value: string): asserts value is PrefixedLocale {
   if (!locales.includes(value as Locale) || value === "fr") {
@@ -89,7 +157,7 @@ const translatedPages = {
         },
         {
           title: "Training and certifications",
-          items: ["Medical doctor", "Master in public health", "Certified integrative health and nutrition coach, IIN", "Certified perimenopause and menopause coach, IWHI", "In training: Longevity for Women in Menopause and Perimenopause", "In training: Applied polyvagal theory, Polyvagal Institute"],
+          items: ["Medical doctor", "Master in public health", "Certified integrative health and nutrition coach, IIN", "Certified perimenopause and menopause coach, IWHI"],
         },
       ],
     },
@@ -442,6 +510,10 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
     path === "/chemine-avec-moi/formulaire-selection"
   ) {
     notFound();
+  }
+
+  if (path === "/a-propos" && locale === "en") {
+    return <AboutPage content={aboutPageContentEn} />;
   }
 
   if (locale === "en") {

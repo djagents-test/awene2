@@ -27,10 +27,6 @@ const faq = [
     q: "Y a-t-il un suivi entre les séances ?",
     a: "Selon le programme choisi, un suivi par message est possible. L'objectif est que vous ne vous sentiez jamais seule dans votre démarche entre deux séances.",
   },
-  {
-    q: "Le coaching est-il remboursé ?",
-    a: "Le coaching intégratif n'est pas remboursé par l'assurance maladie en France. Certaines mutuelles peuvent prendre en charge une partie des séances, nous vous conseillons de vous renseigner auprès de la vôtre.",
-  },
 ];
 
 export default function RoleDuCoach() {

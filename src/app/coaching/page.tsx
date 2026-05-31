@@ -25,6 +25,19 @@ export const metadata: Metadata = {
   ],
 };
 
+const coachingHeroImage = {
+  src: "/images/awene-comprehension-corps-hormones-femme.jpg",
+  title: "Le chemin vers une meilleure compréhension de soi",
+  metaDescription:
+    "Chaque transition mérite écoute, compréhension et accompagnement. AWENE aide les femmes à mieux comprendre leur corps, leurs hormones et leurs besoins à chaque étape de leur vie.",
+  alt: "Portrait d’une femme regardant vers l’horizon dans un paysage naturel au coucher du soleil",
+  caption:
+    "Comprendre son corps, avancer avec confiance et retrouver un équilibre durable grâce à une approche fondée sur la science et l’écoute.",
+  seoFilename: "awene-comprehension-corps-hormones-femme.jpg",
+  shortDescription:
+    "Une image symbolisant la réflexion, la connaissance de soi et l’accompagnement des femmes à travers les transitions hormonales et les changements de vie.",
+} as const;
+
 const pillars = [
   {
     title: "Comprendre",
@@ -79,8 +92,8 @@ export default function CoachingPage() {
       >
         <div className="absolute inset-0" aria-hidden="true">
           <Image
-            src="/images/2149883558.jpg"
-            alt=""
+            src={coachingHeroImage.src}
+            alt={coachingHeroImage.alt}
             fill
             priority
             className="object-cover object-[76%_24%]"

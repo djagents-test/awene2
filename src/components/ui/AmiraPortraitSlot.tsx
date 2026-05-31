@@ -4,14 +4,16 @@ import { useState } from "react";
 import Image from "next/image";
 import PlaceholderVisual from "@/components/ui/PlaceholderVisual";
 
-const AMIRA_PORTRAIT_SRC = "/images/amira_portrait.jpeg";
+const AMIRA_PORTRAIT_SRC = "/images/amira_portrait-20260531.jpeg";
 const AMIRA_PORTRAIT_ENABLED = true;
 
 type AmiraPortraitSlotProps = {
+  alt?: string;
   className?: string;
 };
 
 export default function AmiraPortraitSlot({
+  alt = "Portrait d'Amira Medimagh",
   className = "",
 }: AmiraPortraitSlotProps) {
   const [imageUnavailable, setImageUnavailable] = useState(false);
@@ -29,7 +31,7 @@ export default function AmiraPortraitSlot({
         <>
           <Image
             src={AMIRA_PORTRAIT_SRC}
-            alt="Portrait d'Amira Medimagh"
+            alt={alt}
             fill
             className="object-cover object-center md:object-[center_top]"
             sizes="(min-width: 1024px) 18rem, 100vw"

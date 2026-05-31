@@ -38,7 +38,7 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-[0_1px_0_rgba(110,100,120,0.1)]"
     >
       <Container>
-        <div className="grid h-20 grid-cols-[auto_1fr_auto] items-center gap-6">
+        <div className="flex h-20 items-center justify-between gap-6 lg:grid lg:grid-cols-[auto_1fr_auto] lg:items-center">
           {/* Logo */}
           <Link
             href={localizedPath("/", locale)}
@@ -111,7 +111,7 @@ export default function Header() {
 
           {/* Mobile menu button */}
           <button
-            className="lg:hidden p-2 rounded-xl text-[#2E2438] transition-colors hover:bg-[#F3ECFB]"
+            className="ml-auto lg:hidden p-2 rounded-xl text-[#2E2438] transition-colors hover:bg-[#F3ECFB]"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? t.nav.close : t.nav.open}
           >
