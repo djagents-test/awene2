@@ -1,8 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
+import Button from "@/components/ui/Button";
+import AmiraPortraitSlot from "@/components/ui/AmiraPortraitSlot";
+import CoachingFaq from "@/components/sections/CoachingFaq";
 import HomeHero from "@/components/sections/Hero";
 import HomeApproach from "@/components/sections/Pillars";
 import HomeAmiraBio from "@/components/sections/Manifesto";
@@ -603,39 +607,344 @@ export function EnglishHomePage() {
   );
 }
 
+const pillarColors = [
+  { color: "#6F3FD6", bg: "#F3ECFB" },
+  { color: "#4B1F7A", bg: "#F8EEF5" },
+  { color: "#F68B2C", bg: "#FEF3E8" },
+];
+
 export function EnglishCoachingPage() {
   return (
     <>
-      <Hero
-        title="You deserve to understand what is happening inside your body. And to have what you need to feel better."
-        body="Perimenopause and menopause can upend everything: hot flashes, exhaustion, a mind that fogs over, sleep that shatters, weight changes, moods you don't recognise. None of this is inevitable. This is a transition, and you can move through it with clarity, with agency, with strength. My role is to walk alongside you at every step, with rigour, with science, and with full respect for what your life actually looks like."
-      />
-      <Cards title="Three Pillars" items={coachingPillars} />
-      <TwoColumnCards title="How We Work Together" items={coachingSteps} />
-      <TwoColumnCards title="What I Work With" items={coachingTools} background="white" />
-      <TextSection title="My Role, Where Coaching Ends and Medicine Begins" background="deep">
-        <p style={{ color: "rgba(243,236,251,0.75)" }}>
-          I do not diagnose. I do not prescribe. What I do is help you
-          understand what your body is telling you, take meaningful action, and
-          build changes that actually last. I work in close collaboration with
-          your medical team, picking up where the appointment ends and carrying
-          that support into real life, into daily habits, over time.
-        </p>
-      </TextSection>
-      <TextSection title="Where Would You Like to Start?" background="offwhite">
-        <h3 className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
-          Book your first call
-        </h3>
-        <p>
-          30 minutes. Free. No commitment required. To understand where you are
-          right now, your symptoms, your situation, what you need, and to be
-          honest about whether I am the right person to support you.
-        </p>
-        <p>
-          <ArrowLink href="/en/contact">→ Book my free call</ArrowLink>
-        </p>
-      </TextSection>
-      <FaqList items={coachingFaqs} />
+      <section
+        className="relative min-h-screen overflow-hidden"
+        style={{ background: "#FCFAF8" }}
+      >
+        <div className="absolute inset-0" aria-hidden="true">
+          <Image
+            src="/images/awene-comprehension-corps-hormones-femme.jpg"
+            alt="A woman looking towards the horizon in a natural landscape at sunset"
+            fill
+            priority
+            className="object-cover object-[76%_24%]"
+            sizes="100vw"
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(252,250,248,0.95) 0%, rgba(252,250,248,0.82) 28%, rgba(252,250,248,0.38) 58%, rgba(252,250,248,0.7) 100%)",
+            }}
+          />
+        </div>
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+          <div
+            className="absolute -top-24 -right-24 h-96 w-96 rounded-full opacity-[0.12]"
+            style={{ background: "radial-gradient(circle, #6F3FD6 0%, transparent 70%)" }}
+          />
+          <div
+            className="absolute bottom-0 left-0 h-72 w-72 rounded-full opacity-[0.12]"
+            style={{ background: "radial-gradient(circle, #F68B2C 0%, transparent 70%)" }}
+          />
+        </div>
+
+        <Container className="relative z-10 pt-32 pb-20">
+          <div className="max-w-3xl">
+            <p
+              className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]"
+              style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+            >
+              <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
+              Coaching
+            </p>
+            <h1
+              className="mb-8 text-5xl font-bold leading-[1.08] md:text-6xl"
+              style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+            >
+              You deserve to understand{" "}
+              <em className="awene-emphasis">
+                what is happening inside your body.
+              </em>{" "}
+              And to have what you need to feel better.
+            </h1>
+            <p
+              className="max-w-[35rem] text-lg leading-relaxed md:text-xl"
+              style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+            >
+              Perimenopause and menopause can upend everything: hot flashes, exhaustion, a mind that fogs over, sleep that shatters, weight changes, moods you don&apos;t recognise. None of this is inevitable. This is a transition, and you can move through it with clarity, with agency, with strength. My role is to walk alongside you at every step, with rigour, with science, and with full respect for what your life actually looks like.
+            </p>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <Button href="/en/contact" variant="primary" size="lg">
+                Book my free call
+              </Button>
+              <Button href="/en/a-propos" variant="secondary" size="lg">
+                Learn more
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </section>
+
+      <Section background="offwhite" size="lg">
+        <Container className="relative">
+          <div className="mb-14 max-w-3xl text-center mx-auto">
+            <p
+              className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
+              style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+            >
+              The AWENE method
+            </p>
+            <h2
+              className="text-4xl font-bold leading-tight md:text-5xl"
+              style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+            >
+              A{" "}
+              <span className="awene-emphasis">3-pillar</span>{" "}
+              approach
+            </h2>
+          </div>
+
+          <div className="pointer-events-none absolute right-0 top-0 hidden w-[16rem] translate-x-6 -translate-y-8 lg:block">
+            <div className="relative aspect-[0.9/1.1] w-full overflow-hidden rounded-[1.5rem] opacity-90">
+              <Image
+                src="/images/coaching-pillars-side-accent.jpg"
+                alt="Woman reflecting in a calm environment"
+                fill
+                className="object-cover object-center"
+                sizes="16rem"
+              />
+            </div>
+          </div>
+
+          <div className="relative z-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {coachingPillars.map((pillar, index) => (
+              <article
+                key={pillar.title}
+                className="flex h-full flex-col overflow-hidden rounded-3xl border p-8 md:p-10"
+                style={{ borderColor: "#E8DFF0", background: pillarColors[index].bg }}
+              >
+                <span
+                  className="mb-6 text-xs font-semibold uppercase tracking-[0.2em] opacity-40"
+                  style={{ color: pillarColors[index].color, fontFamily: "var(--font-inter)" }}
+                >
+                  0{index + 1}
+                </span>
+                <div
+                  className="mb-6 h-0.5 w-10 rounded-full"
+                  style={{ background: pillarColors[index].color }}
+                />
+                <h3
+                  className="mb-4 text-2xl font-bold md:text-3xl"
+                  style={{ fontFamily: "var(--font-playfair)", color: pillarColors[index].color }}
+                >
+                  {pillar.title}
+                </h3>
+                <p
+                  className="flex-1 text-base leading-relaxed"
+                  style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                >
+                  {pillar.body[0]}
+                </p>
+              </article>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      <Section background="lavender" size="lg">
+        <Container>
+          <div className="grid items-stretch gap-10 lg:grid-cols-[minmax(280px,0.9fr)_minmax(0,1.55fr)] lg:gap-12">
+            <div className="w-full max-w-[20rem] mx-auto lg:mx-0 lg:max-w-none">
+              <div className="aspect-[4/5] overflow-hidden rounded-[2rem] bg-white/30 lg:h-full lg:aspect-auto">
+                <AmiraPortraitSlot alt="Portrait of Amira Medimagh" className="h-full w-full" />
+              </div>
+            </div>
+
+            <div className="flex h-full flex-col">
+              <p
+                className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-center lg:text-left"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Support
+              </p>
+              <h2
+                className="mb-10 text-center text-4xl font-bold leading-tight lg:text-left"
+                style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+              >
+                How We Work Together
+              </h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {coachingSteps.map((step) => (
+                  <article
+                    key={step.title}
+                    className="group flex h-full flex-col rounded-3xl border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(75,31,122,0.12)] hover:border-[#D8C7F3]"
+                    style={{ borderColor: "#E8DFF0" }}
+                  >
+                    <h3
+                      className="mb-3 text-xl font-bold transition-colors duration-300 group-hover:text-[#6F3FD6]"
+                      style={{ fontFamily: "var(--font-playfair)", color: "#4B1F7A" }}
+                    >
+                      {step.title}
+                    </h3>
+                    <p
+                      className="flex-1 text-sm leading-relaxed"
+                      style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                    >
+                      {step.body[0]}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      <Section background="white" size="lg">
+        <Container>
+          <div className="mb-14 max-w-3xl text-center mx-auto">
+            <p
+              className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
+              style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+            >
+              The tools
+            </p>
+            <h2
+              className="text-4xl font-bold leading-tight md:text-5xl"
+              style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+            >
+              What I Work{" "}
+              <span className="awene-emphasis">With</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {coachingTools.map((tool) => (
+              <article
+                key={tool.title}
+                className="group flex h-full flex-col rounded-3xl border bg-[#FCFAF8] p-7 shadow-[0_10px_30px_rgba(75,31,122,0.05)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(75,31,122,0.12)] hover:border-[#D8C7F3] hover:bg-white"
+                style={{ borderColor: "#E8DFF0" }}
+              >
+                <div
+                  className="mb-5 h-0.5 w-10 rounded-full transition-all duration-300 group-hover:w-12"
+                  style={{ background: "#6F3FD6" }}
+                />
+                <h3
+                  className="mb-3 text-xl font-bold transition-colors duration-300 group-hover:text-[#6F3FD6]"
+                  style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+                >
+                  {tool.title}
+                </h3>
+                <p
+                  className="flex-1 text-sm leading-relaxed"
+                  style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                >
+                  {tool.body[0]}
+                </p>
+              </article>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      <Section background="deep" size="md" className="overflow-hidden">
+        <Container>
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(220px,0.42fr)]">
+            <div className="max-w-[33.75rem]">
+              <p
+                className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: "rgba(246,139,44,0.8)", fontFamily: "var(--font-inter)" }}
+              >
+                My role
+              </p>
+              <h2
+                className="mb-6 text-3xl font-bold leading-tight md:text-4xl"
+                style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}
+              >
+                My Role, Where Coaching Ends and Medicine Begins
+              </h2>
+              <p
+                className="text-base leading-relaxed md:text-lg"
+                style={{ color: "rgba(243,236,251,0.75)", fontFamily: "var(--font-inter)" }}
+              >
+                I do not diagnose. I do not prescribe. What I do is help you understand what your body is telling you, take meaningful action, and build changes that actually last. I work in close collaboration with your medical team, picking up where the appointment ends and carrying that support into real life, into daily habits, over time.
+              </p>
+            </div>
+            <div className="w-full max-w-[18rem] justify-self-center lg:justify-self-end">
+              <Image
+                src="/AWENE.png"
+                alt="AWENE"
+                width={180}
+                height={180}
+                className="h-auto w-full max-w-[9rem] justify-self-center"
+              />
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      <Section background="offwhite" size="md">
+        <Container>
+          <div className="mx-auto max-w-4xl text-center">
+            <p
+              className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
+              style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+            >
+              First step
+            </p>
+            <h2
+              className="mb-5 text-4xl font-bold leading-tight"
+              style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+            >
+              Where Would You Like to Start?
+            </h2>
+            <p
+              className="mx-auto max-w-[50ch] text-base leading-relaxed"
+              style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+            >
+              30 minutes. Free. No commitment required. To understand where you are right now, your symptoms, your situation, what you need, and to be honest about whether I am the right person to support you.
+            </p>
+            <div className="mt-8">
+              <Button href="/en/contact" size="lg">
+                Book my free call
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      <Section background="white" size="md">
+        <Container>
+          <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.66fr)_minmax(240px,0.34fr)]">
+            <div>
+              <p
+                className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Your questions
+              </p>
+              <h2
+                className="mb-10 text-4xl font-bold leading-tight"
+                style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+              >
+                FAQ
+              </h2>
+              <CoachingFaq items={coachingFaqs} />
+            </div>
+
+            <div className="hidden lg:block">
+              <div className="relative aspect-[0.92/1.15] w-full overflow-hidden rounded-[1.75rem]">
+                <Image
+                  src="/images/coaching-faq-side-accent.jpg"
+                  alt="A woman supporting another woman in a difficult moment"
+                  fill
+                  className="object-cover object-[30%_center]"
+                  sizes="(min-width: 1024px) 24rem, 100vw"
+                />
+              </div>
+            </div>
+          </div>
+        </Container>
+      </Section>
     </>
   );
 }
@@ -780,8 +1089,5 @@ export function EnglishEventsPage() {
 export function getEnglishPage(path: string) {
   if (path === "/") return <EnglishHomePage />;
   if (path === "/coaching") return <EnglishCoachingPage />;
-  if (path === "/a-propos") return <EnglishAboutPage />;
-  if (path === "/articles") return <EnglishArticlesPage />;
-  if (path === "/evenements") return <EnglishEventsPage />;
   return null;
 }

@@ -25,14 +25,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://awene.net"
+  ),
   title: {
     template: "%s | AWENE",
     default: "AWENE | Coaching ménopause et périménopause, Comprendre, Réguler, Incarner",
-  },
-  icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
   },
   description:
     "Bouffées de chaleur, fatigue, brouillard mental, sommeil perturbé, ce n'est pas une fatalité. AWENE accompagne les femmes en périménopause et ménopause avec une approche scientifique et humaine. En ligne, région MENA et au-delà.",
@@ -53,13 +51,35 @@ export const metadata: Metadata = {
     "France",
     "AWENE",
   ],
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
+  },
   openGraph: {
     title: "AWENE | Coaching ménopause et périménopause",
     description:
       "Bouffées de chaleur, fatigue, brouillard mental, sommeil perturbé, ce n'est pas une fatalité. AWENE vous accompagne avec rigueur et humanité. En ligne, région MENA et au-delà.",
+    url: "https://awene.net",
     siteName: "AWENE",
     locale: "fr_FR",
+    alternateLocale: ["en_US", "ar_AR"],
     type: "website",
+    images: [
+      {
+        url: "/images/awene-comprehension-corps-hormones-femme.jpg",
+        width: 1200,
+        height: 630,
+        alt: "AWENE — Coaching périménopause et ménopause",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AWENE | Coaching ménopause et périménopause",
+    description:
+      "Bouffées de chaleur, fatigue, brouillard mental, sommeil perturbé, ce n'est pas une fatalité. AWENE vous accompagne avec rigueur et humanité.",
+    images: ["/images/awene-comprehension-corps-hormones-femme.jpg"],
   },
 };
 
