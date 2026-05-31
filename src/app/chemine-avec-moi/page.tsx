@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
-import Button from "@/components/ui/Button";
 import PageHero from "@/components/layout/PageHero";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Chemine avec moi",
@@ -25,6 +26,14 @@ const paths = [
 export default function ChemineAvecMoi() {
   return (
     <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/chemine-avec-moi",
+          title: "Chemine avec moi",
+          description:
+            "Découvrez les différents chemins d'accompagnement AWENE, du rôle du coach aux programmes structurés.",
+        })}
+      />
       <PageHero
         eyebrow="Votre chemin"
         title="Chemine avec moi"

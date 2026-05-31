@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import AboutPage, { type AboutPageContent } from "@/components/pages/AboutPage";
+import { organizationSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "À propos | AWENE, Coaching ménopause et périménopause par Amira Medimagh",
@@ -86,5 +88,19 @@ export const aboutPageContentFr: AboutPageContent = {
 };
 
 export default function AProposPage() {
-  return <AboutPage content={aboutPageContentFr} />;
+  return (
+    <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/a-propos",
+          title: "À propos | AWENE, Coaching ménopause et périménopause par Amira Medimagh",
+          description:
+            "Amira Medimagh est médecin, experte en santé publique et coach certifiée en périménopause et ménopause. Découvrez pourquoi AWENE existe, et ce qui rend cette approche différente.",
+          type: "AboutPage",
+          about: organizationSchema(),
+        })}
+      />
+      <AboutPage content={aboutPageContentFr} />
+    </>
+  );
 }

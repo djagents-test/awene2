@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Button from "@/components/ui/Button";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Merci",
@@ -30,10 +32,18 @@ const nextSteps = [
 
 export default function Merci() {
   return (
-    <section
-      className="min-h-screen flex items-center relative overflow-hidden"
-      style={{ background: "#FCFAF8" }}
-    >
+    <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/merci",
+          title: "Merci",
+          description: "Votre message a bien été reçu.",
+        })}
+      />
+      <section
+        className="min-h-screen flex items-center relative overflow-hidden"
+        style={{ background: "#FCFAF8" }}
+      >
       {/* Decorative */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         <div
@@ -136,6 +146,7 @@ export default function Merci() {
           </div>
         </div>
       </Container>
-    </section>
+      </section>
+    </>
   );
 }

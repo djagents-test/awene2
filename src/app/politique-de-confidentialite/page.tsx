@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import PageHero from "@/components/layout/PageHero";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
@@ -11,6 +13,13 @@ export const metadata: Metadata = {
 export default function PolitiqueConfidentialite() {
   return (
     <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/politique-de-confidentialite",
+          title: "Politique de confidentialité",
+          description: "Politique de confidentialité et mentions légales d'AWENE.",
+        })}
+      />
       <PageHero
         eyebrow="Légal"
         title="Politique de confidentialité"

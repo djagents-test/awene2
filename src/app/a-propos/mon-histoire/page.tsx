@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import PageHero from "@/components/layout/PageHero";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Mon histoire",
@@ -13,6 +15,15 @@ export const metadata: Metadata = {
 export default function MonHistoire() {
   return (
     <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/a-propos/mon-histoire",
+          title: "Mon histoire",
+          description:
+            "L'histoire derrière AWENE, une femme, une transition, une conviction profonde que les choses peuvent être vécues autrement.",
+          type: "AboutPage",
+        })}
+      />
       <PageHero
         eyebrow="À propos"
         title="Mon histoire"

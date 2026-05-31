@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import PageHero from "@/components/layout/PageHero";
 import NewsletterBand from "@/components/sections/NewsletterBand";
 import { getEvents, type CmsEvent } from "@/lib/cms";
+import { cmsEventSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Événements AWENE | Ateliers ménopause et périménopause",
@@ -36,6 +38,18 @@ export default async function EvenementsPage() {
 
   return (
     <>
+      <JsonLd
+        data={[
+          webPageSchema({
+            path: "/evenements",
+            title: "Événements AWENE | Ateliers ménopause et périménopause",
+            description:
+              "Ateliers, webinaires et rencontres autour de la ménopause et de la périménopause. Des espaces pour comprendre, partager et avancer ensemble. Inscrivez-vous à la newsletter pour être informée en première.",
+            type: "CollectionPage",
+          }),
+          ...events.map((event) => cmsEventSchema(event)),
+        ]}
+      />
       <PageHero
         eyebrow="Événements"
         title="Des espaces de rencontre"

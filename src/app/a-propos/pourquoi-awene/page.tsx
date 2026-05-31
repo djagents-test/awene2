@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import PageHero from "@/components/layout/PageHero";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Pourquoi AWENE",
@@ -32,6 +34,15 @@ const values = [
 export default function PourquoiAWENE() {
   return (
     <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/a-propos/pourquoi-awene",
+          title: "Pourquoi AWENE",
+          description:
+            "Le nom, le mouvement, la mission, comprendre la raison d'être profonde d'AWENE.",
+          type: "AboutPage",
+        })}
+      />
       <PageHero
         eyebrow="La raison d'être"
         title="Pourquoi AWENE"

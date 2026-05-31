@@ -1,11 +1,12 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import PageHero from "@/components/layout/PageHero";
-import PlaceholderVisual from "@/components/ui/PlaceholderVisual";
 import { getFormations } from "@/lib/cms";
+import { absoluteUrl, formationEventSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
 import { FormationFilters, FormationsFAQ } from "./FormationsClient";
 
 export const metadata: Metadata = {
@@ -122,9 +123,25 @@ export default async function FormationsPage() {
         />
       </div>
       <div className="relative z-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema()) }}
+      <JsonLd
+        data={[
+          webPageSchema({
+            path: "/formations",
+            title: "Formations AWENE | Ménopause, périménopause et santé féminine",
+            description:
+              "Formations AWENE pour comprendre la périménopause, la ménopause, la santé hormonale et accompagner les femmes, les entreprises et les professionnels.",
+            type: "CollectionPage",
+          }),
+          itemListSchema(
+            "/formations",
+            formations.map((formation) => ({
+              name: formation.title,
+              url: absoluteUrl(`/formations/${formation.slug}`),
+            })),
+          ),
+          faqSchema(),
+          ...formations.map((formation) => formationEventSchema(formation)),
+        ]}
       />
 
       <PageHero
@@ -189,7 +206,7 @@ export default async function FormationsPage() {
                   équipes et les professionnelles.
                 </p>
                 <p>
-                  L'objectif est simple : rendre les transitions hormonales moins
+                  L&apos;objectif est simple : rendre les transitions hormonales moins
                   floues, moins isolantes, et plus faciles à aborder dans la vie
                   quotidienne, au travail et dans les espaces de soin ou de bien-être.
                 </p>

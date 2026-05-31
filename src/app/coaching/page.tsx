@@ -1,11 +1,12 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
-import PlaceholderVisual from "@/components/ui/PlaceholderVisual";
 import AmiraPortraitSlot from "@/components/ui/AmiraPortraitSlot";
 import CoachingFaq from "@/components/sections/CoachingFaq";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Coaching ménopause et périménopause | AWENE, Comprendre, Réguler, Incarner",
@@ -86,6 +87,14 @@ const faqs = [
 export default function CoachingPage() {
   return (
     <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/coaching",
+          title: "Coaching ménopause et périménopause | AWENE, Comprendre, Réguler, Incarner",
+          description:
+            "Bouffées de chaleur, brouillard mental, fatigue hormonale, sommeil fragmenté : votre corps vous parle. AWENE vous donne les clés pour le comprendre et agir, avec une approche scientifique, personnalisée, en ligne.",
+        })}
+      />
       <section
         className="relative min-h-screen overflow-hidden"
         style={{ background: "#FCFAF8" }}

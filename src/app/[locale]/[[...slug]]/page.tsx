@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
 import ArticlesList from "@/app/articles/ArticlesList";
+import JsonLd from "@/components/seo/JsonLd";
 import AboutPage, { type AboutPageContent } from "@/components/pages/AboutPage";
 import ContactPage from "@/components/contact/ContactPage";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
+import PageHero from "@/components/layout/PageHero";
+import Section from "@/components/ui/Section";
 import NewsletterBand from "@/components/sections/NewsletterBand";
 import { getArticleBySlug, getArticles, getEvents, type CmsEvent } from "@/lib/cms";
 import { canonicalPathForLocale, localizedPath, locales, translations, type Locale } from "@/lib/i18n";
+import { articleSchema, cmsEventSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
 import { englishMetadata, getEnglishPage } from "./EnglishPages";
 
 type LocalizedPageProps = {
@@ -513,13 +516,215 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
   }
 
   if (path === "/a-propos" && locale === "en") {
-    return <AboutPage content={aboutPageContentEn} />;
+    return (
+      <>
+        <JsonLd
+          data={webPageSchema({
+            path: localizedPath("/a-propos", locale),
+            title: "AWENE, why this approach exists.",
+            description:
+              "Every woman deserves to understand what is happening in her body, her hormones, nervous system, symptoms, and transitions, and to access serious, science-rooted support adapted to her real life.",
+            type: "AboutPage",
+            inLanguage: "en",
+          })}
+        />
+        <AboutPage content={aboutPageContentEn} />
+      </>
+    );
   }
 
   if (locale === "en") {
+    if (path === "/articles") {
+      const articles = await getArticles(100, locale);
+      return (
+        <div dir="ltr">
+          <PageHero
+            eyebrow="Resources"
+            title="Articles"
+            subtitle="Science-based, clear and accessible articles to understand what is happening in your body and act."
+            visual
+            visualVariant="card"
+            visualTone="violet"
+            blobs
+          />
+          <ArticlesList
+            articles={articles}
+            labels={{
+              empty: "No articles yet, subscribe to the newsletter to be notified.",
+              featured: "Featured",
+              all: "All articles",
+            }}
+          />
+          <NewsletterBand
+            headline="Do these articles speak to you?"
+            body="Receive reliable, science-based information on perimenopause and menopause, once a week, straight to your inbox."
+          />
+        </div>
+      );
+    }
+
+    if (path === "/evenements") {
+      const events = await getEvents();
+      return (
+        <div dir="ltr">
+          <PageHero
+            eyebrow="Events"
+            title="Spaces to Come Together"
+            subtitle="Workshops, webinars and gatherings around menopause and perimenopause, to understand, to share and to move forward, together."
+            visual
+            visualPlacement="eventsHero"
+            visualVariant="movement"
+            visualTone="mixed"
+            blobs
+          />
+          <Section background="offwhite" size="lg">
+            <Container>
+              <p
+                className="text-xs font-semibold tracking-[0.25em] uppercase mb-6 text-center"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Coming soon
+              </p>
+              <h2
+                className="text-4xl md:text-5xl font-bold mb-6 text-center leading-tight"
+                style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+              >
+                Upcoming events
+              </h2>
+              <p
+                className="text-base md:text-lg leading-relaxed mb-12 text-center max-w-xl mx-auto"
+                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+              >
+                Events coming soon, subscribe to the newsletter to be the first to hear.
+              </p>
+              {events.length > 0 ? (
+                <div className="space-y-4">
+                  {events.map((event) => {
+                    const imageSrc = eventImageSrc(event);
+                    return (
+                      <div
+                        key={event.id}
+                        className="group overflow-hidden rounded-3xl border bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#D8C7F3] hover:shadow-[0_18px_42px_rgba(75,31,122,0.1)]"
+                        style={{ borderColor: "#E8DFF0" }}
+                      >
+                        {imageSrc && (
+                          <div className="relative h-56 md:h-72">
+                            <Image
+                              src={imageSrc}
+                              alt={event.image?.alt ?? event.title}
+                              fill
+                              className="object-cover"
+                              sizes="(min-width: 768px) 768px, 100vw"
+                            />
+                          </div>
+                        )}
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5 p-6 md:p-8">
+                          <div>
+                            <div className="flex flex-wrap items-center gap-3 mb-4">
+                              <span
+                                className="px-3 py-1 rounded-full text-xs font-semibold"
+                                style={{
+                                  background: event.color + "18",
+                                  color: event.color,
+                                  fontFamily: "var(--font-inter)",
+                                }}
+                              >
+                                {event.type}
+                              </span>
+                              <span
+                                className="text-xs font-medium tracking-wide"
+                                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                              >
+                                {event.date}
+                              </span>
+                              {event.status && event.status !== "upcoming" && (
+                                <span
+                                  className="px-3 py-1 rounded-full text-xs font-semibold"
+                                  style={{
+                                    background: "#FEF3E8",
+                                    color: "#F68B2C",
+                                    fontFamily: "var(--font-inter)",
+                                  }}
+                                >
+                                  {event.status}
+                                </span>
+                              )}
+                            </div>
+                            <h3
+                              className="mb-3 text-2xl font-bold transition-colors duration-300 group-hover:text-[#6F3FD6] md:text-3xl"
+                              style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+                            >
+                              {event.title}
+                            </h3>
+                            <p
+                              className="text-sm md:text-base leading-relaxed max-w-2xl"
+                              style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                            >
+                              {event.description}
+                            </p>
+                            {(event.time || event.location || event.price) && (
+                              <div
+                                className="flex flex-wrap gap-x-5 gap-y-2 mt-5 text-sm font-medium"
+                                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                              >
+                                {event.time && <span>{event.time}</span>}
+                                {event.location && <span>{event.location}</span>}
+                                {event.price && <span>{event.price}</span>}
+                              </div>
+                            )}
+                          </div>
+                          <Button
+                            href={event.url ?? "/en/contact"}
+                            variant="outline"
+                            size="sm"
+                            external={Boolean(event.url)}
+                          >
+                            Find out more
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div
+                  className="group mx-auto max-w-3xl rounded-3xl border bg-white px-8 py-12 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D8C7F3] hover:shadow-[0_14px_30px_rgba(75,31,122,0.08)] md:px-12"
+                  style={{ borderColor: "#E8DFF0" }}
+                >
+                  <p
+                    className="text-base leading-relaxed transition-colors duration-300 group-hover:text-[#4B1F7A] md:text-lg"
+                    style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                  >
+                    Events coming soon, subscribe to the newsletter to be the first to hear.
+                  </p>
+                </div>
+              )}
+            </Container>
+          </Section>
+          <NewsletterBand
+            headline="Subscribe to the newsletter to hear about events first"
+            body="Subscribe to the AWENE newsletter to receive event announcements before anyone else."
+          />
+        </div>
+      );
+    }
+
     const englishPage = getEnglishPage(path);
     if (englishPage) {
-      return <div dir="ltr">{englishPage}</div>;
+      const englishMeta = englishMetadata[path];
+      return (
+        <div dir="ltr">
+          <JsonLd
+            data={webPageSchema({
+              path: localizedPath(path, locale),
+              title: (typeof englishMeta?.title === "string" ? englishMeta.title : (englishMeta?.title as { absolute?: string } | undefined)?.absolute) ?? "AWENE",
+              description: englishMeta?.description ?? t.articles.body,
+              inLanguage: "en",
+            })}
+          />
+          {englishPage}
+        </div>
+      );
     }
   }
 
@@ -530,7 +735,22 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
   if (path === "/articles") {
     const articles = await getArticles(100, locale);
     return (
-      <LocalizedShell locale={locale} title={t.articles.title} body={t.articles.body}>
+      <LocalizedShell
+        locale={locale}
+        path={localizedPath("/articles", locale)}
+        title={t.articles.title}
+        body={t.articles.body}
+      >
+        <JsonLd
+          data={itemListSchema(
+            localizedPath("/articles", locale),
+            articles.map((article) => ({
+              name: article.title,
+              url: localizedPath(`/articles/${article.slug}`, locale),
+            })),
+            locale,
+          )}
+        />
         <ArticlesList
           articles={articles}
           labels={{
@@ -558,7 +778,13 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
   if (path === "/evenements") {
     const events = await getEvents();
     return (
-      <LocalizedShell locale={locale} title={t.events.title} body={t.events.body}>
+      <LocalizedShell
+        locale={locale}
+        path={localizedPath("/evenements", locale)}
+        title={t.events.title}
+        body={t.events.body}
+      >
+        <JsonLd data={events.map((event) => cmsEventSchema(event, localizedPath("/evenements", locale)))} />
         <section className="py-16 md:py-24" style={{ background: "#FCFAF8" }}>
           <Container size="md">
             <h2
@@ -647,25 +873,63 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
   }
 
   if (path === "/coaching") {
-    return <TranslatedContentPage locale={locale} page={translatedPages[locale][path]} />;
+    return (
+      <TranslatedContentPage
+        locale={locale}
+        path={localizedPath(path, locale)}
+        page={translatedPages[locale][path]}
+      />
+    );
   }
 
   if (path === "/a-propos") {
-    return <TranslatedContentPage locale={locale} page={translatedPages[locale][path]} />;
+    return (
+      <TranslatedContentPage
+        locale={locale}
+        path={localizedPath(path, locale)}
+        page={translatedPages[locale][path]}
+      />
+    );
   }
 
   if (path === "/contact") {
     if (locale === "en") {
-      return <ContactPage locale="en" />;
+      return (
+        <>
+          <JsonLd
+            data={webPageSchema({
+              path: localizedPath(path, locale),
+              title: "Contact",
+              description:
+                "Reach out with a question, partnership idea, or first conversation about support.",
+              type: "ContactPage",
+              inLanguage: "en",
+            })}
+          />
+          <ContactPage locale="en" />
+        </>
+      );
     }
-    return <TranslatedContentPage locale={locale} page={translatedPages[locale][path]} />;
+    return (
+      <TranslatedContentPage
+        locale={locale}
+        path={localizedPath(path, locale)}
+        page={translatedPages[locale][path]}
+      />
+    );
   }
 
   const translatedPage =
     translatedPages[locale][path as keyof (typeof translatedPages)[typeof locale]];
 
   if (translatedPage) {
-    return <TranslatedContentPage locale={locale} page={translatedPage} />;
+    return (
+      <TranslatedContentPage
+        locale={locale}
+        path={localizedPath(path, locale)}
+        page={translatedPage}
+      />
+    );
   }
 
   notFound();
@@ -673,9 +937,11 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
 
 function TranslatedContentPage({
   locale,
+  path,
   page,
 }: {
   locale: Locale;
+  path: string;
   page: {
     eyebrow: string;
     title: string;
@@ -691,6 +957,14 @@ function TranslatedContentPage({
 
   return (
     <div dir={t.dir}>
+      <JsonLd
+        data={webPageSchema({
+          path,
+          title: page.title,
+          description: page.body,
+          inLanguage: locale,
+        })}
+      />
       <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
         <Container className="relative z-10 pt-32 pb-20">
           <div className="max-w-3xl">
@@ -775,11 +1049,13 @@ function TranslatedContentPage({
 
 function LocalizedShell({
   locale,
+  path,
   title,
   body,
   children,
 }: {
   locale: Locale;
+  path: string;
   title: string;
   body: string;
   children?: React.ReactNode;
@@ -787,6 +1063,14 @@ function LocalizedShell({
   const t = translations[locale];
   return (
     <div dir={t.dir}>
+      <JsonLd
+        data={webPageSchema({
+          path,
+          title,
+          description: body,
+          inLanguage: locale,
+        })}
+      />
       <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
         <Container className="relative z-10 pt-32 pb-20">
           <div className="max-w-3xl">
@@ -820,6 +1104,14 @@ function LocalizedHome({ locale }: { locale: Locale }) {
   const t = translations[locale];
   return (
     <div dir={t.dir}>
+      <JsonLd
+        data={webPageSchema({
+          path: localizedPath("/", locale),
+          title: t.home.title,
+          description: t.home.body,
+          inLanguage: locale,
+        })}
+      />
       <section style={{ background: "#FCFAF8" }}>
         <Container className="relative z-10 pt-32 pb-20">
           <div className="max-w-3xl">
@@ -891,6 +1183,17 @@ async function LocalizedArticle({ locale, slug }: { locale: Locale; slug: string
 
   return (
     <div dir={translations[locale].dir}>
+      <JsonLd
+        data={[
+          webPageSchema({
+            path: localizedPath(`/articles/${article.slug}`, locale),
+            title: article.title,
+            description: article.excerpt,
+            inLanguage: locale,
+          }),
+          articleSchema(article, localizedPath(`/articles/${article.slug}`, locale), locale),
+        ]}
+      />
       <section style={{ background: "#FCFAF8" }}>
         <Container className="relative z-10 pt-32 pb-20">
           <div className="max-w-3xl">

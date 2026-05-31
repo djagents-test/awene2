@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import NewsletterBand from "@/components/sections/NewsletterBand";
 import { getArticleBySlug, type CmsArticle } from "@/lib/cms";
+import { articleSchema, webPageSchema } from "@/lib/jsonld";
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -67,6 +69,16 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          webPageSchema({
+            path: `/articles/${article.slug}`,
+            title: `${article.title} | AWENE`,
+            description: article.excerpt,
+          }),
+          articleSchema(article, `/articles/${article.slug}`),
+        ]}
+      />
       <section
         className="relative overflow-hidden"
         style={{ background: "#FCFAF8" }}

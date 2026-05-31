@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import PageHero from "@/components/layout/PageHero";
+import { webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Le rôle du coach",
@@ -32,6 +34,14 @@ const faq = [
 export default function RoleDuCoach() {
   return (
     <>
+      <JsonLd
+        data={webPageSchema({
+          path: "/chemine-avec-moi/role-du-coach",
+          title: "Le rôle du coach",
+          description:
+            "Comprendre la posture, la méthode et l'engagement d'une coach intégrative en santé et nutrition spécialisée en transition ménopausique.",
+        })}
+      />
       <PageHero
         eyebrow="Chemine avec moi"
         title="Le rôle du coach"

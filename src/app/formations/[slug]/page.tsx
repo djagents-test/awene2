@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import JsonLd from "@/components/seo/JsonLd";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import { getFormationBySlug, getFormations, type CmsFormation } from "@/lib/cms";
+import { formationEventSchema, webPageSchema } from "@/lib/jsonld";
 import FormationRegistrationForm from "./FormationRegistrationForm";
 
 type FormationPageProps = {
@@ -50,47 +52,6 @@ export async function generateMetadata({
       url: canonical,
       siteName: "AWENE",
       type: "article",
-    },
-  };
-}
-
-function eventSchema(formation: CmsFormation) {
-  const attendanceMode = {
-    online: "https://schema.org/OnlineEventAttendanceMode",
-    in_person: "https://schema.org/OfflineEventAttendanceMode",
-    hybrid: "https://schema.org/MixedEventAttendanceMode",
-  }[formation.format];
-
-  const eventStatus = {
-    upcoming: "https://schema.org/EventScheduled",
-    sold_out: "https://schema.org/EventScheduled",
-    past: "https://schema.org/EventCompleted",
-    cancelled: "https://schema.org/EventCancelled",
-  }[formation.status];
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "Event",
-    name: formation.title,
-    description: metaDescription(formation),
-    startDate: formation.startDate,
-    endDate: formation.endDate || undefined,
-    eventAttendanceMode: attendanceMode,
-    eventStatus,
-    location:
-      formation.format === "online"
-        ? {
-            "@type": "VirtualLocation",
-            name: "En ligne",
-          }
-        : {
-            "@type": "Place",
-            name: formation.location,
-          },
-    organizer: {
-      "@type": "Organization",
-      name: "AWENE",
-      url: siteUrl,
     },
   };
 }
@@ -149,9 +110,15 @@ export default async function FormationSinglePage({ params }: FormationPageProps
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(eventSchema(formation)) }}
+      <JsonLd
+        data={[
+          webPageSchema({
+            path: `/formations/${formation.slug}`,
+            title: `${formation.title} | Formation AWENE`,
+            description: metaDescription(formation),
+          }),
+          formationEventSchema(formation),
+        ]}
       />
 
       <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
@@ -211,7 +178,7 @@ export default async function FormationSinglePage({ params }: FormationPageProps
                 ))}
             </div>
             <Button href="#inscription" size="lg">
-              Je m'inscris
+              Je m&apos;inscris
             </Button>
           </div>
         </Container>
@@ -331,7 +298,7 @@ export default async function FormationSinglePage({ params }: FormationPageProps
                   className="mt-3 text-base leading-relaxed"
                   style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
                 >
-                  Cette formation s'adresse aux publics indiqués dans le CMS
+                  Cette formation s&apos;adresse aux publics indiqués dans le CMS
                   AWENE et garde un langage clair, humain et accessible.
                 </p>
               </div>
