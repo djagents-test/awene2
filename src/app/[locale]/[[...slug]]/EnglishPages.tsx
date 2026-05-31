@@ -416,54 +416,6 @@ function Cards({ title, items }: { title?: string; items: readonly TextBlock[] }
   );
 }
 
-function TwoColumnCards({
-  title,
-  items,
-  background = "lavender",
-}: {
-  title: string;
-  items: readonly TextBlock[];
-  background?: "white" | "offwhite" | "lavender";
-}) {
-  return (
-    <Section background={background} size="lg">
-      <Container>
-        <h2
-          className="text-4xl font-bold mb-10 text-center"
-          style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
-        >
-          {title}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {items.map((item) => (
-            <article
-              key={item.title}
-              className="p-7 rounded-3xl bg-white border"
-              style={{ borderColor: "#E8DFF0" }}
-            >
-              <h3
-                className="text-xl font-bold mb-3"
-                style={{ fontFamily: "var(--font-playfair)", color: "#4B1F7A" }}
-              >
-                {item.title}
-              </h3>
-              {item.body.map((paragraph) => (
-                <p
-                  key={paragraph}
-                  className="text-sm leading-relaxed"
-                  style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
-                >
-                  {paragraph}
-                </p>
-              ))}
-            </article>
-          ))}
-        </div>
-      </Container>
-    </Section>
-  );
-}
-
 function ArrowLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
@@ -473,43 +425,6 @@ function ArrowLink({ href, children }: { href: string; children: React.ReactNode
     >
       {children}
     </Link>
-  );
-}
-
-function FaqList({ items }: { items: readonly Faq[] }) {
-  return (
-    <Section background="white" size="md">
-      <Container size="md">
-        <h2
-          className="text-4xl font-bold mb-8 text-center"
-          style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
-        >
-          FAQ
-        </h2>
-        <div className="space-y-4">
-          {items.map((item) => (
-            <article
-              key={item.question}
-              className="p-6 rounded-2xl border"
-              style={{ borderColor: "#E8DFF0", background: "#FCFAF8" }}
-            >
-              <h3
-                className="font-semibold mb-2"
-                style={{ color: "#2E2438", fontFamily: "var(--font-inter)" }}
-              >
-                Q, {item.question}
-              </h3>
-              <p
-                className="text-sm leading-relaxed"
-                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
-              >
-                {item.answer}
-              </p>
-            </article>
-          ))}
-        </div>
-      </Container>
-    </Section>
   );
 }
 
@@ -603,6 +518,66 @@ export function EnglishHomePage() {
         title="Frequently asked questions"
         faqs={homeFaqs}
       />
+      <Section background="offwhite" size="md">
+        <Container>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,0.3fr)]">
+            <div>
+              <p
+                className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Keep exploring
+              </p>
+              <h2
+                className="mb-4 text-4xl font-bold"
+                style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+              >
+                Start with these resources.
+              </h2>
+              <p
+                className="max-w-[56ch] text-base leading-relaxed"
+                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+              >
+                If you want to understand the transition more deeply, start with
+                the articles below, visit the{" "}
+                <Link href="/en/evenements" className="font-semibold" style={{ color: "#6F3FD6" }}>
+                  events page
+                </Link>{" "}
+                to join a workshop, or{" "}
+                <Link href="/en/a-propos" className="font-semibold" style={{ color: "#6F3FD6" }}>
+                  learn more about Amira
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="space-y-3">
+              {[
+                {
+                  href: "/en/articles/variations-humeur-perimenopause-menopause",
+                  label: "Mood changes in perimenopause and menopause",
+                },
+                {
+                  href: "/en/articles/apres-40-ans-bouger-autrement-ce-que-la-science-recommande-vraiment",
+                  label: "Moving differently after 40",
+                },
+                {
+                  href: "/en/articles/inflammation-chronique-perimenopause-menopause",
+                  label: "Chronic inflammation and hormonal transition",
+                },
+              ].map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="block rounded-2xl border bg-white px-5 py-4 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D8C7F3] hover:shadow-[0_10px_24px_rgba(75,31,122,0.08)]"
+                  style={{ borderColor: "#E8DFF0", color: "#2E2438", fontFamily: "var(--font-inter)" }}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </Container>
+      </Section>
     </>
   );
 }
@@ -678,7 +653,10 @@ export function EnglishCoachingPage() {
                 Book my free call
               </Button>
               <Button href="/en/a-propos" variant="secondary" size="lg">
-                Learn more
+                Learn more about Amira
+              </Button>
+              <Button href="/en/evenements" variant="outline" size="lg">
+                Join a workshop
               </Button>
             </div>
           </div>
@@ -904,9 +882,17 @@ export function EnglishCoachingPage() {
               30 minutes. Free. No commitment required. To understand where you are right now, your symptoms, your situation, what you need, and to be honest about whether I am the right person to support you.
             </p>
             <div className="mt-8">
-              <Button href="/en/contact" size="lg">
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <Button href="/en/contact" size="lg">
                 Book my free call
-              </Button>
+                </Button>
+                <Button href="/en/a-propos" variant="secondary" size="lg">
+                  Learn more about Amira
+                </Button>
+                <Button href="/en/evenements" variant="outline" size="lg">
+                  Browse events
+                </Button>
+              </div>
             </div>
           </div>
         </Container>
@@ -1040,7 +1026,27 @@ export function EnglishAboutPage() {
             ))}
           </ul>
           <p className="mt-8" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-            [ Photo to place here ]
+            Learn more about the support itself on the{" "}
+            <Link href="/en/coaching" className="font-semibold" style={{ color: "#6F3FD6" }}>
+              coaching page
+            </Link>
+            , explore the{" "}
+            <Link href="/en/evenements" className="font-semibold" style={{ color: "#6F3FD6" }}>
+              events page
+            </Link>
+            , or read these articles:
+            {" "}
+            <Link href="/en/articles/variations-humeur-perimenopause-menopause" className="font-semibold" style={{ color: "#6F3FD6" }}>
+              mood changes
+            </Link>
+            {" · "}
+            <Link href="/en/articles/apres-40-ans-bouger-autrement-ce-que-la-science-recommande-vraiment" className="font-semibold" style={{ color: "#6F3FD6" }}>
+              moving after 40
+            </Link>
+            {" · "}
+            <Link href="/en/articles/inflammation-chronique-perimenopause-menopause" className="font-semibold" style={{ color: "#6F3FD6" }}>
+              chronic inflammation
+            </Link>
           </p>
         </Container>
       </Section>

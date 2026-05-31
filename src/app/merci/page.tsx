@@ -7,6 +7,10 @@ import { webPageSchema } from "@/lib/jsonld";
 export const metadata: Metadata = {
   title: "Merci",
   description: "Votre message a bien été reçu.",
+  robots: {
+    index: false,
+    follow: true,
+  },
 };
 
 const nextSteps = [
@@ -139,6 +143,9 @@ export default function Merci() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Button href="/" variant="primary">
               Retour à l&apos;accueil
+            </Button>
+            <Button href="/coaching" variant="secondary">
+              Découvrir le coaching
             </Button>
             <Button href="/articles" variant="secondary">
               Lire des articles

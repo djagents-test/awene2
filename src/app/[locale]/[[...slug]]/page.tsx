@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import ArticlesList from "@/app/articles/ArticlesList";
 import JsonLd from "@/components/seo/JsonLd";
@@ -463,6 +464,13 @@ export async function generateMetadata({
       openGraph: {
         locale: "en_US",
       },
+      robots:
+        path === "/merci"
+          ? {
+              index: false,
+              follow: true,
+            }
+          : undefined,
     };
   }
 
@@ -494,6 +502,13 @@ export async function generateMetadata({
   return {
     title,
     description: path === "/" ? t.home.body : t.articles.body,
+    robots:
+      path === "/merci"
+        ? {
+            index: false,
+            follow: true,
+          }
+        : undefined,
     openGraph: {
       locale: rawLocale === "ar" ? "ar_AR" : "en_US",
     },
@@ -529,6 +544,45 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
           })}
         />
         <AboutPage content={aboutPageContentEn} />
+        <section className="py-16 md:py-24" style={{ background: "#FCFAF8" }}>
+          <Container size="md">
+            <div className="rounded-[2rem] border bg-white p-8 md:p-10" style={{ borderColor: "#E8DFF0" }}>
+              <p
+                className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Continue exploring
+              </p>
+              <h2
+                className="mb-4 text-3xl font-bold"
+                style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+              >
+                See how the method comes to life.
+              </h2>
+              <p
+                className="mb-6 max-w-[56ch] text-base leading-relaxed"
+                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+              >
+                Learn how coaching works, browse upcoming workshops, or start with a few core articles on mood, movement and inflammation in midlife.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Button href="/en/coaching" variant="primary">
+                  Explore coaching
+                </Button>
+                <Button href="/en/evenements" variant="outline">
+                  Browse events
+                </Button>
+                <Link
+                  href="/en/articles/variations-humeur-perimenopause-menopause"
+                  className="inline-flex items-center text-sm font-semibold"
+                  style={{ color: "#6F3FD6", fontFamily: "var(--font-inter)" }}
+                >
+                  Read the article on mood changes
+                </Link>
+              </div>
+            </div>
+          </Container>
+        </section>
       </>
     );
   }
@@ -753,6 +807,7 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
         />
         <ArticlesList
           articles={articles}
+          basePath={localizedPath("/articles", locale)}
           labels={{
             empty: t.articles.empty,
             featured: t.articles.featured,
@@ -954,6 +1009,8 @@ function TranslatedContentPage({
   };
 }) {
   const t = translations[locale];
+  const isThankYouPage = path === localizedPath("/merci", locale);
+  const isTrainingPage = path === localizedPath("/formations", locale);
 
   return (
     <div dir={t.dir}>
@@ -1040,12 +1097,37 @@ function TranslatedContentPage({
             ))}
           </div>
           <div className="mt-12 flex flex-wrap gap-4">
-            <Button href={localizedPath("/contact", locale)}>
-              {translations[locale].nav.cta}
-            </Button>
-            <Button href={localizedPath("/articles", locale)} variant="outline">
-              {translations[locale].nav.articles}
-            </Button>
+            {isThankYouPage ? (
+              <>
+                <Button href={localizedPath("/", locale)}>
+                  {locale === "ar" ? "العودة إلى الرئيسية" : "Back to home"}
+                </Button>
+                <Button href={localizedPath("/coaching", locale)} variant="secondary">
+                  {locale === "ar" ? "اكتشفي الكوتشينغ" : "Explore coaching"}
+                </Button>
+                <Button href={localizedPath("/articles", locale)} variant="outline">
+                  {translations[locale].nav.articles}
+                </Button>
+              </>
+            ) : isTrainingPage ? (
+              <>
+                <Button href={localizedPath("/contact", locale)}>
+                  {translations[locale].nav.cta}
+                </Button>
+                <Button href={localizedPath("/evenements", locale)} variant="outline">
+                  {locale === "ar" ? "استكشفي الفعاليات" : "Browse events"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button href={localizedPath("/contact", locale)}>
+                  {translations[locale].nav.cta}
+                </Button>
+                <Button href={localizedPath("/articles", locale)} variant="outline">
+                  {translations[locale].nav.articles}
+                </Button>
+              </>
+            )}
           </div>
         </Container>
       </section>
@@ -1194,6 +1276,9 @@ async function LocalizedArticle({ locale, slug }: { locale: Locale; slug: string
   if (!article) {
     notFound();
   }
+  const relatedArticles = (await getArticles(100, locale))
+    .filter((candidate) => candidate.slug !== article.slug)
+    .slice(0, 3);
 
   const imageSrc =
     article.image?.large ?? article.image?.full ?? article.image?.medium ?? article.image?.thumbnail;
@@ -1267,6 +1352,58 @@ async function LocalizedArticle({ locale, slug }: { locale: Locale; slug: string
           <article className="cms-content" dangerouslySetInnerHTML={{ __html: article.content }} />
         </Container>
       </section>
+      {relatedArticles.length > 0 && (
+        <section className="py-16 md:py-24" style={{ background: "#FCFAF8" }}>
+          <Container size="md">
+            <div className="mb-8 flex items-end justify-between gap-6">
+              <div>
+                <p
+                  className="mb-3 text-xs font-semibold uppercase tracking-[0.2em]"
+                  style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+                >
+                  {locale === "ar" ? "للقراءة أيضاً" : "You might also like"}
+                </p>
+                <h2
+                  className="text-3xl font-bold"
+                  style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+                >
+                  {locale === "ar" ? "مقالات مرتبطة" : "Related Articles"}
+                </h2>
+              </div>
+              <Link
+                href={localizedPath("/articles", locale)}
+                className="text-sm font-semibold"
+                style={{ color: "#6F3FD6", fontFamily: "var(--font-inter)" }}
+              >
+                {locale === "ar" ? "جميع المقالات" : "All articles"}
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+              {relatedArticles.map((related) => (
+                <Link
+                  key={related.slug}
+                  href={localizedPath(`/articles/${related.slug}`, locale)}
+                  className="rounded-3xl border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_32px_rgba(75,31,122,0.08)]"
+                  style={{ borderColor: "#E8DFF0" }}
+                >
+                  <h3
+                    className="mb-3 text-xl font-bold"
+                    style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+                  >
+                    {related.title}
+                  </h3>
+                  <p
+                    className="text-sm leading-relaxed"
+                    style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                  >
+                    {related.excerpt}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </Container>
+        </section>
+      )}
     </div>
   );
 }

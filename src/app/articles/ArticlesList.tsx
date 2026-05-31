@@ -21,6 +21,7 @@ const PILLARS: Pillar[] = ["Tous", "Comprendre", "Réguler", "Incarner"];
 
 type ArticlesListProps = {
   articles: CmsArticle[];
+  basePath?: string;
   labels?: {
     empty: string;
     featured: string;
@@ -77,6 +78,7 @@ function articleImageSrc(article: CmsArticle, preferred: "thumbnail" | "large") 
 
 export default function ArticlesList({
   articles,
+  basePath = "/articles",
   labels = {
     empty: "Les articles seront publiés prochainement.",
     featured: "À la une",
@@ -125,7 +127,7 @@ export default function ArticlesList({
             {labels.featured}
           </p>
           <Link
-            href={`/articles/${featured.slug}`}
+            href={`${basePath}/${featured.slug}`}
             className="group grid grid-cols-1 md:grid-cols-2 gap-8 items-center"
           >
             <div
@@ -216,7 +218,7 @@ export default function ArticlesList({
                 return (
                   <Link
                     key={article.slug}
-                    href={`/articles/${article.slug}`}
+                    href={`${basePath}/${article.slug}`}
                     className="group block rounded-3xl overflow-hidden border transition-all duration-300 hover:shadow-[0_8px_40px_rgba(110,63,214,0.1)] hover:-translate-y-1"
                     style={{ borderColor: "#E8DFF0", background: "#fff" }}
                   >

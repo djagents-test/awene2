@@ -169,9 +169,19 @@ export default async function FormationsPage() {
           <Button href="#prochaines-formations" size="lg">
             Voir les prochaines formations
           </Button>
-          <Button href="/contact?sujet=Formation%20sur%20mesure" variant="secondary" size="lg">
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a
+            href="/contact?sujet=Formation%20sur%20mesure"
+            className="inline-flex items-center justify-center gap-2 rounded-full px-9 py-4.5 text-base font-semibold transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
+            style={{
+              fontFamily: "var(--font-inter)",
+              background: "transparent",
+              color: "#6F3FD6",
+              border: "1.5px solid #6F3FD6",
+            }}
+          >
             Demander une formation sur mesure
-          </Button>
+          </a>
         </div>
       </PageHero>
 
@@ -213,6 +223,18 @@ export default async function FormationsPage() {
                   L&apos;objectif est simple : rendre les transitions hormonales moins
                   floues, moins isolantes, et plus faciles à aborder dans la vie
                   quotidienne, au travail et dans les espaces de soin ou de bien-être.
+                </p>
+                <p>
+                  Besoin d&apos;une session adaptée à votre organisation ou à votre public ?
+                  {" "}
+                  {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                  <a
+                    href="/contact?sujet=Formation%20sur%20mesure"
+                    className="font-semibold"
+                    style={{ color: "#6F3FD6" }}
+                  >
+                    Demandez une formation sur mesure.
+                  </a>
                 </p>
               </div>
             </div>
