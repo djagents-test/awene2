@@ -5,7 +5,7 @@ import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import { getFormationBySlug, getFormations, type CmsFormation } from "@/lib/cms";
-import { formationEventSchema, webPageSchema } from "@/lib/jsonld";
+import { breadcrumbSchema, formationEventSchema, webPageSchema } from "@/lib/jsonld";
 import FormationRegistrationForm from "./FormationRegistrationForm";
 
 type FormationPageProps = {
@@ -112,6 +112,11 @@ export default async function FormationSinglePage({ params }: FormationPageProps
     <>
       <JsonLd
         data={[
+          breadcrumbSchema([
+            { name: "Accueil", path: "/" },
+            { name: "Formations", path: "/formations" },
+            { name: formation.title, path: `/formations/${formation.slug}` },
+          ]),
           webPageSchema({
             path: `/formations/${formation.slug}`,
             title: `${formation.title} | Formation AWENE`,

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import JsonLd from "@/components/seo/JsonLd";
 import AboutPage, { type AboutPageContent } from "@/components/pages/AboutPage";
-import { organizationSchema, webPageSchema } from "@/lib/jsonld";
+import { breadcrumbSchema, organizationSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "À propos | AWENE, Coaching ménopause et périménopause par Amira Medimagh",
@@ -99,6 +99,12 @@ export default function AProposPage() {
           type: "AboutPage",
           about: organizationSchema(),
         })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Accueil", path: "/" },
+          { name: "À propos", path: "/a-propos" },
+        ])}
       />
       <AboutPage content={aboutPageContentFr} />
     </>

@@ -12,7 +12,7 @@ import Section from "@/components/ui/Section";
 import NewsletterBand from "@/components/sections/NewsletterBand";
 import { getArticleBySlug, getArticles, getEvents, type CmsEvent } from "@/lib/cms";
 import { canonicalPathForLocale, localizedPath, locales, translations, type Locale } from "@/lib/i18n";
-import { articleSchema, cmsEventSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
+import { articleSchema, breadcrumbSchema, cmsEventSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
 import { englishMetadata, getEnglishPage } from "./EnglishPages";
 
 type LocalizedPageProps = {
@@ -965,6 +965,12 @@ function TranslatedContentPage({
           inLanguage: locale,
         })}
       />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: locale === "ar" ? "الرئيسية" : "Home", path: localizedPath("/", locale) },
+          { name: page.title, path },
+        ])}
+      />
       <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
         <Container className="relative z-10 pt-32 pb-20">
           <div className="max-w-3xl">
@@ -1071,6 +1077,12 @@ function LocalizedShell({
           inLanguage: locale,
         })}
       />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: locale === "ar" ? "الرئيسية" : "Home", path: localizedPath("/", locale) },
+          { name: title, path },
+        ])}
+      />
       <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
         <Container className="relative z-10 pt-32 pb-20">
           <div className="max-w-3xl">
@@ -1111,6 +1123,11 @@ function LocalizedHome({ locale }: { locale: Locale }) {
           description: t.home.body,
           inLanguage: locale,
         })}
+      />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: locale === "ar" ? "الرئيسية" : "Home", path: localizedPath("/", locale) },
+        ])}
       />
       <section style={{ background: "#FCFAF8" }}>
         <Container className="relative z-10 pt-32 pb-20">
@@ -1185,6 +1202,11 @@ async function LocalizedArticle({ locale, slug }: { locale: Locale; slug: string
     <div dir={translations[locale].dir}>
       <JsonLd
         data={[
+          breadcrumbSchema([
+            { name: locale === "ar" ? "الرئيسية" : "Home", path: localizedPath("/", locale) },
+            { name: translations[locale].articles.title, path: localizedPath("/articles", locale) },
+            { name: article.title, path: localizedPath(`/articles/${article.slug}`, locale) },
+          ]),
           webPageSchema({
             path: localizedPath(`/articles/${article.slug}`, locale),
             title: article.title,

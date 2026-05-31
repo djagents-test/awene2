@@ -6,7 +6,7 @@ import AmiraBio from "@/components/sections/Manifesto";
 import GetStarted from "@/components/sections/MovementCapture";
 import Entreprises from "@/components/sections/CTABand";
 import FAQ from "@/components/sections/FAQ";
-import { webPageSchema, websiteSchema } from "@/lib/jsonld";
+import { breadcrumbSchema, webPageSchema, websiteSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "AWENE | Coaching périménopause et ménopause, comprendre son corps autrement",
@@ -32,6 +32,7 @@ export default function Home() {
       <JsonLd
         data={[
           websiteSchema(),
+          breadcrumbSchema([{ name: "Accueil", path: "/" }]),
           webPageSchema({
             path: "/",
             title: "AWENE | Coaching périménopause et ménopause, comprendre son corps autrement",

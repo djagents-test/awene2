@@ -6,7 +6,7 @@ import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import NewsletterBand from "@/components/sections/NewsletterBand";
 import { getArticleBySlug, type CmsArticle } from "@/lib/cms";
-import { articleSchema, webPageSchema } from "@/lib/jsonld";
+import { articleSchema, breadcrumbSchema, webPageSchema } from "@/lib/jsonld";
 
 type ArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -71,6 +71,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     <>
       <JsonLd
         data={[
+          breadcrumbSchema([
+            { name: "Accueil", path: "/" },
+            { name: "Articles", path: "/articles" },
+            { name: article.title, path: `/articles/${article.slug}` },
+          ]),
           webPageSchema({
             path: `/articles/${article.slug}`,
             title: `${article.title} | AWENE`,

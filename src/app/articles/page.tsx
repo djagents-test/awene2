@@ -3,7 +3,7 @@ import JsonLd from "@/components/seo/JsonLd";
 import PageHero from "@/components/layout/PageHero";
 import NewsletterBand from "@/components/sections/NewsletterBand";
 import { getArticles } from "@/lib/cms";
-import { absoluteUrl, itemListSchema, webPageSchema } from "@/lib/jsonld";
+import { absoluteUrl, breadcrumbSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
 import ArticlesList from "./ArticlesList";
 
 export const metadata: Metadata = {
@@ -29,6 +29,10 @@ export default async function ArticlesPage() {
     <>
       <JsonLd
         data={[
+          breadcrumbSchema([
+            { name: "Accueil", path: "/" },
+            { name: "Articles", path: "/articles" },
+          ]),
           webPageSchema({
             path: "/articles",
             title: "Articles | AWENE, Comprendre la ménopause et la périménopause",

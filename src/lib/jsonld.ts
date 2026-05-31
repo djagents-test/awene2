@@ -26,6 +26,11 @@ export function websiteSchema() {
   };
 }
 
+type BreadcrumbItem = {
+  name: string;
+  path: string;
+};
+
 export function webPageSchema(options: {
   path: string;
   title: string;
@@ -47,6 +52,19 @@ export function webPageSchema(options: {
     },
     about: options.about,
     publisher: organizationSchema(),
+  };
+}
+
+export function breadcrumbSchema(items: BreadcrumbItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
   };
 }
 

@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import PageHero from "@/components/layout/PageHero";
 import NewsletterBand from "@/components/sections/NewsletterBand";
 import { getEvents, type CmsEvent } from "@/lib/cms";
-import { cmsEventSchema, webPageSchema } from "@/lib/jsonld";
+import { breadcrumbSchema, cmsEventSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
   title: "Événements AWENE | Ateliers ménopause et périménopause",
@@ -40,6 +40,10 @@ export default async function EvenementsPage() {
     <>
       <JsonLd
         data={[
+          breadcrumbSchema([
+            { name: "Accueil", path: "/" },
+            { name: "Événements", path: "/evenements" },
+          ]),
           webPageSchema({
             path: "/evenements",
             title: "Événements AWENE | Ateliers ménopause et périménopause",

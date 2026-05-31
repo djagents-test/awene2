@@ -6,7 +6,7 @@ import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import PageHero from "@/components/layout/PageHero";
 import { getFormations } from "@/lib/cms";
-import { absoluteUrl, formationEventSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
+import { absoluteUrl, breadcrumbSchema, formationEventSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
 import { FormationFilters, FormationsFAQ } from "./FormationsClient";
 
 export const metadata: Metadata = {
@@ -125,6 +125,10 @@ export default async function FormationsPage() {
       <div className="relative z-10">
       <JsonLd
         data={[
+          breadcrumbSchema([
+            { name: "Accueil", path: "/" },
+            { name: "Formations", path: "/formations" },
+          ]),
           webPageSchema({
             path: "/formations",
             title: "Formations AWENE | Ménopause, périménopause et santé féminine",
