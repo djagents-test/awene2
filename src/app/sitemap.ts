@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getArticles, getFormations } from "@/lib/cms";
 import { localizedPath } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://awene.net";
 export const dynamic = "force-dynamic";
 
 const staticCanonicalRoutes = [

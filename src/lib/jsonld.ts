@@ -1,6 +1,5 @@
 import type { CmsArticle, CmsEvent, CmsFormation } from "@/lib/cms";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://awene.net";
+import { SITE_URL } from "@/lib/site";
 
 export function absoluteUrl(path: string) {
   return new URL(path, SITE_URL).toString();

@@ -6,13 +6,12 @@ import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import { getFormationBySlug, getFormations, type CmsFormation } from "@/lib/cms";
 import { breadcrumbSchema, formationEventSchema, webPageSchema } from "@/lib/jsonld";
+import { SITE_URL } from "@/lib/site";
 import FormationRegistrationForm from "./FormationRegistrationForm";
 
 type FormationPageProps = {
   params: Promise<{ slug: string }>;
 };
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://awene.net";
 
 function metaDescription(formation: CmsFormation) {
   return (
@@ -38,7 +37,7 @@ export async function generateMetadata({
 
   const title = `${formation.title} | Formation AWENE`;
   const description = metaDescription(formation);
-  const canonical = `${siteUrl}/formations/${formation.slug}`;
+  const canonical = `${SITE_URL}/formations/${formation.slug}`;
 
   return {
     title,

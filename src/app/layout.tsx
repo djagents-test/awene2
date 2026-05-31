@@ -5,6 +5,7 @@ import Script from "next/script";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { SITE_URL } from "@/lib/site";
 
 const META_PIXEL_ID = "4228205960762852";
 const GOOGLE_TAG_ID = "G-77KN5YJ39D";
@@ -25,9 +26,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://awene.net"
-  ),
+  metadataBase: new URL(SITE_URL),
   title: {
     template: "%s | AWENE",
     default: "AWENE | Coaching ménopause et périménopause, Comprendre, Réguler, Incarner",
@@ -60,7 +59,7 @@ export const metadata: Metadata = {
     title: "AWENE | Coaching ménopause et périménopause",
     description:
       "Bouffées de chaleur, fatigue, brouillard mental, sommeil perturbé, ce n'est pas une fatalité. AWENE vous accompagne avec rigueur et humanité. En ligne, région MENA et au-delà.",
-    url: "https://awene.net",
+    url: SITE_URL,
     siteName: "AWENE",
     locale: "fr_FR",
     alternateLocale: ["en_US", "ar_AR"],
