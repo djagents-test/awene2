@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Container from "@/components/ui/Container";
 import PlaceholderVisual from "@/components/ui/PlaceholderVisual";
 
@@ -125,11 +126,23 @@ export default function NewsletterBand({
               Aucun spam. Uniquement ce qui compte.
             </p>
           </div>
-          <PlaceholderVisual
-            variant="breathing"
-            tone="plum"
-            className="hidden lg:block aspect-[1/1] w-full border-[rgba(243,236,251,0.12)] shadow-none"
-          />
+          <div className="relative hidden lg:block">
+            <PlaceholderVisual
+              variant="breathing"
+              tone="plum"
+              className="aspect-[1/1] w-full border-[rgba(243,236,251,0.12)] shadow-none"
+            />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <Image
+                src="/AWENE.png"
+                alt=""
+                aria-hidden="true"
+                width={160}
+                height={160}
+                className="h-auto w-[42%] opacity-85 drop-shadow-[0_2px_20px_rgba(243,236,251,0.35)]"
+              />
+            </div>
+          </div>
         </div>
       </Container>
     </section>

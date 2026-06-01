@@ -260,15 +260,6 @@ export default function PlaceholderVisual({
       style={{ background: colors.base }}
     >
       <div
-        className="absolute inset-0 opacity-[0.16]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.72) 1px, transparent 0)",
-          backgroundSize: "14px 14px",
-          mixBlendMode: "soft-light",
-        }}
-      />
-      <div
         className="absolute inset-0 opacity-[0.45]"
         style={{
           background:

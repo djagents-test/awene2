@@ -11,10 +11,10 @@ import Container from "@/components/ui/Container";
 import PageHero from "@/components/layout/PageHero";
 import Section from "@/components/ui/Section";
 import NewsletterBand from "@/components/sections/NewsletterBand";
-import { getArticleBySlug, getArticles, getEvents, type CmsEvent } from "@/lib/cms";
+import { getArticleBySlug, getArticles, getEvents, getFormations, type CmsEvent } from "@/lib/cms";
 import { canonicalPathForLocale, localizedPath, locales, translations, type Locale } from "@/lib/i18n";
 import { articleSchema, breadcrumbSchema, cmsEventSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
-import { englishMetadata, getEnglishPage } from "./EnglishPages";
+import { englishMetadata, getEnglishPage, EnglishTrainingPage, EnglishWhyAwenePage } from "./EnglishPages";
 
 type LocalizedPageProps = {
   params: Promise<{
@@ -759,6 +759,23 @@ export default async function LocalizedPage({ params }: LocalizedPageProps) {
             headline="Subscribe to the newsletter to hear about events first"
             body="Subscribe to the AWENE newsletter to receive event announcements before anyone else."
           />
+        </div>
+      );
+    }
+
+    if (path === "/formations") {
+      const formations = await getFormations();
+      return (
+        <div dir="ltr">
+          <EnglishTrainingPage formations={formations} />
+        </div>
+      );
+    }
+
+    if (path === "/a-propos/pourquoi-awene") {
+      return (
+        <div dir="ltr">
+          <EnglishWhyAwenePage />
         </div>
       );
     }

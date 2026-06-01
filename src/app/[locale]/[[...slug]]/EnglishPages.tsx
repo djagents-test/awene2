@@ -13,6 +13,11 @@ import HomeAmiraBio from "@/components/sections/Manifesto";
 import HomeGetStarted from "@/components/sections/MovementCapture";
 import HomeEntreprises from "@/components/sections/CTABand";
 import HomeFAQ from "@/components/sections/FAQ";
+import PageHero from "@/components/layout/PageHero";
+import JsonLd from "@/components/seo/JsonLd";
+import { breadcrumbSchema, webPageSchema, itemListSchema, formationEventSchema, absoluteUrl } from "@/lib/jsonld";
+import type { CmsFormation } from "@/lib/cms";
+import { EnglishFormationFilters, EnglishFormationsFAQ } from "./EnglishFormationsClient";
 
 type TextBlock = {
   title: string;
@@ -518,66 +523,6 @@ export function EnglishHomePage() {
         title="Frequently asked questions"
         faqs={homeFaqs}
       />
-      <Section background="offwhite" size="md">
-        <Container>
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,0.3fr)]">
-            <div>
-              <p
-                className="mb-4 text-xs font-semibold uppercase tracking-[0.2em]"
-                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
-              >
-                Keep exploring
-              </p>
-              <h2
-                className="mb-4 text-4xl font-bold"
-                style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
-              >
-                Start with these resources.
-              </h2>
-              <p
-                className="max-w-[56ch] text-base leading-relaxed"
-                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
-              >
-                If you want to understand the transition more deeply, start with
-                the articles below, visit the{" "}
-                <Link href="/en/evenements" className="font-semibold" style={{ color: "#6F3FD6" }}>
-                  events page
-                </Link>{" "}
-                to join a workshop, or{" "}
-                <Link href="/en/a-propos" className="font-semibold" style={{ color: "#6F3FD6" }}>
-                  learn more about Amira
-                </Link>
-                .
-              </p>
-            </div>
-            <div className="space-y-3">
-              {[
-                {
-                  href: "/en/articles/variations-humeur-perimenopause-menopause",
-                  label: "Mood changes in perimenopause and menopause",
-                },
-                {
-                  href: "/en/articles/apres-40-ans-bouger-autrement-ce-que-la-science-recommande-vraiment",
-                  label: "Moving differently after 40",
-                },
-                {
-                  href: "/en/articles/inflammation-chronique-perimenopause-menopause",
-                  label: "Chronic inflammation and hormonal transition",
-                },
-              ].map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="block rounded-2xl border bg-white px-5 py-4 text-sm font-semibold transition-all duration-200 hover:-translate-y-0.5 hover:border-[#D8C7F3] hover:shadow-[0_10px_24px_rgba(75,31,122,0.08)]"
-                  style={{ borderColor: "#E8DFF0", color: "#2E2438", fontFamily: "var(--font-inter)" }}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </Container>
-      </Section>
     </>
   );
 }
@@ -1089,6 +1034,632 @@ export function EnglishEventsPage() {
         </p>
       </TextSection>
     </>
+  );
+}
+
+const whyAweneValues = [
+  {
+    title: "Free women from isolation",
+    body: "Too many women go through this transition in a heavy silence. AWENE breaks that silence by creating a space of recognition, information and structured support.",
+  },
+  {
+    title: "Honour the complexity",
+    body: "Menopause affects the body, the brain, the emotions and the sense of identity. Our approach holds this full depth rather than reducing it to a few symptoms.",
+  },
+  {
+    title: "Build a method",
+    body: "AWENE does not offer generic advice. We offer an architecture: 4 pillars grounded in neurology, nutrition, movement and lifestyle.",
+  },
+  {
+    title: "Create a movement",
+    body: "Beyond individual support, AWENE is a community of women who choose to live this transition with awareness, intention and depth.",
+  },
+];
+
+export function EnglishWhyAwenePage() {
+  return (
+    <>
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/en" },
+            { name: "About", path: "/en/a-propos" },
+            { name: "Why AWENE", path: "/en/a-propos/pourquoi-awene" },
+          ]),
+          webPageSchema({
+            path: "/en/a-propos/pourquoi-awene",
+            title: "Why AWENE",
+            description:
+              "A name, a movement, and a conviction: menopause deserves more than silence or half answers.",
+            type: "AboutPage",
+            inLanguage: "en",
+          }),
+        ]}
+      />
+      <PageHero
+        eyebrow="The reason why"
+        title="Why AWENE"
+        subtitle="A name. A movement. A conviction that menopause deserves more than silence or half answers."
+      />
+
+      {/* The name */}
+      <Section background="white" size="lg">
+        <Container size="md">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <p
+                className="text-xs font-semibold tracking-[0.2em] uppercase mb-4"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                The name
+              </p>
+              <h2
+                className="text-4xl md:text-5xl font-bold mb-6 leading-tight"
+                style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+              >
+                AWENE, the breath that inspires
+              </h2>
+              <p
+                className="text-base leading-relaxed mb-4"
+                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+              >
+                AWENE evokes breath — what is at once discreet and fundamental. What inspires and transforms. A word that carries within it the idea of passage, transition, life continuing and renewing itself.
+              </p>
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+              >
+                This name was chosen because it says what the project is: something soft but powerful, feminine but structured, quiet but present.
+              </p>
+            </div>
+            <div
+              className="rounded-3xl p-10 flex flex-col items-center justify-center text-center"
+              style={{ background: "#F3ECFB", minHeight: "280px" }}
+            >
+              <span
+                className="text-6xl md:text-7xl font-bold tracking-[0.3em] mb-4"
+                style={{ fontFamily: "var(--font-playfair)", color: "#6F3FD6" }}
+              >
+                AWENE
+              </span>
+              <span
+                className="text-base italic"
+                style={{ fontFamily: "var(--font-playfair)", color: "#4B1F7A" }}
+              >
+                &ldquo;the breath that inspires and the moment that transforms&rdquo;
+              </span>
+            </div>
+          </div>
+        </Container>
+      </Section>
+
+      {/* Mission */}
+      <Section background="deep" size="lg">
+        <Container size="md">
+          <p
+            className="text-xs font-semibold tracking-[0.25em] uppercase mb-6"
+            style={{ color: "rgba(246,139,44,0.8)", fontFamily: "var(--font-inter)" }}
+          >
+            The mission
+          </p>
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-8 leading-tight max-w-2xl"
+            style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}
+          >
+            Transform silence into a space of power
+          </h2>
+          <p
+            className="text-base md:text-lg leading-relaxed max-w-2xl"
+            style={{ color: "rgba(243,236,251,0.7)", fontFamily: "var(--font-inter)" }}
+          >
+            For too long, menopause has been a taboo subject, under-studied and poorly understood. Women have crossed this transition in silence, often alone, often without the resources that would have allowed them to live it differently.
+          </p>
+          <p
+            className="mt-4 text-base md:text-lg leading-relaxed max-w-2xl"
+            style={{ color: "rgba(243,236,251,0.7)", fontFamily: "var(--font-inter)" }}
+          >
+            AWENE is here to change that — one accompaniment at a time, one movement at a time, one woman at a time.
+          </p>
+        </Container>
+      </Section>
+
+      {/* Values */}
+      <Section background="offwhite" size="lg">
+        <Container>
+          <div className="text-center mb-14">
+            <p
+              className="text-xs font-semibold tracking-[0.25em] uppercase mb-4"
+              style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+            >
+              What we stand for
+            </p>
+            <h2
+              className="text-4xl font-bold"
+              style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+            >
+              The reasons we exist
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {whyAweneValues.map((v, i) => (
+              <div
+                key={i}
+                className="p-8 rounded-3xl border border-[#E8DFF0] bg-white hover:shadow-[0_8px_32px_rgba(110,63,214,0.08)] transition-all duration-300"
+              >
+                <span
+                  className="text-4xl font-bold opacity-20 block mb-4"
+                  style={{ fontFamily: "var(--font-playfair)", color: "#6F3FD6" }}
+                >
+                  0{i + 1}
+                </span>
+                <h3
+                  className="text-xl font-bold mb-3"
+                  style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+                >
+                  {v.title}
+                </h3>
+                <p
+                  className="text-sm leading-relaxed"
+                  style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                >
+                  {v.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
+      {/* CTA */}
+      <Section background="lavender" size="md">
+        <Container size="md" className="text-center">
+          <h2
+            className="text-3xl md:text-4xl font-bold mb-6"
+            style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
+          >
+            Ready to join the movement?
+          </h2>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <Button href="/en/coaching" variant="primary">
+              Explore coaching
+            </Button>
+            <Button href="/en/a-propos/mon-histoire" variant="secondary">
+              My story
+            </Button>
+          </div>
+        </Container>
+      </Section>
+    </>
+  );
+}
+
+const trainingAudiences = [
+  {
+    title: "For women in transition",
+    body: "Clear reference points to understand what is changing, read the body's signals better and move forward without feeling alone or overwhelmed.",
+    color: "#6F3FD6",
+    bg: "#F3ECFB",
+  },
+  {
+    title: "For companies",
+    body: "Accessible sessions to raise awareness among teams, support employees and create more informed working environments.",
+    color: "#4B1F7A",
+    bg: "#F8EEF5",
+  },
+  {
+    title: "For health and wellness professionals",
+    body: "A rigorous and human foundation to better support questions around perimenopause, menopause and the transitions of the female body.",
+    color: "#F68B2C",
+    bg: "#FEF3E8",
+  },
+];
+
+const trainingLearnings = [
+  "Understand hormonal changes",
+  "Read the body's signals without panic",
+  "Better manage fatigue, sleep, stress and mental load",
+  "Adapt communication, work and daily rhythm",
+  "Know when to refer to a healthcare professional",
+  "Create more informed and more human environments",
+];
+
+const trainingFaqs = [
+  {
+    question: "Are the training sessions medical?",
+    answer:
+      "No. AWENE training sessions do not replace a consultation, a diagnosis or a treatment. They provide reliable, understandable and practical reference points to better understand this transition and know when to consult a doctor.",
+  },
+  {
+    question: "Are these sessions suitable for companies?",
+    answer:
+      "Yes. The content can be adapted for HR teams, managers, employees and wellbeing committees, with a clear, respectful and non-intrusive tone.",
+  },
+  {
+    question: "Can a training session be organised in person?",
+    answer:
+      "Yes. Depending on the location, audience and format requested, a session can be organised in person, online or in a hybrid format.",
+  },
+  {
+    question: "Are training sessions available in Arabic?",
+    answer:
+      "Yes. Sessions can be offered in English, Arabic or French, depending on the audience and context.",
+  },
+  {
+    question: "How do I register?",
+    answer:
+      "Each open training session displays a 'Register' button that leads to its dedicated page, with session details and an integrated registration form.",
+  },
+  {
+    question: "What happens if a session is fully booked?",
+    answer:
+      "The 'Sold out' status is displayed clearly. You can check upcoming dates or request a session adapted to your group.",
+  },
+];
+
+function trainingFaqSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: trainingFaqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
+}
+
+export function EnglishTrainingPage({ formations }: { formations: CmsFormation[] }) {
+  return (
+    <div className="relative overflow-hidden">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div
+          className="absolute -left-20 top-[10rem] h-[24rem] w-[24rem] rounded-full opacity-[0.28]"
+          style={{ background: "radial-gradient(circle, rgba(246,139,44,0.2) 0%, rgba(246,139,44,0.08) 36%, transparent 72%)" }}
+        />
+        <div
+          className="absolute right-[-10rem] top-[3rem] h-[36rem] w-[36rem] rounded-full opacity-[0.42]"
+          style={{ background: "radial-gradient(circle, rgba(111,63,214,0.2) 0%, rgba(111,63,214,0.1) 34%, transparent 72%)" }}
+        />
+        <div
+          className="absolute left-[18%] bottom-[14%] h-[20rem] w-[20rem] rounded-full opacity-[0.22]"
+          style={{ background: "radial-gradient(circle, rgba(243,236,251,0.4) 0%, rgba(243,236,251,0.12) 42%, transparent 76%)" }}
+        />
+      </div>
+      <div className="relative z-10">
+        <JsonLd
+          data={[
+            breadcrumbSchema([
+              { name: "Home", path: "/en" },
+              { name: "Training", path: "/en/formations" },
+            ]),
+            webPageSchema({
+              path: "/en/formations",
+              title: "AWENE Training | Menopause, Perimenopause and Women's Health",
+              description:
+                "AWENE training sessions to understand perimenopause, menopause, hormonal health and support women, companies and professionals.",
+              type: "CollectionPage",
+              inLanguage: "en",
+            }),
+            itemListSchema(
+              "/en/formations",
+              formations.map((formation) => ({
+                name: formation.title,
+                url: absoluteUrl(`/formations/${formation.slug}`),
+              })),
+            ),
+            trainingFaqSchema(),
+            ...formations.map((formation) => formationEventSchema(formation)),
+          ]}
+        />
+
+        <PageHero
+          eyebrow="Training"
+          title={
+            <>
+              AWENE Training.
+              <em className="awene-emphasis block">
+                Understand the body. Support the transition.
+              </em>
+            </>
+          }
+          subtitle="Clear, human, science-based sessions to understand perimenopause, menopause, hormonal health, the nervous system and the transitions of the female body."
+          visual
+          visualPlacement="formationsHero"
+          visualVariant="hormonal-rhythm"
+          visualTone="mixed"
+          blobs
+        >
+          <div className="mt-10 flex flex-wrap gap-4">
+            <Button href="#upcoming-training" size="lg">
+              See upcoming training sessions
+            </Button>
+            <a
+              href="/en/contact?sujet=Formation%20sur%20mesure"
+              className="inline-flex items-center justify-center gap-2 rounded-full px-9 py-4.5 text-base font-semibold transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
+              style={{
+                fontFamily: "var(--font-inter)",
+                background: "transparent",
+                color: "#6F3FD6",
+                border: "1.5px solid #6F3FD6",
+              }}
+            >
+              Request a custom session
+            </a>
+          </div>
+        </PageHero>
+
+        <Section background="white" size="lg">
+          <Container>
+            <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.65fr)_minmax(280px,0.35fr)]">
+              <div className="max-w-4xl">
+                <p
+                  className="mb-6 text-xs font-semibold uppercase tracking-[0.25em]"
+                  style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+                >
+                  Reliable reference points
+                </p>
+                <h2
+                  className="mb-7 text-4xl font-bold md:text-5xl"
+                  style={{ color: "#2E2438", fontFamily: "var(--font-playfair)" }}
+                >
+                  Understand{" "}
+                  <span className="awene-emphasis">
+                    without dramatising.
+                  </span>{" "}
+                  Support{" "}
+                  <span className="awene-emphasis">
+                    without replacing
+                  </span>{" "}
+                  care.
+                </h2>
+                <div
+                  className="space-y-5 text-base leading-relaxed md:text-lg"
+                  style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                >
+                  <p>
+                    AWENE training sessions do not replace medical advice, a consultation or a diagnosis. They provide reliable, concrete and understandable reference points to better support women, teams and professionals.
+                  </p>
+                  <p>
+                    The goal is simple: make hormonal transitions less confusing, less isolating and easier to address in daily life, at work, and in care or wellness settings.
+                  </p>
+                  <p>
+                    Need a session adapted to your organisation or audience?{" "}
+                    <a
+                      href="/en/contact?sujet=Formation%20sur%20mesure"
+                      className="font-semibold"
+                      style={{ color: "#6F3FD6" }}
+                    >
+                      Request a custom training session.
+                    </a>
+                  </p>
+                </div>
+              </div>
+              <div className="relative aspect-[0.95/1.05] w-full overflow-hidden rounded-[1.75rem]">
+                <Image
+                  src="/images/formations-hero.jpg"
+                  alt="Professional woman in an elegant environment representing AWENE training sessions"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(min-width: 1024px) 22rem, 100vw"
+                />
+              </div>
+            </div>
+          </Container>
+        </Section>
+
+        <Section background="offwhite" size="lg">
+          <Container>
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <p
+                className="mb-5 text-xs font-semibold uppercase tracking-[0.25em]"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Upcoming sessions
+              </p>
+              <h2
+                className="mb-5 text-4xl font-bold md:text-5xl"
+                style={{ color: "#2E2438", fontFamily: "var(--font-playfair)" }}
+              >
+                Find the right training session.
+              </h2>
+              <p
+                className="text-base leading-relaxed"
+                style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+              >
+                Filter by date, format, audience, language or status. Sessions are pulled from the AWENE Formations feed.
+              </p>
+            </div>
+            <EnglishFormationFilters formations={formations} />
+          </Container>
+        </Section>
+
+        <Section background="white" size="lg">
+          <Container>
+            <div className="mb-12 max-w-3xl">
+              <p
+                className="mb-5 text-xs font-semibold uppercase tracking-[0.25em]"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Who is it for?
+              </p>
+              <h2
+                className="text-4xl font-bold md:text-5xl"
+                style={{ color: "#2E2438", fontFamily: "var(--font-playfair)" }}
+              >
+                Three audiences. One standard of clarity.
+              </h2>
+            </div>
+            <div className="mb-8 hidden lg:grid lg:grid-cols-3 lg:gap-6">
+              <div className="relative aspect-[1.35/1] w-full overflow-hidden rounded-[1.75rem]">
+                <Image
+                  src="/images/formations-audience-1.jpg"
+                  alt="Group of confident women representing different generations"
+                  fill
+                  className="object-cover object-[50%_20%]"
+                  sizes="(min-width: 1024px) 20rem, 100vw"
+                />
+              </div>
+              <div className="relative aspect-[1.35/1] w-full overflow-hidden rounded-[1.75rem]">
+                <Image
+                  src="/images/formations-audience-2.jpg"
+                  alt="Professional woman in a modern space"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(min-width: 1024px) 20rem, 100vw"
+                />
+              </div>
+              <div className="relative aspect-[1.35/1] w-full overflow-hidden rounded-[1.75rem]">
+                <Image
+                  src="/images/formations-audience-3.jpg"
+                  alt="Mature woman in a calm, natural environment"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(min-width: 1024px) 20rem, 100vw"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {trainingAudiences.map((audience) => (
+                <article
+                  key={audience.title}
+                  className="group rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-1 hover:border-[#D8C7F3] hover:shadow-[0_18px_40px_rgba(75,31,122,0.1)] md:p-9"
+                  style={{ background: audience.bg, borderColor: "#E8DFF0" }}
+                >
+                  <div
+                    className="mb-6 h-0.5 w-10 rounded-full"
+                    style={{ background: audience.color }}
+                  />
+                  <h3
+                    className="mb-4 text-2xl font-bold transition-colors duration-300 group-hover:text-[#6F3FD6]"
+                    style={{ color: audience.color, fontFamily: "var(--font-playfair)" }}
+                  >
+                    {audience.title}
+                  </h3>
+                  <p
+                    className="text-base leading-relaxed"
+                    style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
+                  >
+                    {audience.body}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </Container>
+        </Section>
+
+        <Section background="lavender" size="lg">
+          <Container>
+            <div className="mx-auto mb-12 max-w-3xl text-center">
+              <p
+                className="mb-5 text-xs font-semibold uppercase tracking-[0.25em]"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Practical learning
+              </p>
+              <h2
+                className="text-4xl font-bold md:text-5xl"
+                style={{ color: "#2E2438", fontFamily: "var(--font-playfair)" }}
+              >
+                <span className="awene-emphasis">
+                  What you will learn.
+                </span>
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {trainingLearnings.map((item) => (
+                <div
+                  key={item}
+                  className="group flex items-start gap-4 rounded-2xl border bg-white p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D8C7F3] hover:shadow-[0_14px_30px_rgba(75,31,122,0.08)]"
+                  style={{ borderColor: "#E8DFF0" }}
+                >
+                  <span
+                    className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm text-white transition-transform duration-300 group-hover:scale-110"
+                    style={{ background: "#6F3FD6" }}
+                  >
+                    ✓
+                  </span>
+                  <p
+                    className="text-sm font-semibold leading-relaxed transition-colors duration-300 group-hover:text-[#4B1F7A]"
+                    style={{ color: "#2E2438", fontFamily: "var(--font-inter)" }}
+                  >
+                    {item}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </Section>
+
+        <Section background="deep" size="lg" className="relative overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+            <div
+              className="absolute -right-20 -top-20 h-80 w-80 rounded-full opacity-20"
+              style={{ background: "radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)" }}
+            />
+            <div
+              className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full opacity-15"
+              style={{ background: "radial-gradient(circle, rgba(246,139,44,0.4) 0%, transparent 70%)" }}
+            />
+          </div>
+          <Container className="relative z-10">
+            <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.62fr)_minmax(250px,0.38fr)]">
+              <div className="text-center lg:text-left">
+                <p
+                  className="mb-6 text-xs font-semibold uppercase tracking-[0.25em]"
+                  style={{ color: "rgba(243,236,251,0.75)", fontFamily: "var(--font-inter)" }}
+                >
+                  Custom training
+                </p>
+                <h2
+                  className="mb-6 text-4xl font-bold leading-tight md:text-5xl"
+                  style={{ color: "#F3ECFB", fontFamily: "var(--font-playfair)" }}
+                >
+                  Want a training session adapted to your audience?
+                </h2>
+                <p
+                  className="mx-auto mb-9 max-w-2xl text-base leading-relaxed md:text-lg lg:mx-0"
+                  style={{ color: "rgba(243,236,251,0.82)", fontFamily: "var(--font-inter)" }}
+                >
+                  AWENE can design custom sessions for companies, associations, HR teams, wellness spaces, clinics, practices and communities.
+                </p>
+                <Button href="/en/contact?sujet=Formation%20sur%20mesure" size="lg">
+                  Request a custom training session
+                </Button>
+              </div>
+              <div className="relative hidden lg:block aspect-[1.05/1] w-full overflow-hidden rounded-[1.75rem]">
+                <Image
+                  src="/images/formations-sur-mesure.jpg"
+                  alt="Two women talking in a calm, reassuring environment"
+                  fill
+                  className="object-cover object-center"
+                  sizes="(min-width: 1024px) 24rem, 100vw"
+                />
+              </div>
+            </div>
+          </Container>
+        </Section>
+
+        <Section background="offwhite" size="lg">
+          <Container>
+            <div className="max-w-4xl">
+              <p
+                className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.25em]"
+                style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
+              >
+                Frequently asked questions
+              </p>
+              <h2
+                className="mb-12 text-center text-4xl font-bold md:text-5xl"
+                style={{ color: "#2E2438", fontFamily: "var(--font-playfair)" }}
+              >
+                FAQ
+              </h2>
+              <EnglishFormationsFAQ faqs={trainingFaqs} />
+            </div>
+          </Container>
+        </Section>
+      </div>
+    </div>
   );
 }
 
