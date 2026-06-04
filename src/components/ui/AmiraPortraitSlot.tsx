@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import PlaceholderVisual from "@/components/ui/PlaceholderVisual";
 
-const AMIRA_PORTRAIT_SRC = "/images/amira_portrait-20260531.jpeg";
+const AMIRA_PORTRAIT_SRC = "/images/amira_portrait.jpeg";
 const AMIRA_PORTRAIT_ENABLED = true;
 
 type AmiraPortraitSlotProps = {
@@ -33,7 +33,7 @@ export default function AmiraPortraitSlot({
             src={AMIRA_PORTRAIT_SRC}
             alt={alt}
             fill
-            className="object-cover object-center md:object-[center_top]"
+            className="object-cover object-[50%_25%]"
             sizes="(min-width: 1024px) 18rem, 100vw"
             onError={() => setImageUnavailable(true)}
           />

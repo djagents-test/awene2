@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Container from "@/components/ui/Container";
 import FooterEmailForm from "./FooterEmailForm";
 import { localeFromPath, localizedPath, translations } from "@/lib/i18n";
+import { CALENDLY_BOOKING_URL } from "@/lib/calendly";
 
 export default function Footer() {
   const locale = localeFromPath(usePathname());
@@ -21,7 +22,7 @@ export default function Footer() {
     ],
     accompagnement: [
       { label: locale === "fr" ? "Le rôle du coach" : locale === "en" ? "The coach role" : "دور الكوتش", href: "/chemine-avec-moi/role-du-coach" },
-      { label: t.nav.cta, href: "/contact" },
+      { label: t.nav.cta, href: CALENDLY_BOOKING_URL },
     ],
     legal: [
       { label: locale === "fr" ? "Politique de confidentialité" : locale === "en" ? "Privacy policy" : "سياسة الخصوصية", href: "/politique-de-confidentialite" },
@@ -63,17 +64,19 @@ export default function Footer() {
             <div className="mt-6 flex flex-wrap items-center gap-4">
               <Image
                 src="/images/INHC.jpg"
-                alt="INHC certification badge"
+                alt="Badge de certification en santé et nutrition intégratives de l'Institute for Integrative Nutrition."
+                title="Certification en santé et nutrition intégratives"
                 width={92}
                 height={92}
-                className="h-auto w-[4.75rem] rounded-md"
+                className="h-auto w-[4.75rem] rounded-md object-contain"
               />
               <Image
                 src="/images/IWHI_CERTIFIED.jpg"
-                alt="IWHI Certified badge"
+                alt="Badge de certification en périménopause et ménopause de l'Integrative Women's Health Institute."
+                title="Certification en périménopause et ménopause"
                 width={92}
                 height={92}
-                className="h-auto w-[4.75rem] rounded-md"
+                className="h-auto w-[4.75rem] rounded-md object-contain"
               />
             </div>
           </div>
@@ -90,7 +93,9 @@ export default function Footer() {
               {navigation.explore.map((item) => (
                 <li key={item.href}>
                   <Link
-                    href={localizedPath(item.href, locale)}
+                    href={item.href.startsWith("http") ? item.href : localizedPath(item.href, locale)}
+                    target={item.href.startsWith("http") ? "_blank" : undefined}
+                    rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     className="text-sm transition-colors duration-200 hover:text-[#F3ECFB]"
                     style={{
                       color: "rgba(243,236,251,0.65)",
@@ -116,7 +121,9 @@ export default function Footer() {
               {navigation.accompagnement.map((item) => (
                 <li key={item.href}>
                   <Link
-                    href={localizedPath(item.href, locale)}
+                    href={item.href.startsWith("http") ? item.href : localizedPath(item.href, locale)}
+                    target={item.href.startsWith("http") ? "_blank" : undefined}
+                    rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     className="text-sm transition-colors duration-200 hover:text-[#F3ECFB]"
                     style={{
                       color: "rgba(243,236,251,0.65)",

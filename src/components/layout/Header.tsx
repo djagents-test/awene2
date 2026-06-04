@@ -12,6 +12,7 @@ import {
   translations,
   type Locale,
 } from "@/lib/i18n";
+import { CALENDLY_BOOKING_URL } from "@/lib/calendly";
 
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -98,7 +99,9 @@ export default function Header() {
               ))}
             </div>
             <Link
-              href={localizedPath("/contact", locale)}
+              href={CALENDLY_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex min-w-[11rem] items-center justify-center px-6 py-2.5 rounded-full text-sm font-semibold text-white transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap"
               style={{
                 background: "linear-gradient(135deg, #E02B20 0%, #C0221A 100%)",
@@ -168,7 +171,9 @@ export default function Header() {
           </div>
           <div className="pt-4">
             <Link
-              href={localizedPath("/contact", locale)}
+              href={CALENDLY_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
               onClick={() => setMobileOpen(false)}
               className="block text-center px-6 py-3.5 rounded-full text-sm font-semibold text-white"
               style={{

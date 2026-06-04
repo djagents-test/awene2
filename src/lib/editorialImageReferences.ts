@@ -44,9 +44,9 @@ export const editorialImageReferences: Record<
     note: "Homepage enterprise and partnership support image.",
   },
   homeReadyCall: {
-    src: "/images/2150701504.jpg",
+    src: "/images/employeur-bien-etre-travail.jpg",
     referenceUrl: "",
-    alt: "Portrait de femme adulte",
+    alt: "Femme souriante tenant une tablette dans un environnement professionnel extérieur",
     note: "Homepage support image for the call booking card.",
   },
   homeCommunity: {
@@ -56,10 +56,10 @@ export const editorialImageReferences: Record<
     note: "Homepage newsletter and community support image.",
   },
   coachingProcessSupport: {
-    src: "/images/2150701504.jpg",
+    src: "/images/employeur-bien-etre-travail.jpg",
     referenceUrl:
       "https://www.magnific.com/free-photo/medium-shot-woman-wearing-halal-outdoors_59234194.htm#fromView=search&page=1&position=25&uuid=1f0d3254-ddd7-4650-b8ce-99cd1f95b3b7&query=menopause+arab+women",
-    alt: "Femme accompagnée dans un cadre bienveillant",
+    alt: "Femme souriante tenant une tablette dans un environnement professionnel extérieur, représentant un employeur engagé dans le bien-être au travail",
     note: "Supporting image for coaching process section.",
   },
   formationsHero: {

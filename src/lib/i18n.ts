@@ -39,6 +39,10 @@ export function localeFromPath(pathname: string): Locale {
     return "en";
   }
 
+  if (pathname === "/fr" || pathname.startsWith("/fr/")) {
+    return "fr";
+  }
+
   if (pathname === "/ar" || pathname.startsWith("/ar/")) {
     return "ar";
   }
@@ -49,13 +53,17 @@ export function localeFromPath(pathname: string): Locale {
 export function pathWithoutLocale(pathname: string) {
   const normalized = canonicalize(pathname);
 
-  if (pathname === "/en" || pathname === "/ar") {
+  if (pathname === "/en" || pathname === "/fr" || pathname === "/ar") {
     return "/";
   }
 
   if (normalized.startsWith("/en/")) {
     const stripped = normalized.slice(3) || "/";
     return reverseSlugMap("en")[stripped] ?? stripped;
+  }
+
+  if (normalized.startsWith("/fr/")) {
+    return normalized.slice(3) || "/";
   }
 
   if (normalized.startsWith("/ar/")) {
@@ -70,7 +78,7 @@ export function localizedPath(path: string, locale: Locale) {
   const normalized = canonicalize(path);
 
   if (locale === "fr") {
-    return normalized;
+    return normalized === "/" ? "/fr" : `/fr${normalized}`;
   }
 
   const localized = localizedSlugMaps[locale][normalized as keyof (typeof localizedSlugMaps)[typeof locale]] ?? normalized;

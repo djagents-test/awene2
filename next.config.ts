@@ -10,6 +10,30 @@ const wordpressImageHostname = wordpressApiUrl
   : undefined;
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: "/fr/articles/:slug",
+        destination: "/fr/article?slug=:slug",
+      },
+      {
+        source: "/en/articles/:slug",
+        destination: "/en/article?slug=:slug",
+      },
+      {
+        source: "/fr/formations/:slug",
+        destination: "/fr/formation?slug=:slug",
+      },
+      {
+        source: "/en/training/:slug",
+        destination: "/en/formation?slug=:slug",
+      },
+      {
+        source: "/en/formations/:slug",
+        destination: "/en/formation?slug=:slug",
+      },
+    ];
+  },
   images: {
     remotePatterns: wordpressImageHostname
       ? [

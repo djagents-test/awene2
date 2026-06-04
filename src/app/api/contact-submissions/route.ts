@@ -35,7 +35,7 @@ function emailShell({
   ctaLabel: string;
   locale: "fr" | "en";
 }) {
-  const ctaHref = locale === "en" ? `${SITE_URL}/en/articles` : `${SITE_URL}/articles`;
+  const ctaHref = locale === "en" ? `${SITE_URL}/en/articles` : `${SITE_URL}/fr/articles`;
   const footer = locale === "en"
     ? "AWENE supports women through perimenopause and menopause with a science-rooted, deeply human approach."
     : "AWENE accompagne les femmes en périménopause et ménopause avec une approche scientifique et profondément humaine.";

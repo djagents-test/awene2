@@ -1,52 +1,31 @@
-import type { Metadata } from "next";
-import JsonLd from "@/components/seo/JsonLd";
-import Hero from "@/components/sections/Hero";
-import Approach from "@/components/sections/Pillars";
-import AmiraBio from "@/components/sections/Manifesto";
-import GetStarted from "@/components/sections/MovementCapture";
-import Entreprises from "@/components/sections/CTABand";
-import FAQ from "@/components/sections/FAQ";
-import { breadcrumbSchema, webPageSchema, websiteSchema } from "@/lib/jsonld";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "AWENE | Coaching périménopause et ménopause, comprendre son corps autrement",
-  description:
-    "AWENE accompagne les femmes en périménopause et ménopause avec une approche scientifique, humaine et apaisée. Comprendre les hormones, les symptômes et le système nerveux pour avancer avec plus de clarté.",
-  keywords: [
-    "coaching ménopause",
-    "coaching périménopause",
-    "accompagnement ménopause en ligne",
-    "bouffées de chaleur",
-    "fatigue ménopause",
-    "brain fog",
-    "troubles du sommeil",
-    "prise de poids ménopause",
-    "cycles irréguliers",
-    "MENA",
-  ],
-};
+function preferredLocale(acceptLanguage: string | null): "fr" | "en" {
+  if (!acceptLanguage) {
+    return "fr";
+  }
 
-export default function Home() {
-  return (
-    <>
-      <JsonLd
-        data={[
-          websiteSchema(),
-          breadcrumbSchema([{ name: "Accueil", path: "/" }]),
-          webPageSchema({
-            path: "/",
-            title: "AWENE | Coaching périménopause et ménopause, comprendre son corps autrement",
-            description:
-              "AWENE accompagne les femmes en périménopause et ménopause avec une approche scientifique, humaine et apaisée. Comprendre les hormones, les symptômes et le système nerveux pour avancer avec plus de clarté.",
-          }),
-        ]}
-      />
-      <Hero />
-      <Approach />
-      <AmiraBio />
-      <GetStarted />
-      <Entreprises />
-      <FAQ />
-    </>
-  );
+  const values = acceptLanguage
+    .split(",")
+    .map((entry) => {
+      const [tag = "", qualityPart] = entry.trim().split(";q=");
+      const quality = qualityPart ? Number.parseFloat(qualityPart) : 1;
+      const base = tag.toLowerCase().split("-")[0] ?? "";
+      return {
+        base,
+        quality: Number.isFinite(quality) ? quality : 0,
+      };
+    })
+    .filter((entry) => entry.base === "fr" || entry.base === "en")
+    .sort((left, right) => right.quality - left.quality);
+
+  return values[0]?.base === "en" ? "en" : "fr";
+}
+
+export default async function RootPage() {
+  const acceptLanguage = (await headers()).get("accept-language");
+  const locale = preferredLocale(acceptLanguage);
+
+  redirect(`/${locale}`);
 }

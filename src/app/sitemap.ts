@@ -33,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticEntries: MetadataRoute.Sitemap = staticCanonicalRoutes.flatMap((path) => [
     {
-      url: absoluteUrl(path),
+      url: absoluteUrl(localizedPath(path, "fr")),
       changeFrequency: path === "/" ? "weekly" : "monthly",
       priority: path === "/" ? 1 : path === "/coaching" || path === "/a-propos" || path === "/formations" ? 0.9 : 0.7,
     },
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const articleEntries: MetadataRoute.Sitemap = articles.flatMap((article) => [
     {
-      url: absoluteUrl(`/articles/${article.slug}`),
+      url: absoluteUrl(localizedPath(`/articles/${article.slug}`, "fr")),
       changeFrequency: "monthly",
       priority: 0.6,
     },
@@ -59,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const formationEntries: MetadataRoute.Sitemap = formations.flatMap((formation) => [
     {
-      url: absoluteUrl(`/formations/${formation.slug}`),
+      url: absoluteUrl(localizedPath(`/formations/${formation.slug}`, "fr")),
       changeFrequency: "monthly",
       priority: 0.7,
     },

@@ -65,11 +65,12 @@ export default function Button({
 }: ButtonProps) {
   const base = `inline-flex items-center justify-center gap-2 font-semibold rounded-full transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none`;
   const classes = `${base} ${sizeMap[size]} ${fullWidth ? "w-full" : ""} ${className}`;
+  const isExternalHref = Boolean(href && /^https?:\/\//.test(href));
 
   const content = children;
 
   if (href) {
-    if (external) {
+    if (external || isExternalHref) {
       return (
         <a
           href={href}
