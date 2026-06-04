@@ -186,7 +186,7 @@ export default async function ArticlesPage() {
         style={{ background: "linear-gradient(135deg, #4B1F7A 0%, #6F3FD6 50%, #8B52E8 100%)" }}
       >
         <Container className="relative z-10">
-          <div className="max-w-3xl text-center">
+          <div className="mx-auto flex max-w-3xl flex-col items-center justify-center text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl" style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}>
               Ces articles vous parlent ?
             </h2>

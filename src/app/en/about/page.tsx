@@ -31,8 +31,9 @@ const beliefParagraphs = [
 ] as const;
 
 const notBullets = [
-  "AWENE is not another wellness platform.",
-  "It is not intuitive coaching, positive thinking, or quick fixes for hot flashes and weight gain.",
+  "AWENE is not intuitive coaching.",
+  "It is not positive thinking.",
+  "It is not miracle solutions.",
 ] as const;
 
 const bio = [
@@ -187,21 +188,33 @@ export default function AboutPage() {
               <div className="absolute -right-24 -bottom-8 h-44 w-44 rounded-full md:h-56 md:w-56" style={{ background: "radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(237,229,251,0.52) 55%, transparent 72%)" }} aria-hidden="true" />
               <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.78fr)] lg:gap-14">
                 <div>
-                  <h2 className="text-4xl font-bold leading-[0.95] md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2B2240" }}>
-                    What AWENE Is Not
+                  <h2
+                    className="text-4xl font-bold uppercase leading-[0.95] md:text-5xl lg:text-6xl"
+                    style={{ fontFamily: "var(--font-playfair)", color: "#241c38" }}
+                  >
+                    <span style={{ color: "#6F3FD6", fontStyle: "italic", fontWeight: 500, textTransform: "none" }}>Not</span>{" "}
+                    ANOTHER
+                    <br />
+                    WELLNESS
+                    <br />
+                    <span style={{ color: "#6F3FD6", fontStyle: "italic", fontWeight: 500, textTransform: "none" }}>PLATFORM.</span>
                   </h2>
                 </div>
-                <div>
-                  <div className="space-y-4">
+                <div className="max-w-[30rem] lg:pt-3">
+                  <div
+                    className="space-y-2 text-lg leading-relaxed md:text-[1.45rem]"
+                    style={{ color: "#4B455B", fontFamily: "var(--font-inter)" }}
+                  >
                     {notBullets.map((item) => (
-                      <p key={item} className="text-xl leading-relaxed md:text-[1.6rem]" style={{ color: "#5A5670", fontFamily: "var(--font-inter)" }}>
-                        {item}
-                      </p>
+                      <p key={item}>{item}</p>
                     ))}
                   </div>
-                  <div className="my-7 h-px w-16 rounded-full" style={{ background: "#F68B2C" }} />
-                  <p className="max-w-xl text-xl leading-relaxed md:text-[1.55rem]" style={{ color: "#4B1F7A", fontFamily: "var(--font-inter)" }}>
-                    It is a rigorous integrative approach — one that starts with the body, with biology, with hormones, and with the actual reality of each woman's life.
+                  <div className="my-6 h-px w-10 rounded-full" style={{ background: "rgba(246,139,44,0.6)" }} />
+                  <p
+                    className="text-lg leading-relaxed md:text-[1.45rem]"
+                    style={{ color: "#4B455B", fontFamily: "var(--font-inter)" }}
+                  >
+                    AWENE is a rigorous integrative approach, one that starts with the body, biology, hormones, and the real life of each woman.
                   </p>
                 </div>
               </div>
@@ -211,27 +224,29 @@ export default function AboutPage() {
 
         <Section background="white" size="lg">
           <Container>
-            <div className="grid gap-10 lg:grid-cols-[minmax(18rem,0.6fr)_minmax(0,1fr)] lg:gap-14">
-              <div className="mx-auto w-full max-w-[19rem] lg:mx-0">
-                <div className="aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#F3ECFB]">
-                  <AmiraPortraitSlot alt="Portrait of Amira Medimagh" className="h-full w-full rounded-[2rem]" />
+            <div className="grid grid-cols-1 gap-10 lg:gap-12">
+              <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(16rem,21rem)_minmax(0,1fr)] lg:items-stretch lg:gap-12">
+                <div className="mx-auto w-full max-w-[22rem] lg:mx-0 lg:max-w-none">
+                  <div className="aspect-[4/5] overflow-hidden rounded-[2rem] bg-[#F3ECFB] lg:h-full lg:aspect-auto">
+                    <AmiraPortraitSlot alt="Portrait of Amira Medimagh" className="h-full w-full rounded-[2rem]" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p className="mb-4 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
-                  <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
-                  Amira Medimagh
-                </p>
-                <h2 className="mb-3 text-4xl font-bold md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
-                  Amira Medimagh
-                </h2>
-                <p className="mb-8 text-base font-semibold leading-relaxed md:text-lg" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
-                  Physician. Public Health Expert. Certified Coach.
-                </p>
-                <div className="space-y-5 text-base leading-relaxed md:text-lg" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-                  {bio.map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))}
+                <div>
+                  <p className="mb-4 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
+                    <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
+                    Amira Medimagh
+                  </p>
+                  <h2 className="mb-3 text-4xl font-bold md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
+                    Amira Medimagh
+                  </h2>
+                  <p className="mb-8 text-base font-semibold leading-relaxed md:text-lg" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
+                    Physician. Public Health Expert. Certified Coach.
+                  </p>
+                  <div className="space-y-5 text-base leading-relaxed md:text-lg" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
+                    {bio.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -278,21 +293,14 @@ export default function AboutPage() {
             <h2 className="mb-10 text-4xl font-bold md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
               Qualifications & Certifications
             </h2>
-            <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.56fr)]">
-              <div className="space-y-4">
-                {certifications.map((item) => (
-                  <div key={item} className="rounded-2xl border bg-white px-5 py-4 md:px-6" style={{ borderColor: "#E8DFF0" }}>
-                    <p className="text-sm font-medium md:text-base" style={{ color: "#5A5670", fontFamily: "var(--font-inter)" }}>
-                      {item}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="mx-auto w-full max-w-[18rem]">
-                <div className="aspect-[4/5] overflow-hidden rounded-[2rem] bg-white">
-                  <AmiraPortraitSlot alt="Portrait of Amira Medimagh" className="h-full w-full rounded-[2rem]" />
+            <div className="space-y-4">
+              {certifications.map((item) => (
+                <div key={item} className="rounded-2xl border bg-white px-5 py-4 md:px-6" style={{ borderColor: "#E8DFF0" }}>
+                  <p className="text-sm font-medium md:text-base" style={{ color: "#5A5670", fontFamily: "var(--font-inter)" }}>
+                    {item}
+                  </p>
                 </div>
-              </div>
+              ))}
             </div>
           </Container>
         </Section>

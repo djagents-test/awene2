@@ -211,20 +211,25 @@ export default async function EvenementsPage() {
 
       {/* ── NEWSLETTER ── */}
       <section
-        className="relative overflow-hidden py-20 md:py-24"
+        className="relative overflow-x-hidden overflow-y-hidden py-20 md:py-24"
         style={{ background: "linear-gradient(135deg, #4B1F7A 0%, #6F3FD6 50%, #8B52E8 100%)" }}
       >
         <Container className="relative z-10">
-          <div className="mx-auto flex max-w-[900px] flex-col items-center justify-center text-center">
+          <div className="mx-auto flex max-w-3xl flex-col items-center justify-center text-center">
             <h2
-              className="mb-4 lg:whitespace-nowrap"
+              className="mb-4 max-w-full text-center"
               style={{
                 fontFamily: "var(--font-playfair)",
                 color: "#F3ECFB",
-                fontSize: "clamp(2.5rem, 4vw, 4rem)",
+                fontSize: "clamp(1.875rem, 3vw, 2.25rem)",
+                lineHeight: 1.1,
+                maxWidth: "min(100%, 48rem)",
+                marginInline: "auto",
+                overflowWrap: "normal",
+                wordBreak: "normal",
               }}
             >
-              Je m&apos;inscris à la newsletter pour être informé-e en premier
+              Je m&apos;inscris à la newsletter pour être informée en premier
             </h2>
             <p className="text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
               Inscrivez-vous à la newsletter AWENE pour recevoir les annonces d&apos;événements avant tout le monde.

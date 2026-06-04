@@ -136,15 +136,20 @@ export default async function EventsPage() {
         </Container>
       </Section>
 
-      <section className="relative overflow-hidden py-20 md:py-24" style={{ background: "linear-gradient(135deg, #4B1F7A 0%, #6F3FD6 50%, #8B52E8 100%)" }}>
+      <section className="relative overflow-x-hidden overflow-y-hidden py-20 md:py-24" style={{ background: "linear-gradient(135deg, #4B1F7A 0%, #6F3FD6 50%, #8B52E8 100%)" }}>
         <Container className="relative z-10">
           <div className="mx-auto flex max-w-[900px] flex-col items-center justify-center text-center">
             <h2
-              className="mb-4 lg:whitespace-nowrap"
+              className="mb-4 max-w-full text-center"
               style={{
                 fontFamily: "var(--font-playfair)",
                 color: "#F3ECFB",
-                fontSize: "clamp(2.5rem, 4vw, 4rem)",
+                fontSize: "clamp(2.2rem, 5vw, 4.75rem)",
+                lineHeight: 1.05,
+                maxWidth: "min(100%, 1100px)",
+                marginInline: "auto",
+                overflowWrap: "normal",
+                wordBreak: "normal",
               }}
             >
               Subscribe to the newsletter to hear first
