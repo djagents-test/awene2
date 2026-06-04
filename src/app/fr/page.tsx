@@ -528,7 +528,7 @@ function PartnerCard({
           {eyebrow}
         </p>
         <h3
-          className="mt-6 text-3xl font-bold leading-tight md:text-4xl xl:text-5xl"
+          className="mt-6 text-2xl font-bold leading-tight md:text-[2rem] xl:text-[2.4rem]"
           style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}
         >
           {title}
