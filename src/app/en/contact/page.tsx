@@ -130,10 +130,7 @@ export default async function ContactPage({
                   Choose your time slot directly for a first 30-minute conversation, free of charge and without commitment.
                 </p>
                 <div className="mt-6">
-                  <Button href={CALENDLY_BOOKING_URL}>Open Calendly</Button>
-                </div>
-                <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#E8DFF0]">
-                  <iframe src={CALENDLY_BOOKING_URL} title="AWENE Calendly" className="h-[700px] w-full border-0" />
+                  <Button href={CALENDLY_BOOKING_URL}>Book a call</Button>
                 </div>
               </div>
 

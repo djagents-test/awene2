@@ -19,6 +19,7 @@ export default function Footer() {
       { label: t.nav.formations, href: "/formations" },
       { label: t.nav.articles, href: "/articles" },
       { label: t.nav.events, href: "/evenements" },
+      { label: t.nav.contact, href: "/contact" },
     ],
     accompagnement: [
       { label: locale === "fr" ? "Le rôle du coach" : locale === "en" ? "The coach role" : "دور الكوتش", href: "/chemine-avec-moi/role-du-coach" },

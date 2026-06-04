@@ -7,34 +7,47 @@ import Section from "@/components/ui/Section";
 import { breadcrumbSchema, organizationSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
-  title: "About | AWENE",
+  title: "About | AWENE — Menopause & Perimenopause Coaching by Amira Medimagh",
   description:
-    "Amira Medimagh is a physician, public health expert and certified perimenopause and menopause coach. Discover why AWENE exists and what makes this approach different.",
+    "Amira Medimagh is a physician, public health expert and certified menopause and perimenopause coach. Learn what AWENE is built on — and why this approach is different.",
+  keywords: [
+    "Amira Medimagh menopause coach",
+    "physician menopause coach",
+    "AWENE Tunisia MENA",
+    "women's health",
+    "polyvagal theory",
+    "female longevity",
+    "public health",
+    "IIN",
+    "IWHI",
+    "hormonal health",
+  ],
 };
 
 const beliefParagraphs = [
-  "Perimenopause and menopause are not a disease. They are also not years to endure in silence with hot flashes, chronic fatigue, brain fog, sleep disruption, or unexplained weight gain.",
-  "They are real biological transitions, well documented, understandable, and easier to move through with the right tools.",
-  "AWENE was born from one simple conviction: every woman deserves to understand what is happening in her body, her hormones, her nervous system, her symptoms, and to have access to serious support rooted in science and adapted to her reality.",
+  "Perimenopause and menopause are not a disease. They are not years to be quietly endured — years of hot flashes, bone-deep fatigue, a mind that fogs over, sleep that won't come, or weight that shifts for no reason you can name.",
+  "They are real biological transitions — documented, understandable, navigable — with the right tools and the right support.",
+  "AWENE was built on a single conviction: every woman deserves to understand what is happening inside her body — her hormones, her nervous system, her symptoms — and to have access to support that is serious, science-based and genuinely adapted to her life.",
 ] as const;
 
 const notBullets = [
-  "AWENE is not intuitive coaching.",
-  "It is not positive thinking.",
-  "It is not miracle solutions.",
+  "AWENE is not another wellness platform.",
+  "It is not intuitive coaching, positive thinking, or quick fixes for hot flashes and weight gain.",
 ] as const;
 
 const bio = [
-  "Amira Medimagh is a physician with a Master’s degree in public health and more than 20 years of experience in international public health, especially in sexual and reproductive health, HIV, and women’s rights in Tunisia and across the MENA region.",
-  "Since 2025, she has been a certified integrative health and nutrition coach through the Institute for Integrative Nutrition in the United States, and a certified perimenopause and menopause coach through the Integrative Women’s Health Institute.",
-  "She is currently training in polyvagal theory and female longevity to integrate the latest approaches in neuroscience, hormonal health, and women’s health into her work.",
+  "Amira Medimagh is a physician with a Master's in public health and over twenty years of experience in international public health — in sexual and reproductive health, HIV/AIDS and women's rights, across Tunisia and the MENA region.",
+  "Since 2025, she holds certifications in integrative health and nutrition coaching from the Institute for Integrative Nutrition (USA), and in perimenopause and menopause coaching from the Integrative Women's Health Institute.",
+  "She is currently deepening her training in polyvagal theory and female longevity — bringing the most current thinking in neuroscience and hormonal health into her practice.",
 ] as const;
 
 const certifications = [
   "Doctor of Medicine",
-  "Master’s degree in Public Health",
-  "Certified Integrative Health and Nutrition Coach, Institute for Integrative Nutrition (IIN)",
-  "Certified Perimenopause and Menopause Coach, Integrative Women’s Health Institute (IWHI)",
+  "Master's in Public Health",
+  "Certified Coach in Integrative Health & Nutrition — Institute for Integrative Nutrition (IIN), USA",
+  "Certified Perimenopause & Menopause Coach — Integrative Women's Health Institute (IWHI)",
+  "Currently training: Longevity for Women in Menopause and Perimenopause",
+  "Currently training: Applied Polyvagal Theory — Polyvagal Institute",
 ] as const;
 
 function ConvictionIcon({ kind }: { kind: "leaf" | "thermo" | "brain" }) {
@@ -71,9 +84,9 @@ export default function AboutPage() {
         data={[
           webPageSchema({
             path: "/en/about",
-            title: "About | AWENE",
+            title: "About | AWENE — Menopause & Perimenopause Coaching by Amira Medimagh",
             description:
-              "Amira Medimagh is a physician, public health expert and certified perimenopause and menopause coach. Discover why AWENE exists and what makes this approach different.",
+              "Amira Medimagh is a physician, public health expert and certified menopause and perimenopause coach. Learn what AWENE is built on — and why this approach is different.",
             type: "AboutPage",
             about: organizationSchema(),
             inLanguage: "en",
@@ -103,7 +116,7 @@ export default function AboutPage() {
                 <span style={{ background: "linear-gradient(135deg, #F68B2C 0%, #6F3FD6 100%)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
                   AWENE
                 </span>{" "}
-                , Why this approach exists.
+                — Why This Exists.
               </h1>
             </div>
           </Container>
@@ -116,10 +129,10 @@ export default function AboutPage() {
                 <div className="order-2 py-4 lg:order-1 lg:pr-14 lg:py-6">
                   <p className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
                     <span className="block h-px w-8 shrink-0" style={{ background: "#F68B2C" }} />
-                    Our conviction
+                    What We Believe
                   </p>
                   <h2 className="mb-4 text-4xl font-bold leading-[1.02] md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2B2240" }}>
-                    What we believe
+                    What We Believe
                   </h2>
                   <div className="mb-8 h-px w-16 rounded-full" style={{ background: "#F68B2C" }} />
                   <div className="grid gap-6">
@@ -136,7 +149,7 @@ export default function AboutPage() {
                   </div>
                   <div className="mt-10">
                     <p className="awene-emphasis text-xl leading-tight md:text-2xl" style={{ fontFamily: "var(--font-playfair)" }}>
-                      No generalities. No promises. Concrete answers.
+                      No generalities. No empty promises. Real answers.
                     </p>
                   </div>
                 </div>
@@ -152,7 +165,7 @@ export default function AboutPage() {
                     “
                   </div>
                   <p className="text-lg italic leading-relaxed md:text-[1.6rem]" style={{ color: "#2B2240", fontFamily: "var(--font-playfair)" }}>
-                    Every woman deserves to understand her body, her hormones, her symptoms, and to have access to serious support rooted in science and adapted to her reality.
+                    Every woman deserves to understand what is happening inside her body — her hormones, her nervous system, her symptoms — and to have access to support that is serious, science-based and genuinely adapted to her life.
                   </p>
                   <div className="flex items-start justify-start lg:justify-end" aria-hidden="true">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/35 backdrop-blur-sm">
@@ -175,7 +188,7 @@ export default function AboutPage() {
               <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.78fr)] lg:gap-14">
                 <div>
                   <h2 className="text-4xl font-bold leading-[0.95] md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2B2240" }}>
-                    <span className="awene-emphasis">Not</span> ANOTHER WELLNESS PLATFORM.
+                    What AWENE Is Not
                   </h2>
                 </div>
                 <div>
@@ -188,7 +201,7 @@ export default function AboutPage() {
                   </div>
                   <div className="my-7 h-px w-16 rounded-full" style={{ background: "#F68B2C" }} />
                   <p className="max-w-xl text-xl leading-relaxed md:text-[1.55rem]" style={{ color: "#4B1F7A", fontFamily: "var(--font-inter)" }}>
-                    AWENE is a rigorous integrative approach that starts from the body, biology, hormones, and the real life of every woman.
+                    It is a rigorous integrative approach — one that starts with the body, with biology, with hormones, and with the actual reality of each woman's life.
                   </p>
                 </div>
               </div>
@@ -207,13 +220,13 @@ export default function AboutPage() {
               <div>
                 <p className="mb-4 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
                   <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
-                  Your guide
+                  Amira Medimagh
                 </p>
                 <h2 className="mb-3 text-4xl font-bold md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
                   Amira Medimagh
                 </h2>
                 <p className="mb-8 text-base font-semibold leading-relaxed md:text-lg" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
-                  Physician. Public health expert. Certified coach.
+                  Physician. Public Health Expert. Certified Coach.
                 </p>
                 <div className="space-y-5 text-base leading-relaxed md:text-lg" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
                   {bio.map((paragraph) => (
@@ -236,18 +249,24 @@ export default function AboutPage() {
               </div>
               <div>
                 <h3 className="mb-4 text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#4B1F7A" }}>
-                  Why this path
+                  Why This Path
                 </h3>
                 <p className="text-sm leading-relaxed md:text-base" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-                  After two decades working on health systems, Amira made a different choice: bringing women closer to individual support. Not statistics. Not standardized programs. Real women, with real bodies, real symptoms, real lives. AWENE stands where public-health rigor meets the closeness of human support.
+                  After two decades working on health systems — the structures, the data, the policies — Amira made a deliberate choice: to get much closer to individual women. Not to statistics. Not to programmes. To real women, with real bodies, real symptoms and real lives.
+                </p>
+                <p className="mt-3 text-sm leading-relaxed md:text-base" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
+                  AWENE is that bridge: between the rigour of public health and the intimacy of genuine human support.
                 </p>
               </div>
               <div>
                 <h3 className="mb-4 text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#4B1F7A" }}>
-                  What makes her different
+                  What Sets Her Apart
                 </h3>
                 <p className="text-sm leading-relaxed md:text-base" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-                  Not just another coach. A physician who supports. The difference is not the title, it is the ability to read what your body, your hormones, and your nervous system are trying to communicate, the biological mechanisms behind symptoms, with precision. And to answer with rigor and humanity.
+                  Not just a coach. A physician who accompanies.
+                </p>
+                <p className="mt-3 text-sm leading-relaxed md:text-base" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
+                  The difference is not the title — it is the ability to read what a body is saying: the hormonal signals, the nervous system patterns, the biological mechanisms beneath the symptoms. To read all of that with precision. And to help each woman respond to it with humanity.
                 </p>
               </div>
             </div>
@@ -257,37 +276,22 @@ export default function AboutPage() {
         <Section background="offwhite" size="lg">
           <Container size="md">
             <h2 className="mb-10 text-4xl font-bold md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
-              Education and certifications
+              Qualifications & Certifications
             </h2>
-            <div className="space-y-4">
-              {certifications.map((item) => (
-                <div key={item} className="rounded-2xl border bg-white px-5 py-4 md:px-6" style={{ borderColor: "#E8DFF0" }}>
-                  <p className="text-sm font-medium md:text-base" style={{ color: "#5A5670", fontFamily: "var(--font-inter)" }}>
-                    {item}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-10 flex flex-wrap items-center gap-6">
-              <div className="relative h-24 w-24 flex-shrink-0">
-                <Image
-                  src="/images/INHC.jpg"
-                  alt="Certification badge in integrative health and nutrition from the Institute for Integrative Nutrition."
-                  title="Integrative health and nutrition certification"
-                  fill
-                  className="object-contain"
-                  sizes="6rem"
-                />
+            <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.56fr)]">
+              <div className="space-y-4">
+                {certifications.map((item) => (
+                  <div key={item} className="rounded-2xl border bg-white px-5 py-4 md:px-6" style={{ borderColor: "#E8DFF0" }}>
+                    <p className="text-sm font-medium md:text-base" style={{ color: "#5A5670", fontFamily: "var(--font-inter)" }}>
+                      {item}
+                    </p>
+                  </div>
+                ))}
               </div>
-              <div className="relative h-24 w-24 flex-shrink-0">
-                <Image
-                  src="/images/IWHI_CERTIFIED.jpg"
-                  alt="Certification badge in perimenopause and menopause from the Integrative Women's Health Institute."
-                  title="Perimenopause and menopause certification"
-                  fill
-                  className="object-contain"
-                  sizes="6rem"
-                />
+              <div className="mx-auto w-full max-w-[18rem]">
+                <div className="aspect-[4/5] overflow-hidden rounded-[2rem] bg-white">
+                  <AmiraPortraitSlot alt="Portrait of Amira Medimagh" className="h-full w-full rounded-[2rem]" />
+                </div>
               </div>
             </div>
           </Container>

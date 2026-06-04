@@ -99,7 +99,7 @@ export default function FrenchHomePageRoute() {
       >
         <div className="absolute inset-0" aria-hidden="true">
           <Image
-            src="/images/2151249731.jpg"
+            src="/images/62256.jpg"
             alt=""
             fill
             priority

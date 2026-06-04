@@ -389,28 +389,6 @@ export default function AProposPage() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-10 flex flex-wrap items-center gap-6">
-                  <div className="relative h-24 w-24 flex-shrink-0">
-                    <Image
-                      src="/images/INHC.jpg"
-                      alt="Badge de certification en santé et nutrition intégratives de l'Institute for Integrative Nutrition."
-                      title="Certification en santé et nutrition intégratives"
-                      fill
-                      className="object-contain"
-                      sizes="6rem"
-                    />
-                  </div>
-                  <div className="relative h-24 w-24 flex-shrink-0">
-                    <Image
-                      src="/images/IWHI_CERTIFIED.jpg"
-                      alt="Badge de certification en périménopause et ménopause de l'Integrative Women's Health Institute."
-                      title="Certification en périménopause et ménopause"
-                      fill
-                      className="object-contain"
-                      sizes="6rem"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
           </Container>

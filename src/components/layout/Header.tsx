@@ -27,6 +27,7 @@ export default function Header() {
     { label: t.nav.formations, href: localizedPath("/formations", locale), base: "/formations" },
     { label: t.nav.articles, href: localizedPath("/articles", locale), base: "/articles" },
     { label: t.nav.events, href: localizedPath("/evenements", locale), base: "/evenements" },
+    { label: t.nav.contact, href: localizedPath("/contact", locale), base: "/contact" },
   ];
 
   const isActive = (href: string) =>
@@ -39,21 +40,23 @@ export default function Header() {
       className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-[0_1px_0_rgba(110,100,120,0.1)]"
     >
       <Container>
-        <div className="flex h-20 items-center justify-between gap-6 lg:grid lg:grid-cols-[auto_1fr_auto] lg:items-center">
+        <div className="flex h-24 items-center justify-between gap-6 lg:grid lg:grid-cols-[auto_1fr_auto] lg:items-center">
           {/* Logo */}
           <Link
             href={localizedPath("/", locale)}
-            className="flex items-center gap-2"
+            className="flex shrink-0 items-center"
             aria-label={`AWENE, ${t.nav.home}`}
           >
-            <Image
-              src="/AWENE.png"
-              alt="AWENE"
-              width={56}
-              height={56}
-              className="h-[3.15rem] w-auto"
-              priority
-            />
+            <div className="relative h-[4.6rem] w-[4.6rem] shrink-0 md:h-[5rem] md:w-[5rem] lg:h-[5.35rem] lg:w-[5.35rem]">
+              <Image
+                src="/AWENE.png"
+                alt="AWENE"
+                fill
+                className="object-contain"
+                sizes="(min-width: 1024px) 5.35rem, (min-width: 768px) 5rem, 4.6rem"
+                priority
+              />
+            </div>
           </Link>
 
           {/* Desktop Nav */}

@@ -5,6 +5,7 @@ import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import { getEvents, type CmsEvent } from "@/lib/cms";
+import { NEWSLETTER_SIGNUP_URL } from "@/lib/newsletter";
 import { breadcrumbSchema, cmsEventSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
@@ -214,13 +215,25 @@ export default async function EvenementsPage() {
         style={{ background: "linear-gradient(135deg, #4B1F7A 0%, #6F3FD6 50%, #8B52E8 100%)" }}
       >
         <Container className="relative z-10">
-          <div className="max-w-3xl text-center">
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl" style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}>
+          <div className="mx-auto flex max-w-[900px] flex-col items-center justify-center text-center">
+            <h2
+              className="mb-4 lg:whitespace-nowrap"
+              style={{
+                fontFamily: "var(--font-playfair)",
+                color: "#F3ECFB",
+                fontSize: "clamp(2.5rem, 4vw, 4rem)",
+              }}
+            >
               Je m&apos;inscris à la newsletter pour être informé-e en premier
             </h2>
             <p className="text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
               Inscrivez-vous à la newsletter AWENE pour recevoir les annonces d&apos;événements avant tout le monde.
             </p>
+            <div className="mt-8">
+              <Button href={NEWSLETTER_SIGNUP_URL} variant="light" size="lg" external>
+                Je m&apos;inscris à la newsletter
+              </Button>
+            </div>
           </div>
         </Container>
       </section>

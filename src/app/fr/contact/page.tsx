@@ -167,13 +167,6 @@ export default async function ContactPage({
                 <div className="mt-6">
                   <Button href={CALENDLY_BOOKING_URL}>Ouvrir Calendly</Button>
                 </div>
-                <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#E8DFF0]">
-                  <iframe
-                    src={CALENDLY_BOOKING_URL}
-                    title="Calendly AWENE"
-                    className="h-[700px] w-full border-0"
-                  />
-                </div>
               </div>
 
               <div
