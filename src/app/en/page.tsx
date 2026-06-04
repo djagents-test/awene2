@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import EditorialImageBlock from "@/components/ui/EditorialImageBlock";
 import NewsletterSignupForm from "@/components/ui/NewsletterSignupForm";
+import PartnerCard from "@/components/ui/PartnerCard";
 import Section from "@/components/ui/Section";
 import { CALENDLY_BOOKING_URL } from "@/lib/calendly";
 import { breadcrumbSchema, webPageSchema, websiteSchema } from "@/lib/jsonld";
@@ -96,7 +97,7 @@ export default function EnglishHomePage() {
             alt=""
             fill
             priority
-            className="object-cover object-[78%_18%] opacity-[0.34] md:object-[76%_22%] lg:object-[82%_20%]"
+            className="object-cover object-[62%_22%] opacity-[0.34] md:object-[76%_22%] lg:object-[82%_20%]"
             sizes="100vw"
           />
           <div
@@ -203,14 +204,24 @@ export default function EnglishHomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {pillars.map((pillar) => (
-              <article
+            {pillars.map((pillar, i) => (
+              <div
                 key={pillar.title}
-                className="rounded-3xl border p-8"
-                style={{ borderColor: "#E8DFF0", background: pillar.bg }}
+                className="group relative rounded-3xl border p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_40px_rgba(110,63,214,0.12)] md:p-10"
+                style={{ background: pillar.bg, borderColor: "#E8DFF0" }}
               >
+                <span
+                  className="absolute right-8 top-8 text-xs font-semibold tracking-[0.2em] opacity-40"
+                  style={{ color: pillar.color, fontFamily: "var(--font-inter)" }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div
+                  className="mb-6 h-0.5 w-10 rounded-full transition-all duration-300 group-hover:w-16"
+                  style={{ background: pillar.color }}
+                />
                 <h3
-                  className="mb-4 text-2xl font-bold"
+                  className="mb-4 text-2xl font-bold md:text-3xl"
                   style={{ color: pillar.color, fontFamily: "var(--font-playfair)" }}
                 >
                   {pillar.title}
@@ -221,7 +232,7 @@ export default function EnglishHomePage() {
                 >
                   {pillar.body}
                 </p>
-              </article>
+              </div>
             ))}
           </div>
         </Container>
@@ -351,62 +362,25 @@ export default function EnglishHomePage() {
             >
               AWENE works alongside physicians, gynaecologists, nutritionists, psychologists, osteopaths, fitness coaches and other professionals who support women through hormonal transitions.
             </p>
-            <p
-              className="mx-auto mt-4 max-w-3xl text-base leading-relaxed md:text-lg"
-              style={{ color: "rgba(243,236,251,0.78)", fontFamily: "var(--font-inter)" }}
-            >
-              Our approach is grounded in science, not in trends. Effective support for perimenopause and menopause requires more than one perspective — and the professionals who understand this have every reason to work together.
-            </p>
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <article className="flex h-full flex-col rounded-[2rem] border border-[rgba(243,236,251,0.12)] bg-[rgba(255,255,255,0.04)] p-6 shadow-[0_18px_60px_rgba(35,12,58,0.12)] backdrop-blur-[2px] md:p-8">
-              <div className="mb-6 overflow-hidden rounded-[1.4rem]">
-                <div className="relative aspect-[16/9] w-full">
-                  <Image
-                    src="/images/employeur-bien-etre-travail.jpg"
-                    alt="Smiling woman holding a tablet in an outdoor professional setting, representing an employer committed to workplace well-being."
-                    title="Employer committed to workplace well-being"
-                    fill
-                    className="object-cover object-[50%_35%]"
-                    sizes="(min-width: 1024px) 28rem, 100vw"
-                  />
-                </div>
-              </div>
-              <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "rgba(243,236,251,0.7)", fontFamily: "var(--font-inter)" }}>
-                Employers
-              </p>
-              <h3 className="mt-6 text-3xl font-bold leading-tight md:text-4xl" style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}>
-                Are you an employer?
-              </h3>
-              <p className="mt-6 flex-1 text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
-                The women on your team aged 40 to 55 are navigating perimenopause and menopause quietly, often invisibly. Hot flashes at their desk, a mind that won&apos;t focus, fatigue that won&apos;t lift, concentration that slips — absenteeism and lost productivity carry a real cost. So does doing nothing about it.
-              </p>
-              <div className="mt-8">
-                <Button href="/en/contact" variant="primary" size="lg">
-                  Let&apos;s talk
-                </Button>
-              </div>
-            </article>
-            <article className="flex h-full flex-col rounded-[2rem] border border-[rgba(243,236,251,0.12)] bg-[rgba(255,255,255,0.04)] p-6 shadow-[0_18px_60px_rgba(35,12,58,0.12)] backdrop-blur-[2px] md:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "rgba(243,236,251,0.7)", fontFamily: "var(--font-inter)" }}>
-                Health and wellness professionals
-              </p>
-              <h3 className="mt-6 text-3xl font-bold leading-tight md:text-4xl" style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}>
-                Are you a health or wellness professional?
-              </h3>
-              <p className="mt-6 flex-1 text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
-                A partnership with AWENE might look like co-creating educational content, cross-referring clients, joining forces for online events, or something else entirely — as long as it serves the women we both work with.
-              </p>
-              <p className="mt-4 flex-1 text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
-                If you support women over 40 and are looking for a rigorous, committed partner in the MENA region, we should talk.
-              </p>
-              <div className="mt-8">
-                <Button href="/en/contact" variant="light" size="lg">
-                  Propose a collaboration
-                </Button>
-              </div>
-            </article>
+            <PartnerCard
+              eyebrow="Employers"
+              title="Are you an employer?"
+              body="The women on your team aged 40 to 55 are navigating perimenopause and menopause quietly, often invisibly. Hot flashes at their desk, a mind that won't focus, fatigue that won't lift — absenteeism and lost productivity carry a real cost. So does doing nothing about it."
+              href="/en/contact"
+              cta="Let's talk"
+              variant="primary"
+            />
+            <PartnerCard
+              eyebrow="Health and wellness professionals"
+              title="Are you a health or wellness professional?"
+              body="A partnership with AWENE might look like co-creating educational content, cross-referring clients, joining forces for online events, or something else entirely — as long as it serves the women we both work with. If you support women over 40 and are looking for a rigorous, committed partner in the MENA region, we should talk."
+              href="/en/contact"
+              cta="Propose a collaboration"
+              variant="light"
+            />
           </div>
         </Container>
       </section>

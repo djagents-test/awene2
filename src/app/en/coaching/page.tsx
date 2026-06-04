@@ -236,7 +236,7 @@ export default function CoachingPage() {
               </p>
             </div>
             <div className="w-full max-w-[18rem] justify-self-center lg:justify-self-end">
-              <Image src="/AWENE.png" alt="AWENE" width={180} height={180} className="h-auto w-full max-w-[9rem] justify-self-center" />
+              <Image src="/AWENE.png" alt="AWENE" width={180} height={180} className="h-auto w-full justify-self-center" />
             </div>
           </div>
         </Container>

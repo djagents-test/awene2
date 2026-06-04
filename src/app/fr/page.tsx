@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import EditorialImageBlock from "@/components/ui/EditorialImageBlock";
 import NewsletterSignupForm from "@/components/ui/NewsletterSignupForm";
+import PartnerCard from "@/components/ui/PartnerCard";
 import Section from "@/components/ui/Section";
 import { CALENDLY_BOOKING_URL } from "@/lib/calendly";
 import { breadcrumbSchema, webPageSchema, websiteSchema } from "@/lib/jsonld";
@@ -104,7 +105,7 @@ export default function FrenchHomePageRoute() {
             alt=""
             fill
             priority
-            className="object-cover object-[78%_18%] opacity-[0.34] md:object-[76%_22%] lg:object-[82%_20%]"
+            className="object-cover object-[62%_22%] opacity-[0.34] md:object-[76%_22%] lg:object-[82%_20%]"
             sizes="100vw"
           />
           <div
@@ -428,28 +429,26 @@ export default function FrenchHomePageRoute() {
             >
               Awene développe des collaborations sérieuses, structurées et durables, avec un cadre clair, une démarche éthique et un accompagnement aligné sur les réalités du terrain.
             </p>
-            <div className="mt-8 flex justify-center">
-              <Button href="/fr/contact" size="lg">
-                Discuter d’un partenariat
-              </Button>
-            </div>
           </div>
 
           <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2">
             <PartnerCard
-              eyebrow="Employeurs"
-              title="Vous êtes employeur ?"
-              body="Awene vous aide à intégrer la santé mentale et le bien-être dans une démarche structurée, éthique et adaptée à votre organisation, avec un cadre d’intervention clair et professionnel."
+              eyebrow="Vous êtes une entreprise ?"
+              title="Vous êtes une entreprise ?"
+              body="Vos collaboratrices de 40-55 ans traversent la périménopause et la ménopause en silence. Bouffées de chaleur au bureau, brouillard mental, fatigue chronique, difficultés de concentration — l&apos;absentéisme et la baisse de productivité ont un coût réel. Les solutions aussi."
               href="/fr/contact"
-              cta="Discuter d’un partenariat"
+              cta="Parlons-en"
               variant="primary"
             />
             <PartnerCard
-              eyebrow="Professionnels de la santé ou du bien-être"
-              title="Vous êtes professionnel de la santé ou du bien-être ?"
-              body="Construisons un cadre de collaboration clair, durable et rigoureux pour accompagner les publics avec sérieux, cohérence et confiance, dans une logique de partenariat éthique et structuré."
+              eyebrow="Vous êtes un professionnel de santé ?"
+              title="Vous êtes un professionnel de la santé et/ou du bien-être ?"
+              body={[
+                "AWENE collabore avec des médecins, gynécologues, nutritionnistes, psychologues, ostéopathes, coaches sportifs et autres professionnels qui accompagnent les femmes en transition hormonale.",
+                "Si vous accompagnez des femmes de 40 ans et plus et que vous cherchez un partenaire rigoureux et engagé dans la région MENA, parlons-en.",
+              ]}
               href="/fr/contact"
-              cta="Construire un partenariat"
+              cta="Proposer une collaboration"
               variant="light"
             />
           </div>
@@ -461,71 +460,6 @@ export default function FrenchHomePageRoute() {
   );
 }
 
-function PartnerCard({
-  eyebrow,
-  title,
-  body,
-  href,
-  cta,
-  variant,
-  imageSrc,
-  imageAlt,
-  imageTitle,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  href: string;
-  cta: string;
-  variant: "primary" | "light";
-  imageSrc?: string;
-  imageAlt?: string;
-  imageTitle?: string;
-}) {
-  return (
-    <article className="flex h-full flex-col rounded-[2rem] border border-[rgba(243,236,251,0.12)] bg-[rgba(255,255,255,0.04)] p-6 text-center shadow-[0_18px_60px_rgba(35,12,58,0.12)] backdrop-blur-[2px] md:p-8 lg:text-left">
-      {imageSrc ? (
-        <div className="mb-6 overflow-hidden rounded-[1.4rem]">
-          <div className="relative aspect-[16/9] w-full">
-            <Image
-              src={imageSrc}
-              alt={imageAlt ?? ""}
-              title={imageTitle}
-              fill
-              className="object-cover object-[50%_35%]"
-              sizes="(min-width: 1024px) 28rem, 100vw"
-            />
-          </div>
-        </div>
-      ) : null}
-      <div className="flex flex-1 flex-col">
-        <p
-          className="text-xs font-semibold uppercase tracking-[0.25em]"
-          style={{ color: "rgba(243,236,251,0.7)", fontFamily: "var(--font-inter)" }}
-        >
-          {eyebrow}
-        </p>
-        <h3
-          className="mt-6 text-2xl font-bold leading-tight md:text-[2rem] xl:text-[2.4rem]"
-          style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}
-        >
-          {title}
-        </h3>
-        <p
-          className="mt-6 flex-1 text-base leading-relaxed md:text-lg"
-          style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}
-        >
-          {body}
-        </p>
-        <div className="mt-8">
-          <Button href={href} variant={variant} size="lg">
-            {cta}
-          </Button>
-        </div>
-      </div>
-    </article>
-  );
-}
 
 function HomeFaqSection() {
   return (

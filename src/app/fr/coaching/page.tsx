@@ -351,7 +351,7 @@ export default function CoachingPage() {
                 alt="AWENE"
                 width={180}
                 height={180}
-                className="h-auto w-full max-w-[9rem] justify-self-center"
+                className="h-auto w-full justify-self-center"
               />
             </div>
           </div>
