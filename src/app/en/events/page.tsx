@@ -5,7 +5,7 @@ import Container from "@/components/ui/Container";
 import Section from "@/components/ui/Section";
 import Button from "@/components/ui/Button";
 import { getEvents, type CmsEvent } from "@/lib/cms";
-import { NEWSLETTER_SIGNUP_URL } from "@/lib/newsletter";
+import { NEWSLETTER_SIGNUP_URL_EN } from "@/lib/newsletter";
 import { breadcrumbSchema, cmsEventSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
@@ -158,7 +158,7 @@ export default async function EventsPage() {
               Join the AWENE newsletter to receive event announcements before everyone else.
             </p>
             <div className="mt-8">
-              <Button href={NEWSLETTER_SIGNUP_URL} variant="light" size="lg" external>
+              <Button href={NEWSLETTER_SIGNUP_URL_EN} variant="light" size="lg" external>
                 Sign me up for the newsletter
               </Button>
             </div>

@@ -5,6 +5,7 @@ import AmiraPortraitSlot from "@/components/ui/AmiraPortraitSlot";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
 import EditorialImageBlock from "@/components/ui/EditorialImageBlock";
+import NewsletterSignupForm from "@/components/ui/NewsletterSignupForm";
 import Section from "@/components/ui/Section";
 import { CALENDLY_BOOKING_URL } from "@/lib/calendly";
 import { breadcrumbSchema, webPageSchema, websiteSchema } from "@/lib/jsonld";
@@ -318,17 +319,7 @@ export default function EnglishHomePage() {
               <p className="mb-8 flex-1 text-base leading-relaxed" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
                 Join the AWENE newsletter — grounded, science-based writing on perimenopause and menopause, hormones, the nervous system and women&apos;s health. Once a week. Straight to your inbox.
               </p>
-              <form className="flex flex-col gap-3">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="rounded-full border-2 px-5 py-4 text-sm outline-none transition-all"
-                  style={{ background: "#fff", borderColor: "#E8DFF0", color: "#2E2438", fontFamily: "var(--font-inter)" }}
-                />
-                <button type="submit" className="rounded-full px-7 py-4 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]" style={{ background: "linear-gradient(135deg, #F68B2C 0%, #E67520 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}>
-                  Sign me up
-                </button>
-              </form>
+              <NewsletterSignupForm locale="en" />
             </div>
           </div>
         </Container>
