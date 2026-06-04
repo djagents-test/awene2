@@ -10,6 +10,15 @@ const wordpressImageHostname = wordpressApiUrl
   : undefined;
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/articles/:slug",
+        destination: "/fr/articles/:slug",
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
