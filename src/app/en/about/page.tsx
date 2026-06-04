@@ -47,8 +47,6 @@ const certifications = [
   "Master's in Public Health",
   "Certified Coach in Integrative Health & Nutrition — Institute for Integrative Nutrition (IIN), USA",
   "Certified Perimenopause & Menopause Coach — Integrative Women's Health Institute (IWHI)",
-  "Currently training: Longevity for Women in Menopause and Perimenopause",
-  "Currently training: Applied Polyvagal Theory — Polyvagal Institute",
 ] as const;
 
 function ConvictionIcon({ kind }: { kind: "leaf" | "thermo" | "brain" }) {
