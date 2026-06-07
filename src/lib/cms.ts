@@ -157,6 +157,8 @@ export type CmsSatisfactionForm = {
   thankYouMessage?: string;
   active: boolean;
   anonymousAllowed: boolean;
+  requireEmail?: boolean;
+  language?: string;
   pdfAfterSubmissionUrl?: string;
   questions: CmsSatisfactionQuestion[];
 };
@@ -253,6 +255,15 @@ type AweneEventPvApi = {
   completionStatus?: string;
 };
 
+type RawSatisfactionQuestion = {
+  type?: string;
+  question?: string;
+  label?: string;
+  required?: boolean;
+  options?: unknown;
+  choices?: unknown;
+};
+
 type AweneSatisfactionFormApi = {
   id: number;
   eventId: number;
@@ -261,9 +272,72 @@ type AweneSatisfactionFormApi = {
   thankYouMessage?: string;
   active?: boolean;
   anonymousAllowed?: boolean;
+  requireEmail?: boolean;
+  language?: string;
   pdfAfterSubmissionUrl?: string;
-  questions?: CmsSatisfactionQuestion[];
+  questions?: RawSatisfactionQuestion[];
 };
+
+function normalizeSatisfactionType(raw: string | undefined): CmsSatisfactionQuestion["type"] {
+  switch ((raw ?? "").toLowerCase().replace(/[\s\-]/g, "_")) {
+    case "short_text":
+    case "text":
+    case "short":
+      return "short_text";
+    case "long_text":
+    case "textarea":
+    case "paragraph":
+      return "long_text";
+    case "rating_5":
+    case "rating_1_5":
+    case "rating1_5":
+      return "rating_1_5";
+    case "rating_10":
+    case "rating_1_10":
+    case "rating1_10":
+    case "nps":
+      return "rating_1_10";
+    case "yes_no":
+    case "yes/no":
+    case "boolean":
+      return "yes_no";
+    case "multiple_choice":
+    case "radio":
+    case "single_choice":
+      return "multiple_choice";
+    case "checkbox":
+    case "checkboxes":
+    case "multi_select":
+      return "checkbox";
+    case "email":
+      return "email";
+    default:
+      return "short_text";
+  }
+}
+
+function normalizeOptions(raw: unknown): string[] {
+  if (Array.isArray(raw)) return raw.filter((o) => typeof o === "string" && o.trim() !== "") as string[];
+  if (typeof raw === "string" && raw.trim() !== "") {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.filter((o) => typeof o === "string") as string[];
+    } catch {
+      return raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+    }
+  }
+  return [];
+}
+
+function normalizeQuestion(raw: RawSatisfactionQuestion, index: number): CmsSatisfactionQuestion {
+  return {
+    id: String(index),
+    label: String(raw.label ?? raw.question ?? ""),
+    type: normalizeSatisfactionType(raw.type),
+    required: Boolean(raw.required),
+    options: normalizeOptions(raw.options ?? raw.choices ?? []),
+  };
+}
 
 type AweneFormationApi = {
   id: number;
@@ -789,8 +863,10 @@ function toSatisfactionForm(form: AweneSatisfactionFormApi): CmsSatisfactionForm
     thankYouMessage: form.thankYouMessage,
     active: form.active !== false,
     anonymousAllowed: form.anonymousAllowed !== false,
+    requireEmail: Boolean(form.requireEmail),
+    language: form.language,
     pdfAfterSubmissionUrl: form.pdfAfterSubmissionUrl,
-    questions: form.questions ?? [],
+    questions: (form.questions ?? []).map(normalizeQuestion),
   };
 }
 

@@ -99,7 +99,10 @@ final class Awene_Events_Plugin
         'thank_you_message' => '_awene_satisfaction_thank_you_message',
         'active' => '_awene_satisfaction_active',
         'anonymous_allowed' => '_awene_satisfaction_anonymous_allowed',
+        'require_email' => '_awene_satisfaction_require_email',
+        'language' => '_awene_satisfaction_language',
         'pdf_after_submission_url' => '_awene_satisfaction_pdf_after_submission_url',
+        'pdf_attachment_id' => '_awene_satisfaction_pdf_attachment_id',
     ];
 
     private const SATISFACTION_RESPONSE_META_FIELDS = [
@@ -168,6 +171,7 @@ final class Awene_Events_Plugin
             return;
         }
         wp_enqueue_media();
+        wp_enqueue_script('jquery-ui-sortable');
     }
 
     public static function register_content(): void
@@ -325,7 +329,7 @@ final class Awene_Events_Plugin
         foreach (self::SATISFACTION_META_FIELDS as $field => $meta_key) {
             register_post_meta(self::SATISFACTION_POST_TYPE, $meta_key, [
                 'single' => true,
-                'type' => in_array($field, ['event_id'], true) ? 'integer' : (in_array($field, ['active', 'anonymous_allowed'], true) ? 'boolean' : 'string'),
+                'type' => in_array($field, ['event_id', 'pdf_attachment_id'], true) ? 'integer' : (in_array($field, ['active', 'anonymous_allowed', 'require_email'], true) ? 'boolean' : 'string'),
                 'show_in_rest' => false,
                 'auth_callback' => static function () {
                     return current_user_can('edit_posts');
@@ -382,10 +386,19 @@ final class Awene_Events_Plugin
 
         add_meta_box(
             'awene_satisfaction_details',
-            'Satisfaction Details',
+            'Form Builder',
             [self::class, 'render_satisfaction_box'],
             self::SATISFACTION_POST_TYPE,
             'normal',
+            'high'
+        );
+
+        add_meta_box(
+            'awene_satisfaction_status',
+            'Form Status',
+            [self::class, 'render_satisfaction_status_sidebar_box'],
+            self::SATISFACTION_POST_TYPE,
+            'side',
             'high'
         );
 
@@ -828,6 +841,135 @@ final class Awene_Events_Plugin
         <?php
     }
 
+    // ── Satisfaction Form Builder ─────────────────────────────────────────────
+
+    private static function render_question_card_html(int $index, array $q): void
+    {
+        $type     = (string) ($q['type'] ?? 'rating_5');
+        $required = !empty($q['required']);
+        $options  = is_array($q['options'] ?? null) ? $q['options'] : [];
+        $has_opts = in_array($type, ['multiple_choice', 'checkbox'], true);
+
+        $type_labels = [
+            'rating_5'        => '⭐ Rating 1–5',
+            'rating_10'       => '⭐ Rating 1–10',
+            'yes_no'          => '✅ Yes / No',
+            'text'            => '💬 Short text',
+            'textarea'        => '📝 Long text',
+            'multiple_choice' => '🔘 Multiple choice',
+            'checkbox'        => '☑️ Checkboxes',
+            'email'           => '📧 Email',
+            'nps'             => '📈 NPS 0–10',
+        ];
+        $type_label = $type_labels[$type] ?? $type;
+        ?>
+        <div class="awene-sf-question-card" data-index="<?php echo esc_attr((string) $index); ?>">
+            <div class="awene-sf-q-header">
+                <span class="awene-sf-drag-handle">⠿</span>
+                <span class="awene-sf-q-num"><?php echo esc_html((string) ($index + 1)); ?></span>
+                <span class="awene-sf-q-type-badge"><?php echo esc_html($type_label); ?></span>
+                <?php if ($required) : ?><span class="awene-sf-q-required-badge">Required</span><?php endif; ?>
+                <button type="button" class="awene-sf-q-remove" onclick="aweneSfRemoveQuestion(this)" title="Remove">&#215;</button>
+            </div>
+            <div class="awene-sf-q-body">
+                <div class="awene-sf-q-row">
+                    <div>
+                        <label class="awene-sf-q-sublabel">Question</label>
+                        <input type="text" class="awene-sf-input awene-sf-q-text" value="<?php echo esc_attr((string) ($q['question'] ?? '')); ?>" placeholder="Type your question here…" oninput="aweneSfSyncQuestions()" />
+                    </div>
+                    <div>
+                        <label class="awene-sf-q-sublabel">Type</label>
+                        <select class="awene-sf-type-select awene-sf-q-type-sel" onchange="aweneSfOnTypeChange(this)">
+                            <?php foreach ($type_labels as $val => $lbl) : ?>
+                                <option value="<?php echo esc_attr($val); ?>" <?php selected($type, $val); ?>><?php echo esc_html($lbl); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="awene-sf-q-sublabel">Required</label>
+                        <label class="awene-sf-req-toggle">
+                            <input type="checkbox" class="awene-sf-q-required" <?php checked($required); ?> onchange="aweneSfSyncQuestions();aweneSfUpdateRequiredBadge(this);" />
+                            <span>Required</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="awene-sf-options-editor<?php echo $has_opts ? ' visible' : ''; ?>">
+                    <label class="awene-sf-q-sublabel" style="margin-bottom:8px;">Choices</label>
+                    <?php $opts = $options ?: ['', '']; foreach ($opts as $opt) : ?>
+                        <div class="awene-sf-option-row">
+                            <input type="text" class="awene-sf-option-input" value="<?php echo esc_attr((string) $opt); ?>" placeholder="Option…" onchange="aweneSfSyncQuestions()" oninput="aweneSfSyncQuestions()" />
+                            <button type="button" onclick="aweneSfRemoveOption(this)" class="awene-sf-opt-remove">&#215;</button>
+                        </div>
+                    <?php endforeach; ?>
+                    <button type="button" class="awene-sf-btn-add-option" onclick="aweneSfAddOption(this)">+ Add option</button>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    public static function render_satisfaction_status_sidebar_box(WP_Post $post): void
+    {
+        $values = [];
+        foreach (self::SATISFACTION_META_FIELDS as $field => $meta_key) {
+            $values[$field] = get_post_meta($post->ID, $meta_key, true);
+        }
+        $linked_event_id = absint($values['event_id']);
+        $active          = (bool) $values['active'];
+        $questions_data  = json_decode((string) ($values['questions'] ?: '[]'), true);
+        $q_count         = is_array($questions_data) ? count($questions_data) : 0;
+        $pdf_url         = (string) $values['pdf_after_submission_url'];
+
+        $response_count = $post->ID > 0 ? (new WP_Query([
+            'post_type'      => self::SATISFACTION_RESPONSE_POST_TYPE,
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'meta_query'     => [[
+                'key'     => self::SATISFACTION_RESPONSE_META_FIELDS['form_id'],
+                'value'   => $post->ID,
+                'compare' => '=',
+            ]],
+        ]))->found_posts : 0;
+        ?>
+        <style>
+        .awene-sf-sb-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f5f0fb; font-size:13px; }
+        .awene-sf-sb-row:last-child { border-bottom:none; padding-bottom:0; }
+        .awene-sf-sb-key { color:#6d5b8a; font-weight:500; }
+        .awene-sf-sb-val { font-weight:700; color:#2E2438; text-align:right; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .awene-sf-sb-badge { padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; }
+        .awene-sf-sb-badge.active { background:#e6f9ef; color:#1a7c3e; }
+        .awene-sf-sb-badge.inactive { background:#fef2f2; color:#b32d2e; }
+        </style>
+        <div>
+            <div class="awene-sf-sb-row">
+                <span class="awene-sf-sb-key">Status</span>
+                <span class="awene-sf-sb-badge <?php echo $active ? 'active' : 'inactive'; ?>">
+                    <?php echo $active ? '● Active' : '● Inactive'; ?>
+                </span>
+            </div>
+            <div class="awene-sf-sb-row">
+                <span class="awene-sf-sb-key">Linked event</span>
+                <span class="awene-sf-sb-val" title="<?php echo $linked_event_id ? esc_attr(get_the_title($linked_event_id)) : ''; ?>">
+                    <?php echo $linked_event_id ? esc_html(get_the_title($linked_event_id)) : '—'; ?>
+                </span>
+            </div>
+            <div class="awene-sf-sb-row">
+                <span class="awene-sf-sb-key">Questions</span>
+                <span class="awene-sf-sb-val"><?php echo esc_html((string) $q_count); ?></span>
+            </div>
+            <div class="awene-sf-sb-row">
+                <span class="awene-sf-sb-key">Responses</span>
+                <span class="awene-sf-sb-val"><?php echo esc_html((string) $response_count); ?></span>
+            </div>
+            <div class="awene-sf-sb-row">
+                <span class="awene-sf-sb-key">PDF attached</span>
+                <span class="awene-sf-sb-val"><?php echo $pdf_url ? '✓ Yes' : '—'; ?></span>
+            </div>
+        </div>
+        <?php
+    }
+
     public static function render_satisfaction_box(WP_Post $post): void
     {
         wp_nonce_field(self::EVENT_NONCE_ACTION, self::EVENT_NONCE_NAME);
@@ -836,168 +978,613 @@ final class Awene_Events_Plugin
             $values[$field] = get_post_meta($post->ID, $meta_key, true);
         }
 
-        // Parse existing questions JSON
         $questions_json = (string) ($values['questions'] ?: '[]');
         $questions_data = json_decode($questions_json, true);
         if (!is_array($questions_data)) {
             $questions_data = [];
         }
 
-        // Query events for the dropdown
         $all_events = get_posts([
-            'post_type' => self::EVENT_POST_TYPE,
+            'post_type'   => self::EVENT_POST_TYPE,
             'post_status' => 'publish',
             'numberposts' => -1,
-            'orderby' => 'title',
-            'order' => 'ASC',
+            'orderby'     => 'title',
+            'order'       => 'ASC',
         ]);
         $linked_event_id = absint($values['event_id']);
 
-        // PDF after submission
-        $pdf_sub_url = (string) ($values['pdf_after_submission_url'] ?: '');
-        $pdf_sub_filename = $pdf_sub_url ? basename(parse_url($pdf_sub_url, PHP_URL_PATH)) : '';
-        ?>
-        <div class="awene-pv-editor">
+        $linked_event    = $linked_event_id ? self::event_payload($linked_event_id) : null;
+        $pdf_att_id      = absint($values['pdf_attachment_id']);
+        $pdf_sub_url     = (string) ($values['pdf_after_submission_url'] ?: ($pdf_att_id ? wp_get_attachment_url($pdf_att_id) : ''));
+        $pdf_sub_name    = $pdf_att_id ? basename((string) get_attached_file($pdf_att_id)) : ($pdf_sub_url ? basename((string) parse_url($pdf_sub_url, PHP_URL_PATH)) : '');
+        $active          = (bool) $values['active'];
+        $anon            = (bool) $values['anonymous_allowed'];
+        $req_email       = (bool) ($values['require_email'] ?? false);
+        $language        = (string) ($values['language'] ?: 'fr');
 
-            <!-- Section 1: Linked Event -->
-            <div class="awene-pv-section">
-                <h3>Linked Event</h3>
-                <label for="awene_satisfaction_event_id">Event</label>
-                <select id="awene_satisfaction_event_id" name="awene_satisfaction_meta[event_id]">
-                    <option value="">— None —</option>
-                    <?php foreach ($all_events as $ev) : ?>
-                        <option value="<?php echo esc_attr((string) $ev->ID); ?>" <?php selected($linked_event_id, $ev->ID); ?>>
-                            <?php echo esc_html($ev->post_title); ?>
-                        </option>
+        // Response stats
+        $response_count    = 0;
+        $last_response_date = '';
+        if ($post->ID > 0) {
+            $r_query = new WP_Query([
+                'post_type'      => self::SATISFACTION_RESPONSE_POST_TYPE,
+                'post_status'    => 'publish',
+                'posts_per_page' => 1,
+                'orderby'        => 'date',
+                'order'          => 'DESC',
+                'meta_query'     => [['key' => self::SATISFACTION_RESPONSE_META_FIELDS['form_id'], 'value' => $post->ID, 'compare' => '=']],
+            ]);
+            $response_count = (new WP_Query([
+                'post_type'      => self::SATISFACTION_RESPONSE_POST_TYPE,
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'fields'         => 'ids',
+                'meta_query'     => [['key' => self::SATISFACTION_RESPONSE_META_FIELDS['form_id'], 'value' => $post->ID, 'compare' => '=']],
+            ]))->found_posts;
+            if ($r_query->have_posts()) {
+                $last_response_date = (string) get_post_meta($r_query->posts[0]->ID, self::SATISFACTION_RESPONSE_META_FIELDS['submitted_at'], true);
+            }
+        }
+        ?>
+
+        <style>
+        /* ── Satisfaction Form Builder ───────────────────────────────────── */
+        .awene-sf-builder { max-width:100%; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+        .awene-sf-card { background:#fff; border:1.5px solid #e5e0f0; border-radius:14px; padding:22px 24px; margin-bottom:20px; }
+        .awene-sf-card-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid #f0eaf8; }
+        .awene-sf-card-icon { width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
+        .awene-sf-card-icon.purple { background:#f0e8fd; }
+        .awene-sf-card-icon.green  { background:#e6f9ef; }
+        .awene-sf-card-icon.blue   { background:#e8f1fd; }
+        .awene-sf-card-icon.orange { background:#fef3e7; }
+        .awene-sf-card-icon.teal   { background:#e6f7f7; }
+        .awene-sf-card-title { font-size:14px; font-weight:700; color:#2E2438; margin:0; line-height:1.3; }
+        .awene-sf-card-subtitle { font-size:11px; color:#8b7fa0; margin:2px 0 0; }
+
+        .awene-sf-field { margin-bottom:18px; }
+        .awene-sf-field:last-child { margin-bottom:0; }
+        .awene-sf-label { display:block; font-size:13px; font-weight:600; color:#3a2e4a; margin-bottom:6px; }
+        .awene-sf-helper { display:block; font-size:11px; color:#8b7fa0; margin-top:4px; line-height:1.5; }
+        .awene-sf-input,.awene-sf-textarea,.awene-sf-select {
+            width:100%; border:1.5px solid #e0d9ee; border-radius:8px;
+            padding:9px 12px; font-size:13px; color:#2E2438; background:#faf8fd;
+            transition:border-color .15s; box-sizing:border-box;
+        }
+        .awene-sf-input:focus,.awene-sf-textarea:focus,.awene-sf-select:focus {
+            border-color:#7c3aed; outline:none; background:#fff;
+        }
+        .awene-sf-textarea { resize:vertical; min-height:76px; }
+        .awene-sf-two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+        /* Toggles */
+        .awene-sf-toggle-group { border:1.5px solid #e5e0f0; border-radius:10px; padding:2px 14px; margin-bottom:20px; }
+        .awene-sf-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid #f5f0fb; }
+        .awene-sf-toggle-row:last-child { border-bottom:none; }
+        .awene-sf-toggle-info { flex:1; padding-right:12px; }
+        .awene-sf-toggle-label { font-size:13px; font-weight:600; color:#2E2438; display:block; }
+        .awene-sf-toggle-desc  { font-size:11px; color:#8b7fa0; display:block; margin-top:2px; }
+        .awene-sf-switch { position:relative; display:inline-block; width:42px; height:23px; flex-shrink:0; }
+        .awene-sf-switch input { opacity:0; width:0; height:0; }
+        .awene-sf-slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#d8d0e8; border-radius:23px; transition:.2s; }
+        .awene-sf-slider:before { position:absolute; content:""; height:17px; width:17px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:.2s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+        .awene-sf-switch input:checked + .awene-sf-slider { background:#7c3aed; }
+        .awene-sf-switch input:checked + .awene-sf-slider:before { transform:translateX(19px); }
+
+        /* Active badge */
+        .awene-sf-status-badge { display:inline-flex; align-items:center; gap:5px; border-radius:999px; padding:4px 11px; font-size:11px; font-weight:700; }
+        .awene-sf-status-badge.active   { background:#e6f9ef; color:#1a7c3e; }
+        .awene-sf-status-badge.inactive { background:#fef2f2; color:#b32d2e; }
+        .awene-sf-status-dot { width:7px; height:7px; border-radius:50%; display:inline-block; }
+        .awene-sf-status-badge.active .awene-sf-status-dot   { background:#22c55e; }
+        .awene-sf-status-badge.inactive .awene-sf-status-dot { background:#ef4444; }
+
+        /* Event summary */
+        .awene-sf-event-summary { background:#f8f4fb; border:1px solid #e5e0f0; border-radius:10px; padding:14px 16px; margin-top:14px; display:none; }
+        .awene-sf-event-summary.visible { display:block; }
+        .awene-sf-event-title { font-size:14px; font-weight:700; color:#4B1F7A; margin-bottom:8px; }
+        .awene-sf-event-chips { display:flex; flex-wrap:wrap; gap:6px; }
+        .awene-sf-event-chip { display:inline-flex; align-items:center; gap:4px; background:#fff; border:1px solid #e5e0f0; border-radius:999px; padding:3px 9px; font-size:11px; color:#4a3860; }
+
+        /* Questions builder */
+        .awene-sf-questions-list { min-height:56px; margin-bottom:14px; }
+        .awene-sf-question-card { background:#faf8fd; border:1.5px solid #e5e0f0; border-radius:12px; margin-bottom:10px; transition:border-color .15s,box-shadow .15s; }
+        .awene-sf-question-card:hover { border-color:#c4b5de; box-shadow:0 2px 8px rgba(76,31,122,.07); }
+        .awene-sf-question-card.sortable-placeholder { border:2px dashed #c4b5de; background:#f5f0fb; min-height:76px; border-radius:12px; }
+        .awene-sf-q-header { display:flex; align-items:center; gap:8px; padding:10px 14px; background:#f0eaf8; border-radius:10px 10px 0 0; border-bottom:1px solid #e5e0f0; cursor:grab; user-select:none; }
+        .awene-sf-q-header:active { cursor:grabbing; }
+        .awene-sf-drag-handle { color:#a090be; font-size:15px; line-height:1; }
+        .awene-sf-q-num { background:#7c3aed; color:#fff; border-radius:999px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
+        .awene-sf-q-type-badge { background:#fff; border:1px solid #d8d0e8; border-radius:6px; padding:2px 8px; font-size:11px; color:#6d5b8a; font-weight:600; flex:1; }
+        .awene-sf-q-required-badge { background:#fef3e7; color:#d97706; border-radius:999px; padding:2px 8px; font-size:11px; font-weight:600; }
+        .awene-sf-q-remove { background:none; border:none; cursor:pointer; color:#b0a0c8; font-size:17px; padding:1px 4px; border-radius:4px; line-height:1; margin-left:auto; }
+        .awene-sf-q-remove:hover { color:#b32d2e; background:#fef2f2; }
+        .awene-sf-q-body { padding:14px; }
+        .awene-sf-q-row { display:grid; grid-template-columns:1fr 180px 110px; gap:10px; align-items:start; }
+        .awene-sf-q-sublabel { display:block; font-size:11px; font-weight:600; color:#6d5b8a; margin-bottom:5px; }
+        .awene-sf-type-select { border:1.5px solid #e0d9ee; border-radius:8px; padding:8px 10px; font-size:12px; background:#fff; color:#3a2e4a; width:100%; }
+        .awene-sf-req-toggle { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:#6d5b8a; cursor:pointer; margin-top:4px; }
+        .awene-sf-options-editor { margin-top:10px; padding-top:10px; border-top:1px solid #ede8f5; display:none; }
+        .awene-sf-options-editor.visible { display:block; }
+        .awene-sf-option-row { display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+        .awene-sf-option-input { flex:1; border:1.5px solid #e0d9ee; border-radius:7px; padding:7px 10px; font-size:12px; }
+        .awene-sf-opt-remove { background:none; border:none; color:#b32d2e; cursor:pointer; font-size:16px; padding:2px 4px; line-height:1; }
+        .awene-sf-btn-add-option { background:none; border:1px dashed #c4b5de; border-radius:7px; padding:5px 12px; font-size:11px; color:#7c3aed; cursor:pointer; }
+        .awene-sf-btn-add-option:hover { background:#f5f0fb; }
+
+        /* Add question */
+        .awene-sf-add-q-btn { width:100%; border:2px dashed #c4b5de; background:#faf8fd; border-radius:12px; padding:14px; font-size:13px; font-weight:700; color:#7c3aed; cursor:pointer; transition:all .15s; display:flex; align-items:center; justify-content:center; gap:8px; }
+        .awene-sf-add-q-btn:hover { background:#f0e8fd; border-color:#9f65e8; }
+
+        /* Empty */
+        .awene-sf-empty { text-align:center; padding:28px 16px; color:#8b7fa0; border:2px dashed #e5e0f0; border-radius:10px; }
+        .awene-sf-empty-icon { font-size:36px; margin-bottom:8px; }
+
+        /* PDF */
+        .awene-sf-pdf-preview { display:flex; align-items:center; gap:10px; background:#f8f4fb; border:1px solid #e5e0f0; border-radius:8px; padding:10px 14px; margin-bottom:10px; }
+        .awene-sf-pdf-icon { font-size:20px; }
+        .awene-sf-pdf-name { font-size:13px; color:#4a3860; font-weight:600; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .awene-sf-pdf-remove { color:#b32d2e; font-size:11px; cursor:pointer; background:none; border:none; text-decoration:underline; }
+        .awene-sf-choose-pdf { border:1.5px solid #e0d9ee; background:#faf8fd; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:600; color:#4a3860; cursor:pointer; }
+        .awene-sf-choose-pdf:hover { background:#f0e8fd; border-color:#c4b5de; }
+        .awene-sf-pdf-warning { background:#fff8eb; border:1px solid #f8c962; border-radius:8px; padding:9px 13px; font-size:12px; color:#92400e; margin-top:10px; display:none; }
+        .awene-sf-pdf-warning.visible { display:block; }
+
+        /* Responses */
+        .awene-sf-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+        .awene-sf-stat { background:#f8f4fb; border:1px solid #e5e0f0; border-radius:10px; padding:14px; text-align:center; }
+        .awene-sf-stat-value { font-size:24px; font-weight:700; color:#4B1F7A; display:block; }
+        .awene-sf-stat-label { font-size:11px; color:#8b7fa0; display:block; margin-top:2px; }
+        .awene-sf-btn-view { display:inline-flex; align-items:center; gap:6px; background:#4B1F7A; color:#fff; text-decoration:none; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:600; margin-right:8px; }
+        .awene-sf-btn-view:hover { background:#6d2ea8; color:#fff; }
+        .awene-sf-btn-export { display:inline-flex; align-items:center; gap:6px; background:#f5f0fb; color:#4B1F7A; text-decoration:none; border:1.5px solid #d8d0e8; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:600; }
+        .awene-sf-btn-export:hover { background:#ede8f8; }
+        .awene-sf-no-responses { text-align:center; padding:24px 16px; color:#8b7fa0; border:2px dashed #e5e0f0; border-radius:10px; font-size:13px; }
+        .awene-sf-q-count { margin-left:auto; font-size:12px; color:#8b7fa0; }
+
+        @media (max-width:782px) {
+            .awene-sf-two-col,.awene-sf-stats-grid { grid-template-columns:1fr; }
+            .awene-sf-q-row { grid-template-columns:1fr; }
+        }
+        </style>
+
+        <div class="awene-sf-builder">
+
+        <!-- ── Card 1: Linked Event ── -->
+        <div class="awene-sf-card">
+            <div class="awene-sf-card-header">
+                <div class="awene-sf-card-icon purple">📅</div>
+                <div>
+                    <p class="awene-sf-card-title">Linked Event</p>
+                    <p class="awene-sf-card-subtitle">Connect this form to a specific event</p>
+                </div>
+            </div>
+            <div class="awene-sf-field">
+                <label class="awene-sf-label" for="awene_satisfaction_event_id">Event</label>
+                <select id="awene_satisfaction_event_id" name="awene_satisfaction_meta[event_id]" class="awene-sf-select" onchange="aweneSfUpdateEventSummary(this)">
+                    <option value="">— Select an event —</option>
+                    <?php foreach ($all_events as $ev) :
+                        $ev_date = (string) get_post_meta($ev->ID, self::EVENT_META_FIELDS['start_date'], true);
+                        $ev_loc  = trim(implode(', ', array_filter([(string) get_post_meta($ev->ID, self::EVENT_META_FIELDS['location_name'], true), (string) get_post_meta($ev->ID, self::EVENT_META_FIELDS['location_address'], true)])));
+                        $ev_stat = (string) get_post_meta($ev->ID, self::EVENT_META_FIELDS['event_status'], true);
+                        $ev_reg  = self::registration_count_for_event($ev->ID);
+                    ?>
+                        <option value="<?php echo esc_attr((string) $ev->ID); ?>"
+                            data-date="<?php echo esc_attr($ev_date); ?>"
+                            data-location="<?php echo esc_attr($ev_loc); ?>"
+                            data-status="<?php echo esc_attr($ev_stat ?: 'upcoming'); ?>"
+                            data-reg="<?php echo esc_attr((string) $ev_reg); ?>"
+                            <?php selected($linked_event_id, $ev->ID); ?>
+                        ><?php echo esc_html($ev->post_title); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-
-            <!-- Section 2: Form Content -->
-            <div class="awene-pv-section">
-                <h3>Form Content</h3>
-                <label for="awene_satisfaction_intro_text">Intro text</label>
-                <textarea id="awene_satisfaction_intro_text" name="awene_satisfaction_meta[intro_text]" rows="3"><?php echo esc_textarea((string) $values['intro_text']); ?></textarea>
-
-                <label for="awene_satisfaction_thank_you_message">Thank you message</label>
-                <textarea id="awene_satisfaction_thank_you_message" name="awene_satisfaction_meta[thank_you_message]" rows="3"><?php echo esc_textarea((string) $values['thank_you_message']); ?></textarea>
-
-                <label style="font-weight:400;">
-                    <input type="checkbox" name="awene_satisfaction_meta[active]" value="1" <?php checked((bool) $values['active']); ?> />
-                    Active
-                </label>
-                <label style="font-weight:400; margin-top:6px;">
-                    <input type="checkbox" name="awene_satisfaction_meta[anonymous_allowed]" value="1" <?php checked((bool) $values['anonymous_allowed']); ?> />
-                    Anonymous responses allowed
-                </label>
+            <div class="awene-sf-event-summary <?php echo $linked_event ? 'visible' : ''; ?>" id="awene_sf_event_summary">
+                <?php if ($linked_event) : ?>
+                    <div class="awene-sf-event-title"><?php echo esc_html($linked_event['title']); ?></div>
+                    <div class="awene-sf-event-chips">
+                        <span class="awene-sf-event-chip">📅 <?php echo esc_html($linked_event['date_label']); ?></span>
+                        <span class="awene-sf-event-chip">📍 <?php echo esc_html($linked_event['locationLabel'] ?: 'TBC'); ?></span>
+                        <span class="awene-sf-event-chip">🔖 <?php echo esc_html(ucfirst($linked_event['eventStatus'])); ?></span>
+                        <span class="awene-sf-event-chip">👥 <?php echo esc_html((string) self::registration_count_for_event($linked_event_id)); ?> registrations</span>
+                    </div>
+                <?php endif; ?>
             </div>
+        </div>
 
-            <!-- Section 3: Questions Builder -->
-            <div class="awene-pv-section">
-                <h3>Questions Builder</h3>
-                <table class="awene-questions-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Question</th>
-                            <th>Required</th>
-                            <th>Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody id="awene-questions-tbody">
-                        <?php foreach ($questions_data as $qi => $q) :
-                            $q_type = esc_attr((string) ($q['type'] ?? 'rating_5'));
-                            $q_text = esc_textarea((string) ($q['question'] ?? ''));
-                            $q_req  = !empty($q['required']);
-                        ?>
-                            <tr>
-                                <td>
-                                    <select name="awene_q_type_<?php echo esc_attr((string) $qi); ?>">
-                                        <option value="rating_5" <?php selected($q_type, 'rating_5'); ?>>&#9733; Rating 1-5</option>
-                                        <option value="yes_no"   <?php selected($q_type, 'yes_no'); ?>>Yes / No</option>
-                                        <option value="text"     <?php selected($q_type, 'text'); ?>>Free text</option>
-                                        <option value="nps"      <?php selected($q_type, 'nps'); ?>>NPS 0-10</option>
-                                    </select>
-                                </td>
-                                <td><textarea name="awene_q_text_<?php echo esc_attr((string) $qi); ?>" rows="2"><?php echo $q_text; ?></textarea></td>
-                                <td style="text-align:center"><input type="checkbox" name="awene_q_required_<?php echo esc_attr((string) $qi); ?>" value="1" <?php checked($q_req); ?> /></td>
-                                <td><button type="button" class="button" onclick="this.closest('tr').remove();aweneSyncQuestions();">&#10005;</button></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <input type="hidden" id="awene_questions_json" name="awene_satisfaction_meta[questions]" value="<?php echo esc_attr($questions_json); ?>" />
-                <button type="button" class="button" onclick="aweneAddQuestion()">Add question</button>
-            </div>
-
-            <!-- Section 4: Resources -->
-            <div class="awene-pv-section">
-                <h3>Resources</h3>
-                <label>PDF after submission</label>
-                <div class="awene-pdf-preview" id="awene_sat_pdf_preview" style="<?php echo $pdf_sub_url ? '' : 'display:none;'; ?>">
-                    <span><?php echo esc_html($pdf_sub_filename); ?></span>
-                    <a href="#" onclick="aweneClearMedia('awene_sat_pdf_url','awene_sat_pdf_preview');return false;" style="color:#b32d2e;">Remove</a>
+        <!-- ── Card 2: Form Settings ── -->
+        <div class="awene-sf-card">
+            <div class="awene-sf-card-header">
+                <div class="awene-sf-card-icon green">⚙️</div>
+                <div>
+                    <p class="awene-sf-card-title">Form Settings</p>
+                    <p class="awene-sf-card-subtitle">Behaviour, language and messages</p>
                 </div>
-                <input type="hidden" id="awene_sat_pdf_url" name="awene_satisfaction_meta[pdf_after_submission_url]" value="<?php echo esc_attr($pdf_sub_url); ?>" />
-                <button type="button" class="button" onclick="aweneOpenMediaPicker('awene_sat_pdf_url','awene_sat_pdf_preview','application/pdf')">Choose PDF</button>
+                <div style="margin-left:auto;">
+                    <span class="awene-sf-status-badge <?php echo $active ? 'active' : 'inactive'; ?>" id="awene_sf_active_badge">
+                        <span class="awene-sf-status-dot"></span>
+                        <?php echo $active ? 'Active' : 'Inactive'; ?>
+                    </span>
+                </div>
             </div>
 
-        </div><!-- /.awene-pv-editor -->
+            <div class="awene-sf-toggle-group">
+                <div class="awene-sf-toggle-row">
+                    <div class="awene-sf-toggle-info">
+                        <span class="awene-sf-toggle-label">Form active</span>
+                        <span class="awene-sf-toggle-desc">Allow participants to submit responses</span>
+                    </div>
+                    <label class="awene-sf-switch">
+                        <input type="checkbox" name="awene_satisfaction_meta[active]" value="1" <?php checked($active); ?> onchange="aweneSfUpdateActiveBadge(this.checked)">
+                        <span class="awene-sf-slider"></span>
+                    </label>
+                </div>
+                <div class="awene-sf-toggle-row">
+                    <div class="awene-sf-toggle-info">
+                        <span class="awene-sf-toggle-label">Allow anonymous responses</span>
+                        <span class="awene-sf-toggle-desc">Participants can respond without providing their email</span>
+                    </div>
+                    <label class="awene-sf-switch">
+                        <input type="checkbox" name="awene_satisfaction_meta[anonymous_allowed]" value="1" <?php checked($anon); ?>>
+                        <span class="awene-sf-slider"></span>
+                    </label>
+                </div>
+                <div class="awene-sf-toggle-row">
+                    <div class="awene-sf-toggle-info">
+                        <span class="awene-sf-toggle-label">Require email</span>
+                        <span class="awene-sf-toggle-desc">Email address is mandatory to submit</span>
+                    </div>
+                    <label class="awene-sf-switch">
+                        <input type="checkbox" id="awene_sf_require_email" name="awene_satisfaction_meta[require_email]" value="1" <?php checked($req_email); ?>>
+                        <span class="awene-sf-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="awene-sf-field">
+                <label class="awene-sf-label" for="awene_sf_language">Language</label>
+                <select id="awene_sf_language" name="awene_satisfaction_meta[language]" class="awene-sf-select" style="max-width:220px;">
+                    <option value="fr" <?php selected($language, 'fr'); ?>>🇫🇷 Français</option>
+                    <option value="en" <?php selected($language, 'en'); ?>>🇬🇧 English</option>
+                    <option value="ar" <?php selected($language, 'ar'); ?>>🇹🇳 العربية</option>
+                </select>
+            </div>
+
+            <div class="awene-sf-field">
+                <label class="awene-sf-label" for="awene_sf_intro">Intro text</label>
+                <textarea id="awene_sf_intro" name="awene_satisfaction_meta[intro_text]" class="awene-sf-textarea" rows="3" placeholder="e.g. We'd love your feedback — it only takes 2 minutes."><?php echo esc_textarea((string) $values['intro_text']); ?></textarea>
+                <span class="awene-sf-helper">Shown at the top of the form, before the questions.</span>
+            </div>
+
+            <div class="awene-sf-field">
+                <label class="awene-sf-label" for="awene_sf_thankyou">Thank you message</label>
+                <textarea id="awene_sf_thankyou" name="awene_satisfaction_meta[thank_you_message]" class="awene-sf-textarea" rows="3" placeholder="e.g. Thank you! Your feedback helps us improve our events."><?php echo esc_textarea((string) $values['thank_you_message']); ?></textarea>
+                <span class="awene-sf-helper">Displayed on screen after the participant submits.</span>
+            </div>
+        </div>
+
+        <!-- ── Card 3: Questions Builder ── -->
+        <div class="awene-sf-card">
+            <div class="awene-sf-card-header">
+                <div class="awene-sf-card-icon blue">❓</div>
+                <div>
+                    <p class="awene-sf-card-title">Questions Builder</p>
+                    <p class="awene-sf-card-subtitle">Drag to reorder &bull; Click ✕ to remove</p>
+                </div>
+                <span class="awene-sf-q-count" id="awene_sf_q_count_label"><?php echo esc_html(count($questions_data) . ' question' . (count($questions_data) !== 1 ? 's' : '')); ?></span>
+            </div>
+
+            <div class="awene-sf-questions-list" id="awene_sf_questions_list">
+                <?php if (empty($questions_data)) : ?>
+                    <div class="awene-sf-empty" id="awene_sf_empty_state">
+                        <div class="awene-sf-empty-icon">📋</div>
+                        <div>No questions yet.<br>Click <strong>+ Add question</strong> below to start.</div>
+                    </div>
+                <?php else : ?>
+                    <?php foreach ($questions_data as $qi => $q) : self::render_question_card_html((int) $qi, $q); endforeach; ?>
+                <?php endif; ?>
+            </div>
+
+            <input type="hidden" id="awene_questions_json" name="awene_satisfaction_meta[questions]" value="<?php echo esc_attr($questions_json); ?>" />
+
+            <button type="button" class="awene-sf-add-q-btn" onclick="aweneSfAddQuestion()">
+                <span style="font-size:19px;line-height:1;">+</span> Add question
+            </button>
+        </div>
+
+        <!-- ── Card 4: Resource After Submission ── -->
+        <div class="awene-sf-card">
+            <div class="awene-sf-card-header">
+                <div class="awene-sf-card-icon orange">📎</div>
+                <div>
+                    <p class="awene-sf-card-title">Resource After Submission</p>
+                    <p class="awene-sf-card-subtitle">Optionally send a PDF to participants after they respond</p>
+                </div>
+            </div>
+            <div class="awene-sf-field">
+                <label class="awene-sf-label">PDF after submission</label>
+                <div class="awene-sf-pdf-preview" id="awene_sf_pdf_preview" style="<?php echo $pdf_sub_url ? '' : 'display:none;'; ?>">
+                    <span class="awene-sf-pdf-icon">📄</span>
+                    <span class="awene-sf-pdf-name" id="awene_sf_pdf_name"><?php echo esc_html($pdf_sub_name ?: basename((string) parse_url($pdf_sub_url, PHP_URL_PATH))); ?></span>
+                    <?php if ($pdf_sub_url) : ?><a href="<?php echo esc_url($pdf_sub_url); ?>" target="_blank" rel="noopener" style="font-size:11px;color:#7c3aed;text-decoration:none;margin-right:8px;">Preview ↗</a><?php endif; ?>
+                    <button type="button" class="awene-sf-pdf-remove" onclick="aweneSfClearPdf()">Remove</button>
+                </div>
+                <input type="hidden" id="awene_sf_pdf_attachment_id" name="awene_satisfaction_meta[pdf_attachment_id]" value="<?php echo esc_attr((string) $pdf_att_id ?: ''); ?>" />
+                <input type="hidden" id="awene_sat_pdf_url" name="awene_satisfaction_meta[pdf_after_submission_url]" value="<?php echo esc_attr($pdf_sub_url); ?>" />
+                <button type="button" class="awene-sf-choose-pdf" onclick="aweneSfOpenPdfPicker()">📎 Choose PDF</button>
+                <span class="awene-sf-helper">The PDF will be emailed to the participant after they submit. A valid email address is required.</span>
+            </div>
+            <div class="awene-sf-pdf-warning<?php echo $pdf_sub_url ? ' visible' : ''; ?>" id="awene_sf_pdf_warning">
+                ⚠️ <strong>Email required:</strong> A PDF is attached — participants must provide their email. "Require email" will be enforced automatically.
+            </div>
+        </div>
+
+        <!-- ── Card 5: Responses ── -->
+        <div class="awene-sf-card">
+            <div class="awene-sf-card-header">
+                <div class="awene-sf-card-icon teal">📊</div>
+                <div>
+                    <p class="awene-sf-card-title">Responses</p>
+                    <p class="awene-sf-card-subtitle">Review and export participant feedback</p>
+                </div>
+            </div>
+            <?php if ($response_count > 0) : ?>
+                <div class="awene-sf-stats-grid">
+                    <div class="awene-sf-stat">
+                        <span class="awene-sf-stat-value"><?php echo esc_html((string) $response_count); ?></span>
+                        <span class="awene-sf-stat-label">Total responses</span>
+                    </div>
+                    <div class="awene-sf-stat">
+                        <span class="awene-sf-stat-value"><?php echo esc_html((string) count($questions_data)); ?></span>
+                        <span class="awene-sf-stat-label">Questions</span>
+                    </div>
+                    <div class="awene-sf-stat">
+                        <span class="awene-sf-stat-value" style="font-size:13px;padding-top:5px;"><?php echo esc_html($last_response_date ?: '—'); ?></span>
+                        <span class="awene-sf-stat-label">Last response</span>
+                    </div>
+                </div>
+                <div>
+                    <a href="<?php echo esc_url(admin_url('edit.php?post_type=' . self::SATISFACTION_RESPONSE_POST_TYPE)); ?>" class="awene-sf-btn-view">👁 View responses</a>
+                    <?php $export_url = wp_nonce_url(admin_url('admin-post.php?action=awene_events_export_satisfaction&form_id=' . $post->ID), 'awene_events_export_satisfaction'); ?>
+                    <a href="<?php echo esc_url($export_url); ?>" class="awene-sf-btn-export">↓ Export CSV</a>
+                </div>
+            <?php else : ?>
+                <div class="awene-sf-no-responses">
+                    <div style="font-size:30px;margin-bottom:8px;">📭</div>
+                    No responses yet. Share the form link with participants after the event.
+                </div>
+            <?php endif; ?>
+        </div>
+
+        </div><!-- /.awene-sf-builder -->
 
         <script>
-        function aweneAddQuestion() {
-            var tbody = document.getElementById('awene-questions-tbody');
-            var idx = tbody.rows.length;
-            var tr = document.createElement('tr');
-            tr.innerHTML = '<td><select name="awene_q_type_' + idx + '"><option value="rating_5">&#9733; Rating 1-5</option><option value="yes_no">Yes / No</option><option value="text">Free text</option><option value="nps">NPS 0-10</option></select></td>'
-                + '<td><textarea name="awene_q_text_' + idx + '" rows="2"></textarea></td>'
-                + '<td style="text-align:center"><input type="checkbox" name="awene_q_required_' + idx + '" value="1" /></td>'
-                + '<td><button type="button" class="button" onclick="this.closest(\'tr\').remove();aweneSyncQuestions();">&#10005;</button></td>';
-            tbody.appendChild(tr);
-        }
-        function aweneSyncQuestions() {
-            var tbody = document.getElementById('awene-questions-tbody');
-            var questions = [];
-            Array.from(tbody.rows).forEach(function(tr) {
-                var typeEl = tr.querySelector('select');
-                var textEl = tr.querySelector('textarea');
-                var reqEl  = tr.querySelector('input[type=checkbox]');
-                if (typeEl && textEl) {
-                    questions.push({ type: typeEl.value, question: textEl.value, required: reqEl ? reqEl.checked : false });
-                }
-            });
-            document.getElementById('awene_questions_json').value = JSON.stringify(questions);
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            var form = document.querySelector('#post');
-            if (form) { form.addEventListener('submit', aweneSyncQuestions); }
-            var tbody = document.getElementById('awene-questions-tbody');
-            if (tbody) {
-                tbody.addEventListener('change', aweneSyncQuestions);
-                tbody.addEventListener('input', aweneSyncQuestions);
+        (function($) {
+            var Q_TYPES = [
+                { value:'rating_5',        label:'⭐ Rating 1–5' },
+                { value:'rating_10',       label:'⭐ Rating 1–10' },
+                { value:'yes_no',          label:'✅ Yes / No' },
+                { value:'text',            label:'💬 Short text' },
+                { value:'textarea',        label:'📝 Long text' },
+                { value:'multiple_choice', label:'🔘 Multiple choice' },
+                { value:'checkbox',        label:'☑️ Checkboxes' },
+                { value:'email',           label:'📧 Email' },
+                { value:'nps',             label:'📈 NPS 0–10' },
+            ];
+            var HAS_OPTIONS = ['multiple_choice', 'checkbox'];
+
+            function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+            window.escH = escH;
+
+            function typeLabel(val) {
+                for (var i = 0; i < Q_TYPES.length; i++) { if (Q_TYPES[i].value === val) return Q_TYPES[i].label; }
+                return val;
             }
-        });
-        // Media picker helpers (also used by PV box; guard against double-definition)
-        if (typeof aweneOpenMediaPicker === 'undefined') {
-            function aweneOpenMediaPicker(inputId, previewId, type) {
-                var frame = wp.media({ title: 'Select file', multiple: false, library: { type: type } });
+
+            function buildTypeDropdown(sel) {
+                var html = '<select class="awene-sf-type-select awene-sf-q-type-sel" onchange="aweneSfOnTypeChange(this)">';
+                Q_TYPES.forEach(function(t) {
+                    html += '<option value="' + t.value + '"' + (t.value === sel ? ' selected' : '') + '>' + escH(t.label) + '</option>';
+                });
+                return html + '</select>';
+            }
+
+            function buildOptionsEditor(opts, type) {
+                var vis = HAS_OPTIONS.indexOf(type) !== -1;
+                var html = '<div class="awene-sf-options-editor' + (vis ? ' visible' : '') + '">';
+                html += '<span class="awene-sf-q-sublabel" style="display:block;margin-bottom:8px;">Choices</span>';
+                var list = (opts && opts.length) ? opts : ['', ''];
+                list.forEach(function(o) {
+                    html += '<div class="awene-sf-option-row">'
+                        + '<input type="text" class="awene-sf-option-input" value="' + escH(o) + '" placeholder="Option…" onchange="aweneSfSyncQuestions()" oninput="aweneSfSyncQuestions()" />'
+                        + '<button type="button" class="awene-sf-opt-remove" onclick="aweneSfRemoveOption(this)">&#215;</button>'
+                        + '</div>';
+                });
+                return html + '<button type="button" class="awene-sf-btn-add-option" onclick="aweneSfAddOption(this)">+ Add option</button></div>';
+            }
+
+            window.aweneSfBuildCard = function(idx, q) {
+                var type = q.type || 'rating_5';
+                var req  = q.required || false;
+                var opts = q.options  || [];
+                return '<div class="awene-sf-question-card" data-index="' + idx + '">'
+                    + '<div class="awene-sf-q-header">'
+                    + '<span class="awene-sf-drag-handle">⠿</span>'
+                    + '<span class="awene-sf-q-num">' + (idx + 1) + '</span>'
+                    + '<span class="awene-sf-q-type-badge">' + escH(typeLabel(type)) + '</span>'
+                    + (req ? '<span class="awene-sf-q-required-badge">Required</span>' : '')
+                    + '<button type="button" class="awene-sf-q-remove" onclick="aweneSfRemoveQuestion(this)" title="Remove">&#215;</button>'
+                    + '</div>'
+                    + '<div class="awene-sf-q-body">'
+                    + '<div class="awene-sf-q-row">'
+                    + '<div><span class="awene-sf-q-sublabel">Question</span><input type="text" class="awene-sf-input awene-sf-q-text" value="' + escH(q.question || '') + '" placeholder="Type your question here…" oninput="aweneSfSyncQuestions()" /></div>'
+                    + '<div><span class="awene-sf-q-sublabel">Type</span>' + buildTypeDropdown(type) + '</div>'
+                    + '<div><span class="awene-sf-q-sublabel">Required</span><label class="awene-sf-req-toggle"><input type="checkbox" class="awene-sf-q-required"' + (req ? ' checked' : '') + ' onchange="aweneSfSyncQuestions();aweneSfUpdateRequiredBadge(this);" /> <span>Required</span></label></div>'
+                    + '</div>'
+                    + buildOptionsEditor(opts, type)
+                    + '</div></div>';
+            };
+
+            window.aweneSfAddQuestion = function() {
+                var list = document.getElementById('awene_sf_questions_list');
+                var empty = document.getElementById('awene_sf_empty_state');
+                if (empty) empty.remove();
+                var idx = list.querySelectorAll('.awene-sf-question-card').length;
+                list.insertAdjacentHTML('beforeend', aweneSfBuildCard(idx, { type:'rating_5', question:'', required:false, options:[] }));
+                aweneSfSyncQuestions();
+                aweneSfRenumber();
+                aweneSfCountLabel();
+                initSortable();
+                var cards = list.querySelectorAll('.awene-sf-question-card');
+                var last  = cards[cards.length - 1];
+                if (last) { var inp = last.querySelector('.awene-sf-q-text'); if (inp) setTimeout(function() { inp.focus(); }, 80); }
+            };
+
+            window.aweneSfRemoveQuestion = function(btn) {
+                var card = btn.closest('.awene-sf-question-card');
+                if (card) card.remove();
+                aweneSfSyncQuestions();
+                aweneSfRenumber();
+                aweneSfCountLabel();
+                var list = document.getElementById('awene_sf_questions_list');
+                if (!list.querySelector('.awene-sf-question-card')) {
+                    list.innerHTML = '<div class="awene-sf-empty" id="awene_sf_empty_state"><div class="awene-sf-empty-icon">📋</div><div>No questions yet.<br>Click <strong>+ Add question</strong> below to start.</div></div>';
+                }
+            };
+
+            window.aweneSfOnTypeChange = function(sel) {
+                var type = sel.value;
+                var card = sel.closest('.awene-sf-question-card');
+                if (!card) return;
+                var oe = card.querySelector('.awene-sf-options-editor');
+                if (oe) { HAS_OPTIONS.indexOf(type) !== -1 ? oe.classList.add('visible') : oe.classList.remove('visible'); }
+                var badge = card.querySelector('.awene-sf-q-type-badge');
+                if (badge) badge.textContent = typeLabel(type);
+                aweneSfSyncQuestions();
+            };
+
+            window.aweneSfUpdateRequiredBadge = function(cb) {
+                var card = cb.closest('.awene-sf-question-card');
+                if (!card) return;
+                var header = card.querySelector('.awene-sf-q-header');
+                var existing = header.querySelector('.awene-sf-q-required-badge');
+                if (cb.checked && !existing) {
+                    var badge = document.createElement('span');
+                    badge.className = 'awene-sf-q-required-badge';
+                    badge.textContent = 'Required';
+                    header.insertBefore(badge, header.querySelector('.awene-sf-q-remove'));
+                } else if (!cb.checked && existing) {
+                    existing.remove();
+                }
+            };
+
+            window.aweneSfAddOption = function(btn) {
+                var editor = btn.closest('.awene-sf-options-editor');
+                var row = document.createElement('div');
+                row.className = 'awene-sf-option-row';
+                row.innerHTML = '<input type="text" class="awene-sf-option-input" value="" placeholder="Option…" onchange="aweneSfSyncQuestions()" oninput="aweneSfSyncQuestions()" />'
+                    + '<button type="button" class="awene-sf-opt-remove" onclick="aweneSfRemoveOption(this)">&#215;</button>';
+                editor.insertBefore(row, btn);
+                row.querySelector('input').focus();
+            };
+
+            window.aweneSfRemoveOption = function(btn) {
+                var row = btn.closest('.awene-sf-option-row');
+                if (row) row.remove();
+                aweneSfSyncQuestions();
+            };
+
+            window.aweneSfSyncQuestions = function() {
+                var cards = document.querySelectorAll('#awene_sf_questions_list .awene-sf-question-card');
+                var questions = [];
+                cards.forEach(function(card) {
+                    var typeEl = card.querySelector('.awene-sf-q-type-sel');
+                    var textEl = card.querySelector('.awene-sf-q-text');
+                    var reqEl  = card.querySelector('.awene-sf-q-required');
+                    var type   = typeEl ? typeEl.value : 'rating_5';
+                    var optEls = card.querySelectorAll('.awene-sf-option-input');
+                    var opts   = [];
+                    optEls.forEach(function(el) { if (el.value.trim()) opts.push(el.value.trim()); });
+                    questions.push({ type:type, question:textEl ? textEl.value : '', required:reqEl ? reqEl.checked : false, options:opts });
+                });
+                document.getElementById('awene_questions_json').value = JSON.stringify(questions);
+            };
+
+            window.aweneSfRenumber = function() {
+                document.querySelectorAll('#awene_sf_questions_list .awene-sf-question-card').forEach(function(card, i) {
+                    var num = card.querySelector('.awene-sf-q-num');
+                    if (num) num.textContent = i + 1;
+                    card.dataset.index = i;
+                });
+            };
+
+            window.aweneSfCountLabel = function() {
+                var count = document.querySelectorAll('#awene_sf_questions_list .awene-sf-question-card').length;
+                var el = document.getElementById('awene_sf_q_count_label');
+                if (el) el.textContent = count + ' question' + (count !== 1 ? 's' : '');
+            };
+
+            window.aweneSfUpdateActiveBadge = function(checked) {
+                var badge = document.getElementById('awene_sf_active_badge');
+                if (!badge) return;
+                badge.className = 'awene-sf-status-badge ' + (checked ? 'active' : 'inactive');
+                badge.innerHTML = '<span class="awene-sf-status-dot"></span>' + (checked ? 'Active' : 'Inactive');
+            };
+
+            window.aweneSfUpdateEventSummary = function(sel) {
+                var opt = sel.options[sel.selectedIndex];
+                var summary = document.getElementById('awene_sf_event_summary');
+                if (!sel.value || !opt) { summary.classList.remove('visible'); summary.innerHTML = ''; return; }
+                summary.innerHTML = '<div class="awene-sf-event-title">' + escH(opt.text) + '</div>'
+                    + '<div class="awene-sf-event-chips">'
+                    + '<span class="awene-sf-event-chip">📅 ' + escH(opt.dataset.date || '—') + '</span>'
+                    + '<span class="awene-sf-event-chip">📍 ' + escH(opt.dataset.location || 'TBC') + '</span>'
+                    + '<span class="awene-sf-event-chip">🔖 ' + escH(opt.dataset.status || '—') + '</span>'
+                    + '<span class="awene-sf-event-chip">👥 ' + escH(opt.dataset.reg || '0') + ' registrations</span>'
+                    + '</div>';
+                summary.classList.add('visible');
+            };
+
+            window.aweneSfOpenPdfPicker = function() {
+                var frame = wp.media({ title:'Select PDF', multiple:false, library:{ type:'application/pdf' } });
                 frame.on('select', function() {
-                    var attachment = frame.state().get('selection').first().toJSON();
-                    document.getElementById(inputId).value = attachment.url;
-                    var preview = document.getElementById(previewId);
-                    if (preview) {
-                        preview.innerHTML = '<span>' + attachment.filename + '</span> <a href="#" onclick="aweneClearMedia(\'' + inputId + '\',\'' + previewId + '\');return false;" style="color:#b32d2e;">Remove</a>';
-                        preview.style.display = 'flex';
-                    }
+                    var a = frame.state().get('selection').first().toJSON();
+                    document.getElementById('awene_sf_pdf_attachment_id').value = a.id;
+                    document.getElementById('awene_sat_pdf_url').value = a.url;
+                    document.getElementById('awene_sf_pdf_name').textContent = a.filename || a.url.split('/').pop();
+                    document.getElementById('awene_sf_pdf_preview').style.display = 'flex';
+                    document.getElementById('awene_sf_pdf_warning').classList.add('visible');
+                    document.getElementById('awene_sf_require_email').checked = true;
                 });
                 frame.open();
+            };
+
+            window.aweneSfClearPdf = function() {
+                document.getElementById('awene_sf_pdf_attachment_id').value = '';
+                document.getElementById('awene_sat_pdf_url').value = '';
+                document.getElementById('awene_sf_pdf_preview').style.display = 'none';
+                document.getElementById('awene_sf_pdf_warning').classList.remove('visible');
+            };
+
+            function initSortable() {
+                $('#awene_sf_questions_list').sortable({
+                    handle: '.awene-sf-q-header',
+                    placeholder: 'awene-sf-question-card sortable-placeholder',
+                    tolerance: 'pointer',
+                    update: function() { aweneSfSyncQuestions(); aweneSfRenumber(); }
+                }).disableSelection();
             }
-            function aweneClearMedia(inputId, previewId) {
-                document.getElementById(inputId).value = '';
-                var preview = document.getElementById(previewId);
-                if (preview) { preview.innerHTML = ''; preview.style.display = 'none'; }
-            }
-        }
+
+            $(function() {
+                var form = document.querySelector('#post');
+                if (form) form.addEventListener('submit', aweneSfSyncQuestions);
+                var listEl = document.getElementById('awene_sf_questions_list');
+                if (listEl) {
+                    listEl.addEventListener('change', aweneSfSyncQuestions);
+                    listEl.addEventListener('input', aweneSfSyncQuestions);
+                }
+                initSortable();
+            });
+        })(jQuery);
         </script>
         <?php
     }
@@ -1183,7 +1770,7 @@ final class Awene_Events_Plugin
 
         foreach (self::SATISFACTION_META_FIELDS as $field => $meta_key) {
             $value = $input[$field] ?? '';
-            if (in_array($field, ['active', 'anonymous_allowed'], true)) {
+            if (in_array($field, ['active', 'anonymous_allowed', 'require_email'], true)) {
                 $value = !empty($input[$field]);
             }
             update_post_meta($post_id, $meta_key, self::sanitize_satisfaction_value($field, $value));
@@ -2352,7 +2939,10 @@ final class Awene_Events_Plugin
         if ($field === 'event_id') {
             return absint($value);
         }
-        if (in_array($field, ['active', 'anonymous_allowed'], true)) {
+        if ($field === 'pdf_attachment_id') {
+            return absint($value);
+        }
+        if (in_array($field, ['active', 'anonymous_allowed', 'require_email'], true)) {
             return (bool) $value;
         }
         if ($field === 'pdf_after_submission_url') {
@@ -3069,15 +3659,17 @@ final class Awene_Events_Plugin
     {
         $questions = json_decode((string) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['questions'], true), true);
         return [
-            'id' => $post_id,
-            'eventId' => absint(get_post_meta($post_id, self::SATISFACTION_META_FIELDS['event_id'], true)),
-            'title' => get_the_title($post_id),
-            'introText' => (string) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['intro_text'], true),
-            'thankYouMessage' => (string) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['thank_you_message'], true),
-            'active' => (bool) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['active'], true),
-            'anonymousAllowed' => (bool) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['anonymous_allowed'], true),
+            'id'                    => $post_id,
+            'eventId'               => absint(get_post_meta($post_id, self::SATISFACTION_META_FIELDS['event_id'], true)),
+            'title'                 => get_the_title($post_id),
+            'introText'             => (string) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['intro_text'], true),
+            'thankYouMessage'       => (string) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['thank_you_message'], true),
+            'active'                => (bool) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['active'], true),
+            'anonymousAllowed'      => (bool) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['anonymous_allowed'], true),
+            'requireEmail'          => (bool) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['require_email'], true),
+            'language'              => (string) (get_post_meta($post_id, self::SATISFACTION_META_FIELDS['language'], true) ?: 'fr'),
             'pdfAfterSubmissionUrl' => (string) get_post_meta($post_id, self::SATISFACTION_META_FIELDS['pdf_after_submission_url'], true),
-            'questions' => is_array($questions) ? $questions : [],
+            'questions'             => is_array($questions) ? $questions : [],
         ];
     }
 
