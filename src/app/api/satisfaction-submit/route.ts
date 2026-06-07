@@ -13,12 +13,15 @@ function restUrl(path: string) {
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { eventId?: number | string };
-    if (!body.eventId) {
-      return NextResponse.json({ message: "Missing event id." }, { status: 400 });
+    const body = (await request.json()) as Record<string, unknown>;
+
+    const eventId = Number(body.eventId);
+    if (!eventId || eventId < 1) {
+      return NextResponse.json({ message: "Missing or invalid event id." }, { status: 400 });
     }
 
-    const response = await fetch(restUrl(`awene/v1/satisfaction/${body.eventId}/submit`), {
+    const url = restUrl(`awene/v1/satisfaction/${eventId}/submit`);
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
@@ -26,11 +29,16 @@ export async function POST(request: Request) {
     });
 
     const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok && process.env.NODE_ENV !== "production") {
+      console.error("[satisfaction-submit] WP error", { status: response.status, url, payload });
+    }
+
     return NextResponse.json(payload, { status: response.status });
-  } catch {
-    return NextResponse.json(
-      { message: "The survey could not be submitted." },
-      { status: 500 },
-    );
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[satisfaction-submit] Unexpected error", err);
+    }
+    return NextResponse.json({ message: "The survey could not be submitted." }, { status: 500 });
   }
 }
