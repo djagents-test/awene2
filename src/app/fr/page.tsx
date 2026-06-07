@@ -365,10 +365,11 @@ export default function FrenchHomePageRoute() {
               <div className="mb-6 overflow-hidden rounded-[1.6rem]">
                 <div className="relative aspect-[16/10] w-full">
                   <Image
-                    src="/images/formations-audience-2.jpg"
-                    alt="Femme souriante dans un espace calme et lumineux"
+                    src="/images/awene-femmes-diversite-inclusion.jpg"
+                    alt="Femmes de différents horizons réunies dans un esprit de soutien et d’inclusion"
+                    title="Diversité, inclusion et soutien entre femmes"
                     fill
-                    className="object-cover object-center"
+                    className="object-cover object-[50%_15%] md:object-[50%_25%] xl:object-center"
                     sizes="(min-width: 768px) 50vw, 100vw"
                   />
                 </div>

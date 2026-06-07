@@ -16,8 +16,8 @@ final class Awene_Events_Plugin
     private const EVENT_POST_TYPE = 'awene_event';
     private const REGISTRATION_POST_TYPE = 'awene_registration';
     private const EVENT_PV_POST_TYPE = 'awene_event_pv';
-    private const SATISFACTION_POST_TYPE = 'awene_satisfaction_form';
-    private const SATISFACTION_RESPONSE_POST_TYPE = 'awene_satisfaction_response';
+    private const SATISFACTION_POST_TYPE = 'awene_sat_form';
+    private const SATISFACTION_RESPONSE_POST_TYPE = 'awene_sat_entry';
     private const TAXONOMY = 'awene_event_type';
     private const EVENT_NONCE_ACTION = 'awene_event_save_meta';
     private const EVENT_NONCE_NAME = 'awene_event_meta_nonce';

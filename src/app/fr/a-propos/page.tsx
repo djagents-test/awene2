@@ -100,8 +100,22 @@ export default function AProposPage() {
           />
         </div>
 
-        <section style={{ background: "#FCFAF8" }}>
-          <Container className="relative z-10 pt-32 pb-20">
+        <section className="relative min-h-[72vh] overflow-hidden">
+          <Image
+            src="/images/awene-leadership-feminin-entreprise.jpg"
+            alt=""
+            title="Leadership féminin et évolution professionnelle"
+            fill
+            priority
+            aria-hidden="true"
+            className="object-cover object-[65%_40%] md:object-[55%_42%] xl:object-[50%_14%]"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(252,250,248,0.94)_0%,rgba(252,250,248,0.8)_48%,rgba(252,250,248,0.3)_100%)]" />
+          <Container
+            className="relative z-10 flex min-h-[72vh] items-end pt-32 pb-20"
+            style={{ marginTop: "128px" }}
+          >
             <div className="max-w-none lg:max-w-[46rem]">
               <p
                 className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]"

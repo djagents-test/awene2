@@ -52,8 +52,8 @@ function welcomeEmailHtml(locale: "fr" | "en") {
                     </p>
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 26px 0;">
                       <tr>
-                        <td style="border-radius:999px;background:linear-gradient(135deg,#6f3fd6 0%,#8e52f1 100%);box-shadow:0 10px 24px rgba(111,63,214,0.22);">
-                          <a href="${articlesHref}" style="display:inline-block;padding:14px 24px;font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;">
+                        <td bgcolor="#6f3fd6" style="border-radius:999px;background:#6f3fd6;box-shadow:0 10px 24px rgba(111,63,214,0.22);">
+                          <a href="${articlesHref}" style="display:inline-block;padding:14px 24px;font-family:Arial,sans-serif;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;border-radius:999px;mso-padding-alt:14px 24px;">
                             ${isEn ? "Read the articles" : "Lire les articles"}
                           </a>
                         </td>

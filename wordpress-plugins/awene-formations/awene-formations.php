@@ -21,6 +21,8 @@ final class Awene_Formations_Plugin
     private const META_BOX_NONCE_NAME = 'awene_formation_meta_nonce';
     private const REGISTRATION_ACTION_NONCE = 'awene_registration_admin_action';
     private const SETTINGS_NONCE_ACTION = 'awene_formations_save_settings';
+    private const BREVO_OPTION_KEY = 'awene_brevo_notifications_settings';
+    private const BREVO_NOTIFY_NONCE = 'awene_formations_brevo_notify_send';
     private const MENU_SLUG_DASHBOARD = 'awene-formations-dashboard';
     private const MENU_SLUG_REGISTRATIONS = 'awene-formations-registrations';
     private const MENU_SLUG_SETTINGS = 'awene-formations-settings';
@@ -104,6 +106,7 @@ final class Awene_Formations_Plugin
         add_action('restrict_manage_posts', [self::class, 'render_formation_filters']);
         add_filter('posts_clauses', [self::class, 'maybe_sort_by_registration_count'], 10, 2);
         add_shortcode('awene_formations', [self::class, 'shortcode']);
+        add_action('admin_post_awene_formations_send_brevo_campaign', [self::class, 'send_brevo_campaign']);
     }
 
     public static function activate(): void
@@ -248,6 +251,176 @@ final class Awene_Formations_Plugin
         return wp_parse_args((array) get_option(self::OPTION_KEY, []), self::default_settings());
     }
 
+    public static function send_brevo_campaign(): void
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die('Unauthorized');
+        }
+        check_admin_referer(self::BREVO_NOTIFY_NONCE);
+
+        $post_id = absint($_POST['post_id'] ?? 0);
+        $post = $post_id ? get_post($post_id) : null;
+        if (!$post || $post->post_type !== self::POST_TYPE) {
+            wp_die('Formation not found.');
+        }
+
+        $settings = self::brevo_settings();
+        $api_key = self::brevo_api_key();
+        $language = (string) get_post_meta($post_id, self::META_FIELDS['language'], true) ?: 'fr';
+        $public_url = esc_url_raw((string) ($_POST['public_url'] ?? self::formation_public_url($post_id, $language, $settings)));
+        $list_id = sanitize_text_field((string) ($_POST['list_id'] ?? ''));
+        $subject = sanitize_text_field((string) ($_POST['subject'] ?? ''));
+        $preview = sanitize_text_field((string) ($_POST['preview_text'] ?? ''));
+        $intro = sanitize_textarea_field((string) ($_POST['intro_text'] ?? ''));
+        $cta_label = sanitize_text_field((string) ($_POST['cta_label'] ?? ''));
+        $redirect = get_edit_post_link($post_id, 'raw') ?: admin_url();
+
+        if (!$api_key || empty($settings['enabled']) || $post->post_status !== 'publish' || !$public_url || !$list_id || !$subject || empty($settings['sender_email'])) {
+            wp_safe_redirect($redirect);
+            exit;
+        }
+
+        $html = self::brevo_campaign_html([
+            'title' => get_the_title($post_id),
+            'preview' => $preview,
+            'intro' => $intro,
+            'cta_label' => $cta_label,
+            'public_url' => $public_url,
+            'footer' => (string) $settings['campaign_footer'],
+        ]);
+
+        $create = wp_remote_post('https://api.brevo.com/v3/emailCampaigns', [
+            'headers' => [
+                'api-key' => $api_key,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'body' => wp_json_encode([
+                'name' => $subject,
+                'subject' => $subject,
+                'previewText' => $preview,
+                'sender' => ['name' => $settings['sender_name'], 'email' => $settings['sender_email']],
+                'replyTo' => $settings['reply_to_email'] ? ['email' => $settings['reply_to_email']] : null,
+                'type' => 'classic',
+                'htmlContent' => $html,
+                'recipients' => ['listIds' => [(int) $list_id]],
+            ]),
+            'timeout' => 30,
+        ]);
+
+        $log = [
+            'campaign_id' => '',
+            'list_id' => $list_id,
+            'subject' => $subject,
+            'status' => 'Failed',
+            'sent_at' => current_time('mysql'),
+        ];
+
+        if (!is_wp_error($create)) {
+            $create_body = json_decode((string) wp_remote_retrieve_body($create), true);
+            $campaign_id = (string) ($create_body['id'] ?? '');
+            $log['campaign_id'] = $campaign_id;
+            if ($campaign_id) {
+                $send = wp_remote_post('https://api.brevo.com/v3/emailCampaigns/' . rawurlencode($campaign_id) . '/sendNow', [
+                    'headers' => [
+                        'api-key' => $api_key,
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                    ],
+                    'body' => wp_json_encode(new stdClass()),
+                    'timeout' => 30,
+                ]);
+                if (!is_wp_error($send) && wp_remote_retrieve_response_code($send) < 300) {
+                    $log['status'] = 'Sent';
+                }
+            }
+        }
+
+        $history = get_post_meta($post_id, '_awene_brevo_notification_logs', true);
+        $history = is_array($history) ? $history : [];
+        $history[] = $log;
+        update_post_meta($post_id, '_awene_brevo_notification_logs', $history);
+
+        wp_safe_redirect($redirect);
+        exit;
+    }
+
+    private static function formation_public_url(int $post_id, string $language, array $settings): string
+    {
+        $base = untrailingslashit((string) ($settings['public_website_url'] ?: home_url('/')));
+        $slug = get_post_field('post_name', $post_id);
+        if (!$slug) {
+            return '';
+        }
+        return $base . '/' . ($language === 'en' ? 'en/training/' : 'fr/formations/') . $slug;
+    }
+
+    private static function default_list_id_for_language(string $language, array $settings): string
+    {
+        return (string) ($language === 'en' ? $settings['en_list_id'] : ($language === 'ar' ? $settings['ar_list_id'] : $settings['fr_list_id']));
+    }
+
+    private static function notification_defaults(int $post_id, string $language, string $public_url): array
+    {
+        $title = get_the_title($post_id);
+        $is_en = $language === 'en';
+        return [
+            'subject' => $is_en ? "New AWENE training: {$title}" : "Nouvelle formation AWENE : {$title}",
+            'preview' => $is_en ? 'Discover this AWENE training and its practical details.' : 'Découvrez cette formation AWENE et ses informations pratiques.',
+            'intro' => $is_en ? 'A new AWENE training is now available. View the programme, details and practical information using the link below.' : 'Une nouvelle formation AWENE est disponible. Consultez le programme, les détails et les modalités depuis le lien ci-dessous.',
+            'cta' => $is_en ? 'View training' : 'Voir la formation',
+            'url' => $public_url,
+        ];
+    }
+
+    private static function brevo_campaign_html(array $data): string
+    {
+        return '<div style="background:#f7f2fb;padding:32px 16px;font-family:Arial,sans-serif;">'
+            . '<div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:24px;padding:40px 32px;">'
+            . '<div style="font-size:28px;font-weight:700;color:#4B1F7A;margin-bottom:16px;">AWENE</div>'
+            . '<p style="color:#6E6478;font-size:15px;line-height:1.6;margin:0 0 12px;">' . esc_html($data['preview']) . '</p>'
+            . '<h1 style="color:#4B1F7A;font-size:30px;line-height:1.2;margin:0 0 16px;">' . esc_html($data['title']) . '</h1>'
+            . '<p style="color:#2E2438;font-size:16px;line-height:1.7;margin:0 0 24px;">' . nl2br(esc_html($data['intro'])) . '</p>'
+            . '<p style="margin:0 0 28px;"><a href="' . esc_url($data['public_url']) . '" style="display:inline-block;background:#F68B2C;color:#ffffff;text-decoration:none;padding:14px 22px;border-radius:999px;font-weight:700;">' . esc_html($data['cta_label']) . '</a></p>'
+            . '<p style="color:#6E6478;font-size:13px;line-height:1.6;margin:0;">' . esc_html($data['footer']) . '</p>'
+            . '</div></div>';
+    }
+
+    private static function notification_history(int $post_id): array
+    {
+        $history = get_post_meta($post_id, '_awene_brevo_notification_logs', true);
+        return is_array($history) ? $history : [];
+    }
+
+    private static function brevo_settings(): array
+    {
+        return wp_parse_args((array) get_option(self::BREVO_OPTION_KEY, []), [
+            'enabled' => 0,
+            'sender_name' => 'AWENE',
+            'sender_email' => get_option('admin_email'),
+            'reply_to_email' => get_option('admin_email'),
+            'fr_list_id' => '',
+            'en_list_id' => '',
+            'ar_list_id' => '',
+            'public_website_url' => home_url('/'),
+            'campaign_footer' => 'AWENE',
+        ]);
+    }
+
+    private static function brevo_api_key(): string
+    {
+        foreach (['BREVO_API_KEY', 'BREVO_API', 'BREVO_KEY'] as $env) {
+            $value = getenv($env);
+            if (is_string($value) && trim($value) !== '') {
+                return trim($value);
+            }
+            if (isset($_ENV[$env]) && is_string($_ENV[$env]) && trim($_ENV[$env]) !== '') {
+                return trim($_ENV[$env]);
+            }
+        }
+        return '';
+    }
+
     public static function add_meta_boxes(): void
     {
         add_meta_box(
@@ -256,6 +429,14 @@ final class Awene_Formations_Plugin
             [self::class, 'render_details_box'],
             self::POST_TYPE,
             'normal',
+            'high'
+        );
+        add_meta_box(
+            'awene_formation_brevo_notifications',
+            'Brevo Notifications',
+            [self::class, 'render_brevo_notification_box'],
+            self::POST_TYPE,
+            'side',
             'high'
         );
     }
@@ -371,6 +552,54 @@ final class Awene_Formations_Plugin
             <h3>Notes internes</h3>
             <label for="awene_formation_internal_notes">Notes privees non exposees publiquement</label>
             <textarea id="awene_formation_internal_notes" name="awene_formation_meta[internal_notes]" rows="5"><?php echo esc_textarea((string) $values['internal_notes']); ?></textarea>
+        </div>
+        <?php
+    }
+
+    public static function render_brevo_notification_box(WP_Post $post): void
+    {
+        $settings = self::brevo_settings();
+        $api_key = self::brevo_api_key();
+        $language = (string) get_post_meta($post->ID, self::META_FIELDS['language'], true) ?: 'fr';
+        $public_url = self::formation_public_url($post->ID, $language, $settings);
+        $can_send = current_user_can('manage_options') && $api_key && !empty($settings['enabled']) && $post->post_status === 'publish' && $public_url && get_the_title($post->ID) && $language;
+        $history = self::notification_history($post->ID);
+        $defaults = self::notification_defaults($post->ID, $language, $public_url);
+        $list_id = self::default_list_id_for_language($language, $settings);
+        ?>
+        <p>
+            <?php if ($api_key) : ?>
+                <strong>Brevo API key detected from environment.</strong>
+            <?php else : ?>
+                <strong style="color:#b32d2e;">Brevo API key is missing from environment variables.</strong>
+            <?php endif; ?>
+        </p>
+        <?php if (!$can_send) : ?>
+            <p style="color:#646970;">
+                <?php echo !$api_key
+                    ? esc_html('Brevo API key is missing from environment variables.')
+                    : ($post->post_status !== 'publish'
+                        ? esc_html('Publiez ce contenu avant d’informer votre liste.')
+                        : esc_html('Brevo notifications are disabled or this content has no public URL.')); ?>
+            </p>
+        <?php endif; ?>
+        <?php if ($history) : $last = end($history); ?>
+            <p style="color:#646970;"><?php echo esc_html('Last notification: ' . ($last['status'] ?? '') . ' | Campaign ' . ($last['campaign_id'] ?? '-') . ' | ' . ($last['sent_at'] ?? '')); ?></p>
+        <?php endif; ?>
+        <p><button type="button" class="button" onclick="var panel=this.parentNode.nextElementSibling;panel.style.display=panel.style.display==='none'?'block':'none';"><?php echo esc_html($language === 'en' ? 'Notify your list' : 'Informer votre liste'); ?></button></p>
+        <div style="display:none; margin-top:12px;">
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <?php wp_nonce_field(self::BREVO_NOTIFY_NONCE); ?>
+                <input type="hidden" name="action" value="awene_formations_send_brevo_campaign" />
+                <input type="hidden" name="post_id" value="<?php echo esc_attr((string) $post->ID); ?>" />
+                <p><label><?php echo esc_html($language === 'en' ? 'List ID' : 'ID de liste'); ?><br /><input type="text" name="list_id" class="widefat" value="<?php echo esc_attr((string) $list_id); ?>" /></label></p>
+                <p><label>Subject<br /><input type="text" name="subject" class="widefat" value="<?php echo esc_attr($defaults['subject']); ?>" /></label></p>
+                <p><label>Preview text<br /><input type="text" name="preview_text" class="widefat" value="<?php echo esc_attr($defaults['preview']); ?>" /></label></p>
+                <p><label>Intro text<br /><textarea name="intro_text" class="widefat" rows="4"><?php echo esc_textarea($defaults['intro']); ?></textarea></label></p>
+                <p><label>CTA label<br /><input type="text" name="cta_label" class="widefat" value="<?php echo esc_attr($defaults['cta']); ?>" /></label></p>
+                <p><label>Public page link<br /><input type="url" name="public_url" class="widefat" value="<?php echo esc_attr((string) $public_url); ?>" /></label></p>
+                <p><button type="submit" class="button button-primary" <?php disabled(!$can_send); ?>><?php echo esc_html($language === 'en' ? 'Send now' : 'Envoyer maintenant'); ?></button></p>
+            </form>
         </div>
         <?php
     }

@@ -1,9 +1,15 @@
 import type { Locale } from "@/lib/i18n";
 
+const CMS_SITE_BASE =
+  process.env.NEXT_PUBLIC_AWENE_CMS_URL ??
+  process.env.NEXT_PUBLIC_WORDPRESS_API_URL ??
+  process.env.WORDPRESS_API_URL?.replace(/\/wp-json\/wp\/v2\/?$/, "") ??
+  "https://cms.awene.net";
+
 const CMS_API_BASE =
   process.env.WORDPRESS_API_URL ??
   process.env.NEXT_PUBLIC_WORDPRESS_API_URL ??
-  "https://cms.awene.net/wp-json/wp/v2";
+  `${CMS_SITE_BASE}/wp-json/wp/v2`;
 
 const CMS_REVALIDATE_SECONDS = 300;
 
@@ -60,6 +66,7 @@ export type CmsArticle = {
   excerpt: string;
   content: string;
   date: string;
+  isoDate: string;
   readTime: string;
   category: string;
   categories: CmsCategory[];
@@ -75,17 +82,83 @@ export type CmsEvent = {
   slug: string;
   title: string;
   description: string;
+  shortDescription?: string;
   date: string;
+  startsAt?: string;
+  endDate?: string;
   time?: string;
+  startTime?: string;
+  endTime?: string;
   type: string;
   types: CmsCategory[];
   color: string;
-  format?: string;
+  format?: "online" | "in_person" | "hybrid";
   status?: string;
+  registrationStatus?: "open" | "full" | "closed";
+  eventStatus?: "upcoming" | "past" | "draft";
   location?: string;
+  locationType?: "online" | "in_person" | "hybrid";
+  locationName?: string;
+  locationAddress?: string;
+  onlineUrl?: string;
+  language?: "fr" | "en" | "ar";
+  capacity?: number;
+  availableSeats?: number;
   price?: string;
   image?: CmsImage;
   url?: string;
+  ctaLabel?: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  recapPublished?: boolean;
+};
+
+export type CmsEventPv = {
+  eventId: number;
+  eventSlug: string;
+  pvTitle?: string;
+  shortDescription?: string;
+  fullDescription?: string;
+  keyTakeaways?: string;
+  speakerNotes?: string;
+  attendanceNotes?: string;
+  internalNotes?: string;
+  publicRecapStatus: "draft" | "published" | "hidden";
+  pdfUrl?: string;
+  pdfIsPublic?: boolean;
+  videoUrl?: string;
+  gallery: string[];
+  externalGalleryUrl?: string;
+  satisfactionFormId?: number;
+  completionStatus?: string;
+};
+
+export type CmsSatisfactionQuestion = {
+  id: string;
+  label: string;
+  type:
+    | "short_text"
+    | "long_text"
+    | "rating_1_5"
+    | "rating_1_10"
+    | "multiple_choice"
+    | "checkbox"
+    | "yes_no"
+    | "email";
+  required?: boolean;
+  options?: string[];
+};
+
+export type CmsSatisfactionForm = {
+  id: number;
+  eventId: number;
+  title: string;
+  introText?: string;
+  thankYouMessage?: string;
+  active: boolean;
+  anonymousAllowed: boolean;
+  pdfAfterSubmissionUrl?: string;
+  questions: CmsSatisfactionQuestion[];
 };
 
 export type CmsFormationStatus = "upcoming" | "sold_out" | "past" | "cancelled";
@@ -121,12 +194,33 @@ type AweneEventApi = {
   id: number;
   slug: string;
   title: string;
+  description?: string;
+  shortDescription?: string;
   excerpt?: string;
   content?: string;
+  date?: string;
   date_label?: string;
+  start_date?: string;
+  end_date?: string;
   time_label?: string;
+  start_time?: string;
+  end_time?: string;
   format?: string;
   status?: string;
+  registrationStatus?: string;
+  eventStatus?: string;
+  locationType?: string;
+  locationName?: string;
+  locationAddress?: string;
+  onlineUrl?: string;
+  language?: string;
+  capacity?: number | string | null;
+  availableSeats?: number | string | null;
+  ctaLabel?: string;
+  seoTitle?: string;
+  metaDescription?: string;
+  featuredImage?: CmsImage | null;
+  recapPublished?: boolean;
   location?: {
     name?: string;
     address?: string;
@@ -137,6 +231,38 @@ type AweneEventApi = {
   price?: string;
   types?: CmsCategory[];
   image?: CmsImage | null;
+};
+
+type AweneEventPvApi = {
+  eventId: number;
+  eventSlug?: string;
+  pvTitle?: string;
+  shortDescription?: string;
+  fullDescription?: string;
+  keyTakeaways?: string;
+  speakerNotes?: string;
+  attendanceNotes?: string;
+  internalNotes?: string;
+  publicRecapStatus?: "draft" | "published" | "hidden";
+  pdfUrl?: string;
+  pdfIsPublic?: boolean;
+  videoUrl?: string;
+  gallery?: string[];
+  externalGalleryUrl?: string;
+  satisfactionFormId?: number;
+  completionStatus?: string;
+};
+
+type AweneSatisfactionFormApi = {
+  id: number;
+  eventId: number;
+  title: string;
+  introText?: string;
+  thankYouMessage?: string;
+  active?: boolean;
+  anonymousAllowed?: boolean;
+  pdfAfterSubmissionUrl?: string;
+  questions?: CmsSatisfactionQuestion[];
 };
 
 type AweneFormationApi = {
@@ -176,7 +302,7 @@ type AweneFormationApi = {
 
 function cmsUrl(path: string, params: Record<string, string | number> = {}) {
   if (!CMS_API_BASE) {
-    throw new Error("WORDPRESS_API_URL is required to fetch CMS content.");
+    throw new Error("A WordPress CMS URL is required to fetch CMS content.");
   }
 
   const base = CMS_API_BASE.replace(/\/$/, "");
@@ -191,7 +317,7 @@ function cmsUrl(path: string, params: Record<string, string | number> = {}) {
 
 function cmsRestUrl(path: string, params: Record<string, string | number> = {}) {
   if (!CMS_API_BASE) {
-    throw new Error("WORDPRESS_API_URL is required to fetch CMS content.");
+    throw new Error("A WordPress CMS URL is required to fetch CMS content.");
   }
 
   const api = new URL(CMS_API_BASE);
@@ -469,6 +595,7 @@ function toArticle(post: WpPost, index: number): CmsArticle {
     excerpt,
     content: post.content?.rendered ?? "",
     date: formattedDate(post),
+    isoDate: post.date ?? "",
     readTime: readTime(post),
     category: categories[0]?.name ?? pillar,
     categories,
@@ -512,25 +639,158 @@ function eventTypeLabel(types?: CmsCategory[]) {
   return types?.[0]?.name ?? "Événement";
 }
 
+function normalizeEventFormat(value?: string): CmsEvent["format"] {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("hybrid") || normalized.includes("hybride")) {
+    return "hybrid";
+  }
+
+  if (
+    normalized.includes("person") ||
+    normalized.includes("présentiel") ||
+    normalized.includes("presentiel")
+  ) {
+    return "in_person";
+  }
+
+  return "online";
+}
+
+function normalizeEventLanguage(value?: string): CmsEvent["language"] {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("ar")) return "ar";
+  if (normalized.includes("en")) return "en";
+  return "fr";
+}
+
+function normalizeRegistrationStatus(
+  value?: string,
+): CmsEvent["registrationStatus"] {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (
+    normalized.includes("full") ||
+    normalized.includes("complet") ||
+    normalized.includes("sold")
+  ) {
+    return "full";
+  }
+
+  if (normalized.includes("closed") || normalized.includes("fermé")) {
+    return "closed";
+  }
+
+  return "open";
+}
+
+function normalizeEventStatus(value?: string): CmsEvent["eventStatus"] {
+  const normalized = (value ?? "").toLowerCase();
+
+  if (normalized.includes("draft") || normalized.includes("brouillon")) {
+    return "draft";
+  }
+
+  if (normalized.includes("past") || normalized.includes("termin") || normalized.includes("ended")) {
+    return "past";
+  }
+
+  return "upcoming";
+}
+
 function toAweneEvent(event: AweneEventApi): CmsEvent {
   const type = eventTypeLabel(event.types);
+  const startsAt = event.start_date ?? event.date;
+  const format = normalizeEventFormat(event.locationType ?? event.format);
+  const registrationStatus = normalizeRegistrationStatus(
+    event.registrationStatus ?? event.status,
+  );
+  const eventStatus = normalizeEventStatus(event.eventStatus ?? event.status);
+  const capacity = numberOrUndefined(event.capacity);
+  const availableSeats = numberOrUndefined(event.availableSeats);
+  const locationName = event.locationName ?? event.location?.name;
+  const locationAddress =
+    event.locationAddress ??
+    [event.location?.address, event.location?.city, event.location?.country]
+      .filter(Boolean)
+      .join(", ");
+  const locationLabel =
+    locationName ||
+    [event.location?.city, event.location?.country].filter(Boolean).join(", ") ||
+    (format === "online" ? "En ligne" : "");
+  const image = event.featuredImage ?? event.image ?? undefined;
 
   return {
     id: event.id,
     slug: event.slug,
     title: event.title,
-    description: event.excerpt ?? "",
+    description: event.description ?? event.content ?? event.excerpt ?? "",
+    shortDescription: event.shortDescription ?? event.excerpt ?? "",
     date: event.date_label ?? "À venir",
+    startsAt,
+    endDate: event.end_date,
     time: event.time_label,
+    startTime: event.start_time,
+    endTime: event.end_time,
     type,
     types: event.types ?? [],
     color: eventColor(type),
-    format: event.format,
-    status: event.status,
-    location: eventLocationLabel(event.location),
+    format,
+    status: registrationStatus,
+    registrationStatus,
+    eventStatus,
+    location: locationLabel,
+    locationType: format,
+    locationName,
+    locationAddress,
+    onlineUrl: event.onlineUrl,
+    language: normalizeEventLanguage(event.language),
+    capacity,
+    availableSeats: typeof capacity === "number" ? availableSeats : undefined,
     price: event.price,
-    image: event.image ?? undefined,
+    image,
     url: event.registration_url,
+    ctaLabel: event.ctaLabel,
+    seoTitle: event.seoTitle,
+    metaDescription: event.metaDescription,
+    recapPublished: event.recapPublished,
+  };
+}
+
+function toEventPv(pv: AweneEventPvApi): CmsEventPv {
+  return {
+    eventId: pv.eventId,
+    eventSlug: pv.eventSlug ?? "",
+    pvTitle: pv.pvTitle,
+    shortDescription: pv.shortDescription,
+    fullDescription: pv.fullDescription,
+    keyTakeaways: pv.keyTakeaways,
+    speakerNotes: pv.speakerNotes,
+    attendanceNotes: pv.attendanceNotes,
+    internalNotes: pv.internalNotes,
+    publicRecapStatus: pv.publicRecapStatus ?? "draft",
+    pdfUrl: pv.pdfUrl,
+    pdfIsPublic: pv.pdfIsPublic ?? false,
+    videoUrl: pv.videoUrl,
+    gallery: pv.gallery ?? [],
+    externalGalleryUrl: pv.externalGalleryUrl,
+    satisfactionFormId: pv.satisfactionFormId,
+    completionStatus: pv.completionStatus,
+  };
+}
+
+function toSatisfactionForm(form: AweneSatisfactionFormApi): CmsSatisfactionForm {
+  return {
+    id: form.id,
+    eventId: form.eventId,
+    title: form.title,
+    introText: form.introText,
+    thankYouMessage: form.thankYouMessage,
+    active: form.active !== false,
+    anonymousAllowed: form.anonymousAllowed !== false,
+    pdfAfterSubmissionUrl: form.pdfAfterSubmissionUrl,
+    questions: form.questions ?? [],
   };
 }
 
@@ -565,19 +825,56 @@ function toEvent(post: WpPost): CmsEvent {
     acfString(post, ["event_type", "type_evenement", "type"]) ||
     firstTermName(post, ["event_type", "type-evenement", "category"]) ||
     "Événement";
+  const startsAt = acfString(post, ["event_date", "date_evenement", "start_date", "date_debut"]);
+  const format = normalizeEventFormat(
+    acfString(post, ["format", "location_type", "format_evenement"]),
+  );
+  const registrationStatus = normalizeRegistrationStatus(
+    acfString(post, ["registration_status", "status_inscription", "status"]),
+  );
+  const eventStatus = normalizeEventStatus(
+    acfString(post, ["event_status", "statut_evenement"]),
+  );
+  const capacity = numberOrUndefined(acfString(post, ["capacity", "capacite"]));
+  const locationName = acfString(post, ["location_name", "lieu", "location"]);
+  const locationAddress = acfString(post, ["location_address", "adresse"]);
 
   return {
     id: post.id,
     slug: post.slug,
     title,
     description:
+      post.content?.rendered ||
+      renderedText(acfString(post, ["description"])) ||
+      "",
+    shortDescription:
       renderedText(acfString(post, ["summary", "resume", "description"])) ||
       renderedText(post.excerpt?.rendered),
     date: eventDate(post),
+    startsAt,
     type,
     types: [{ name: type, slug: type }],
     color: eventColor(type),
+    format,
+    status: registrationStatus,
+    registrationStatus,
+    eventStatus,
+    location:
+      locationName ||
+      (format === "online" ? "En ligne" : "Lieu à confirmer"),
+    locationType: format,
+    locationName,
+    locationAddress,
+    language: normalizeEventLanguage(acfString(post, ["language", "langue"])),
+    capacity,
+    availableSeats:
+      typeof capacity === "number"
+        ? numberOrUndefined(acfString(post, ["available_seats", "places_disponibles"]))
+        : undefined,
     url: acfString(post, ["registration_url", "url_inscription", "link", "lien"]),
+    ctaLabel: acfString(post, ["cta_label", "label_cta"]),
+    seoTitle: acfString(post, ["seo_title", "meta_title"]),
+    metaDescription: acfString(post, ["meta_description", "seo_description"]),
   };
 }
 
@@ -863,32 +1160,90 @@ export async function getArticleBySlug(slug: string) {
   return posts[0] ? toArticle(posts[0], 0) : null;
 }
 
-export async function getEvents(limit = 20) {
+export async function getEvents(
+  options:
+    | number
+    | {
+        perPage?: number;
+        status?: "upcoming" | "past";
+        type?: string;
+        language?: "fr" | "en" | "ar";
+      } = 20,
+) {
+  const resolved =
+    typeof options === "number"
+      ? { perPage: options }
+      : { perPage: 20, ...options };
+
   try {
     const events = await fetchCmsRest<AweneEventApi[]>("awene/v1/events", {
-      per_page: limit,
+      per_page: resolved.perPage ?? 20,
+      ...(resolved.status ? { status: resolved.status } : {}),
+      ...(resolved.type ? { type: resolved.type } : {}),
+      ...(resolved.language ? { language: resolved.language } : {}),
     });
 
     return events.map(toAweneEvent);
-  } catch {
-    // The plugin may not be installed yet. Fall back to common CPT REST bases.
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[cms] Failed to fetch AWENE events API", {
+        error,
+        cmsBase: CMS_SITE_BASE,
+        options: resolved,
+      });
+    }
   }
 
   const endpointCandidates = ["events", "event", "evenements", "evenement"];
 
   for (const endpoint of endpointCandidates) {
     const posts = await fetchCmsList(endpoint, {
-      per_page: limit,
+      per_page: resolved.perPage ?? 20,
       _embed: 1,
       status: "publish",
     });
 
     if (posts.length > 0) {
-      return posts.map(toEvent);
+      const mapped = posts.map(toEvent);
+      return mapped.filter((event) => {
+        const matchesLanguage = !resolved.language || event.language === resolved.language;
+        const matchesStatus =
+          !resolved.status || event.eventStatus === resolved.status;
+        return matchesLanguage && matchesStatus;
+      });
     }
   }
 
   return [];
+}
+
+export async function getEventBySlug(slug: string, locale?: "fr" | "en" | "ar") {
+  const events = await getEvents({ perPage: 100, language: locale });
+  return events.find((event) => event.slug === slug) ?? null;
+}
+
+export async function getEventPvByEventId(eventId: number) {
+  try {
+    const pv = await fetchCmsRest<AweneEventPvApi>(`awene/v1/events-pv/${eventId}`);
+    return toEventPv(pv);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[cms] Failed to fetch AWENE event PV", { eventId, error });
+    }
+    return null;
+  }
+}
+
+export async function getSatisfactionFormByEventId(eventId: number) {
+  try {
+    const form = await fetchCmsRest<AweneSatisfactionFormApi>(`awene/v1/satisfaction/${eventId}`);
+    return toSatisfactionForm(form);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[cms] Failed to fetch AWENE satisfaction form", { eventId, error });
+    }
+    return null;
+  }
 }
 
 export async function getFormations(limit = 100) {

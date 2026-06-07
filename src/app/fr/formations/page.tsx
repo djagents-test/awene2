@@ -146,8 +146,20 @@ export default async function FormationsPage() {
         ]}
       />
 
-      <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
-        <Container className="relative z-10 pt-32 pb-20">
+      <section className="relative min-h-[72vh] overflow-hidden">
+        <Image
+          src="/images/awene-femmes-professionnelles-collaboration.jpg"
+          alt=""
+          title="Femmes professionnelles réunies autour d’un projet commun"
+          fill
+          priority
+          quality={95}
+          aria-hidden="true"
+          className="object-cover object-[50%_22%] md:object-[50%_42%] xl:object-[50%_32%]"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(252,250,248,0.94)_0%,rgba(252,250,248,0.8)_48%,rgba(252,250,248,0.24)_100%)]" />
+        <Container className="relative z-10 flex min-h-[72vh] items-end pt-32 pb-20">
           <div className="max-w-4xl">
             <p className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
               <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
@@ -185,8 +197,7 @@ export default async function FormationsPage() {
 
       <Section background="white" size="lg">
         <Container>
-          <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.65fr)_minmax(280px,0.35fr)]">
-            <div className="max-w-4xl">
+          <div className="max-w-4xl">
               <p
                 className="mb-6 text-xs font-semibold uppercase tracking-[0.25em]"
                 style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}
@@ -234,17 +245,6 @@ export default async function FormationsPage() {
                   </a>
                 </p>
               </div>
-            </div>
-            <div className="relative hidden lg:block aspect-[0.95/1.05] w-full overflow-hidden rounded-[1.75rem]">
-              <Image
-                src="/images/formations-hero.jpg"
-                alt="Deux femmes dans un cadre professionnel, illustrant les formations Awene sur la santé hormonale et le bien-être."
-                title="Formations Awene sur la santé hormonale"
-                fill
-                className="object-cover object-[50%_30%]"
-                sizes="(min-width: 1024px) 22rem, 100vw"
-              />
-            </div>
           </div>
         </Container>
       </Section>
@@ -422,11 +422,11 @@ export default async function FormationsPage() {
           <div className="mb-8 hidden lg:block">
             <div className="relative aspect-[3/1] w-full overflow-hidden rounded-[1.75rem]">
               <Image
-                src="/images/formations-audience-2.jpg"
-                alt="Femme dans un environnement professionnel chaleureux, représentant les participantes aux formations Awene."
-                title="Formation pour femmes en transition hormonale"
+                src="/images/awene-femmes-diversite-inclusion.jpg"
+                alt="Femmes de différents horizons réunies dans un esprit de soutien et d’inclusion"
+                title="Diversité, inclusion et soutien entre femmes"
                 fill
-                className="object-cover object-[50%_30%]"
+                className="object-cover object-[50%_15%] md:object-[50%_25%] xl:object-center"
                 sizes="(min-width: 1024px) 60rem, 100vw"
               />
             </div>
@@ -530,8 +530,14 @@ export default async function FormationsPage() {
                 Formation sur mesure
               </p>
               <h2
-                className="mb-6 text-4xl font-bold leading-tight md:text-5xl"
-                style={{ color: "#F3ECFB", fontFamily: "var(--font-playfair)" }}
+                className="mb-4"
+                style={{
+                  color: "#F3ECFB",
+                  fontFamily: "var(--font-playfair)",
+                  fontSize: "clamp(1.875rem, 3vw, 2.25rem)",
+                  lineHeight: 1.1,
+                  maxWidth: "min(100%, 48rem)",
+                }}
               >
                 Vous voulez une formation adaptée à votre public ?
               </h2>
@@ -549,11 +555,11 @@ export default async function FormationsPage() {
             </div>
             <div className="relative hidden lg:block aspect-[1.05/1] w-full overflow-hidden rounded-[1.75rem]">
               <Image
-                src="/images/formations-sur-mesure.jpg"
-                alt="Groupe de femmes dans un cadre professionnel, représentant les formations sur mesure proposées par Awene."
-                title="Formations sur mesure pour organisations"
+                src="/images/awene-diversite-feminine-bien-etre.jpg"
+                alt="Deux femmes représentant la diversité et le bien-être"
+                title="Diversité féminine et bien-être"
                 fill
-                className="object-cover object-center"
+                className="object-cover object-[50%_20%] md:object-[50%_25%] xl:object-center"
                 sizes="(min-width: 1024px) 24rem, 100vw"
               />
             </div>

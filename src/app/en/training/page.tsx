@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import JsonLd from "@/components/seo/JsonLd";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
@@ -96,8 +95,20 @@ export default async function TrainingPage() {
           faqSchema(),
         ]}
       />
-      <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
-        <Container className="relative z-10 pt-32 pb-20">
+      <section className="relative min-h-[72vh] overflow-hidden">
+        <Image
+          src="/images/awene-femmes-professionnelles-collaboration.jpg"
+          alt=""
+          title="Professional Women Working Together"
+          fill
+          priority
+          quality={95}
+          aria-hidden="true"
+          className="object-cover object-[50%_22%] md:object-[50%_42%] xl:object-[50%_32%]"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(252,250,248,0.94)_0%,rgba(252,250,248,0.8)_48%,rgba(252,250,248,0.24)_100%)]" />
+        <Container className="relative z-10 flex min-h-[72vh] items-end pt-32 pb-20">
           <div className="max-w-4xl">
             <p className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
               <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
@@ -133,8 +144,7 @@ export default async function TrainingPage() {
 
       <Section background="white" size="lg">
         <Container>
-          <div id="upcoming-training" className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.65fr)_minmax(280px,0.35fr)]">
-            <div className="max-w-4xl">
+          <div id="upcoming-training" className="max-w-4xl">
               <p className="mb-6 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
                 Reliable guidance
               </p>
@@ -153,17 +163,6 @@ export default async function TrainingPage() {
                   The goal is simple: make hormonal transitions less confusing, less isolating, and easier to address in daily life, at work and in care or wellness settings.
                 </p>
               </div>
-            </div>
-            <div className="relative hidden lg:block aspect-[0.95/1.05] w-full overflow-hidden rounded-[1.75rem]">
-              <Image
-                src="/images/formations-hero.jpg"
-                alt="Two women in a professional setting, illustrating Awene trainings on hormonal health and well-being."
-                title="Awene trainings on hormonal health"
-                fill
-                className="object-cover object-[50%_30%]"
-                sizes="(min-width: 1024px) 22rem, 100vw"
-              />
-            </div>
           </div>
         </Container>
       </Section>
@@ -282,11 +281,11 @@ export default async function TrainingPage() {
           <div className="mb-8 hidden lg:block">
             <div className="relative aspect-[3/1] w-full overflow-hidden rounded-[1.75rem]">
               <Image
-                src="/images/formations-audience-2.jpg"
-                alt="Woman in a warm professional setting, representing participants in Awene trainings."
-                title="Training for women in hormonal transition"
+                src="/images/awene-femmes-diversite-inclusion.jpg"
+                alt="Women from diverse backgrounds united through support and inclusion"
+                title="Diversity, Inclusion and Women's Support"
                 fill
-                className="object-cover object-[50%_30%]"
+                className="object-cover object-[50%_15%] md:object-[50%_25%] xl:object-center"
                 sizes="(min-width: 1024px) 60rem, 100vw"
               />
             </div>
@@ -347,7 +346,16 @@ export default async function TrainingPage() {
               <p className="mb-6 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "rgba(243,236,251,0.75)", fontFamily: "var(--font-inter)" }}>
                 Tailored training
               </p>
-              <h2 className="mb-6 text-4xl font-bold leading-tight md:text-5xl" style={{ color: "#F3ECFB", fontFamily: "var(--font-playfair)" }}>
+              <h2
+                className="mb-4"
+                style={{
+                  color: "#F3ECFB",
+                  fontFamily: "var(--font-playfair)",
+                  fontSize: "clamp(1.875rem, 3vw, 2.25rem)",
+                  lineHeight: 1.1,
+                  maxWidth: "min(100%, 48rem)",
+                }}
+              >
                 Would you like a training adapted to your audience?
               </h2>
               <p className="mx-auto mb-9 max-w-2xl text-base leading-relaxed md:text-lg lg:mx-0" style={{ color: "rgba(243,236,251,0.82)", fontFamily: "var(--font-inter)" }}>
@@ -359,11 +367,11 @@ export default async function TrainingPage() {
             </div>
             <div className="relative hidden lg:block aspect-[1.05/1] w-full overflow-hidden rounded-[1.75rem]">
               <Image
-                src="/images/formations-sur-mesure.jpg"
-                alt="Group of women in a professional setting, representing tailored trainings offered by Awene."
-                title="Tailored trainings for organizations"
+                src="/images/awene-diversite-feminine-bien-etre.jpg"
+                alt="Two women representing diversity and wellbeing"
+                title="Women, Diversity and Wellbeing"
                 fill
-                className="object-cover object-center"
+                className="object-cover object-[50%_20%] md:object-[50%_25%] xl:object-center"
                 sizes="(min-width: 1024px) 24rem, 100vw"
               />
             </div>

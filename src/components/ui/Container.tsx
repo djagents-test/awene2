@@ -1,9 +1,10 @@
-import { type ReactNode } from "react";
+import { type CSSProperties, type ReactNode } from "react";
 
 interface ContainerProps {
   children: ReactNode;
   className?: string;
   size?: "sm" | "md" | "lg" | "xl" | "full";
+  style?: CSSProperties;
 }
 
 const sizeMap = {
@@ -18,10 +19,12 @@ export default function Container({
   children,
   className = "",
   size = "xl",
+  style,
 }: ContainerProps) {
   return (
     <div
       className={`${sizeMap[size]} mx-auto px-6 lg:px-8 ${className}`}
+      style={style}
     >
       {children}
     </div>

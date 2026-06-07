@@ -320,7 +320,14 @@ export default function EnglishHomePage() {
             <div className="flex flex-col rounded-3xl p-8 md:p-10" style={{ background: "#FEF3E8", border: "1.5px solid #E8DFF0" }}>
               <div className="mb-6 overflow-hidden rounded-[1.6rem]">
                 <div className="relative aspect-[16/10] w-full">
-                  <Image src="/images/formations-audience-2.jpg" alt="Smiling woman in a calm and bright space" fill className="object-cover object-center" sizes="(min-width: 768px) 50vw, 100vw" />
+                  <Image
+                    src="/images/awene-femmes-diversite-inclusion.jpg"
+                    alt="Women from diverse backgrounds united through support and inclusion"
+                    title="Diversity, Inclusion and Women's Support"
+                    fill
+                    className="object-cover object-[50%_15%] md:object-[50%_25%] xl:object-center"
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                  />
                 </div>
               </div>
               <div className="mb-6 h-0.5 w-10 rounded-full" style={{ background: "#F68B2C" }} />

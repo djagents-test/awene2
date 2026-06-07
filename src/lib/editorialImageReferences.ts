@@ -14,6 +14,10 @@ type EditorialImageReference = {
   src?: string;
   referenceUrl: string;
   alt: string;
+  title?: string;
+  metaTitle?: string;
+  description?: string;
+  objectPosition?: string;
   note: string;
 };
 
@@ -38,42 +42,72 @@ export const editorialImageReferences: Record<
     note: "Coaching page hero image.",
   },
   homeEnterprise: {
-    src: "/images/2149883526.jpg",
+    src: "/images/awene-femmes-diversite-inclusion.jpg",
     referenceUrl: "",
-    alt: "Femme adulte dans un cadre professionnel",
+    alt: "Femmes de différents horizons réunies dans un esprit de soutien et d’inclusion",
+    title: "Diversité, inclusion et soutien entre femmes",
+    metaTitle: "Diversité et inclusion féminine | AWENE",
+    description:
+      "Une représentation authentique de la diversité des parcours féminins et de la richesse des expériences vécues.",
+    objectPosition: "center center",
     note: "Homepage enterprise and partnership support image.",
   },
   homeReadyCall: {
-    src: "/images/employeur-bien-etre-travail.jpg",
+    src: "/images/awene-diversite-feminine-bien-etre.jpg",
     referenceUrl: "",
-    alt: "Femme souriante tenant une tablette dans un environnement professionnel extérieur",
+    alt: "Deux femmes représentant la diversité et le bien-être",
+    title: "Diversité féminine et bien-être",
+    metaTitle: "Bien-être féminin et diversité | AWENE",
+    description:
+      "Portrait naturel mettant en valeur la diversité, l’écoute et l’épanouissement personnel.",
+    objectPosition: "center center",
     note: "Homepage support image for the call booking card.",
   },
   homeCommunity: {
-    src: "/images/2994.jpg",
+    src: "/images/awene-femmes-diversite-inclusion.jpg",
     referenceUrl: "",
-    alt: "Femme souriante dans un moment chaleureux",
+    alt: "Femmes de différents horizons réunies dans un esprit de soutien et d’inclusion",
+    title: "Diversité, inclusion et soutien entre femmes",
+    metaTitle: "Diversité et inclusion féminine | AWENE",
+    description:
+      "Une représentation authentique de la diversité des parcours féminins et de la richesse des expériences vécues.",
+    objectPosition: "center center",
     note: "Homepage newsletter and community support image.",
   },
   coachingProcessSupport: {
-    src: "/images/employeur-bien-etre-travail.jpg",
+    src: "/images/awene-diversite-feminine-bien-etre.jpg",
     referenceUrl:
       "https://www.magnific.com/free-photo/medium-shot-woman-wearing-halal-outdoors_59234194.htm#fromView=search&page=1&position=25&uuid=1f0d3254-ddd7-4650-b8ce-99cd1f95b3b7&query=menopause+arab+women",
-    alt: "Femme souriante tenant une tablette dans un environnement professionnel extérieur, représentant un employeur engagé dans le bien-être au travail",
+    alt: "Deux femmes représentant la diversité et le bien-être",
+    title: "Diversité féminine et bien-être",
+    metaTitle: "Bien-être féminin et diversité | AWENE",
+    description:
+      "Portrait naturel mettant en valeur la diversité, l’écoute et l’épanouissement personnel.",
+    objectPosition: "center center",
     note: "Supporting image for coaching process section.",
   },
   formationsHero: {
-    src: "/images/formations-hero.jpg",
+    src: "/images/awene-femmes-professionnelles-collaboration.jpg",
     referenceUrl:
       "https://www.magnific.com/free-ai-image/world-cancer-day-awareness-with-patient_138695624.htm#fromView=search&page=1&position=12&uuid=1f0d3254-ddd7-4650-b8ce-99cd1f95b3b7&query=menopause+arab+women",
-    alt: "Femme professionnelle dans un environnement élégant representant les formations AWENE",
+    alt: "Groupe de femmes professionnelles collaborant dans un environnement moderne",
+    title: "Femmes professionnelles réunies autour d’un projet commun",
+    metaTitle: "Femmes et collaboration professionnelle | AWENE",
+    description:
+      "Une équipe de femmes issues de parcours variés réunies autour de la collaboration, du partage et du développement personnel.",
+    objectPosition: "center center",
     note: "Strong editorial portrait for formations hero.",
   },
   articlesFeaturedFallback: {
-    src: "/images/2149038120.jpg",
+    src: "/images/awene-femme-professionnelle-accompagnement.jpg",
     referenceUrl:
       "https://www.magnific.com/free-photo/smiley-woman-posing-indoors-mediums-hot_33803123.htm#fromView=search&page=1&position=7&uuid=1f0d3254-ddd7-4650-b8ce-99cd1f95b3b7&query=menopause+arab+women",
-    alt: "Femme souriante en portrait",
+    alt: "Portrait d’une femme professionnelle dans un environnement de travail",
+    title: "Accompagnement professionnel et confiance en soi",
+    metaTitle: "Coaching professionnel pour femmes | AWENE",
+    description:
+      "Une femme professionnelle représentant la confiance, l’accompagnement et l’évolution personnelle.",
+    objectPosition: "center 25%",
     note: "Fallback image for featured article area when CMS image is missing.",
   },
   eventsHero: {

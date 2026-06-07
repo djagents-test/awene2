@@ -43,8 +43,10 @@ export default function EditorialImageBlock({
           <Image
             src={reference.src}
             alt={decorative ? "" : reference.alt}
+            title={decorative ? undefined : reference.title}
             fill
             className="object-cover"
+            style={{ objectPosition: reference.objectPosition ?? "center center" }}
             sizes="(min-width: 1024px) 31rem, 100vw"
           />
           <div

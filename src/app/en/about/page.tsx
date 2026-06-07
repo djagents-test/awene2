@@ -104,8 +104,22 @@ export default function AboutPage() {
           <div className="absolute left-[12%] bottom-[12%] h-[22rem] w-[22rem] rounded-full opacity-[0.24]" style={{ background: "radial-gradient(circle, rgba(220,203,255,0.28) 0%, rgba(220,203,255,0.12) 38%, transparent 74%)" }} />
         </div>
 
-        <section style={{ background: "#FCFAF8" }}>
-          <Container className="relative z-10 pt-32 pb-20">
+        <section className="relative min-h-[72vh] overflow-hidden">
+          <Image
+            src="/images/awene-leadership-feminin-entreprise.jpg"
+            alt=""
+            title="Female Leadership and Career Growth"
+            fill
+            priority
+            aria-hidden="true"
+            className="object-cover object-[65%_40%] md:object-[55%_42%] xl:object-[50%_14%]"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(252,250,248,0.94)_0%,rgba(252,250,248,0.8)_48%,rgba(252,250,248,0.3)_100%)]" />
+          <Container
+            className="relative z-10 flex min-h-[72vh] items-end pt-32 pb-20"
+            style={{ marginTop: "128px" }}
+          >
             <div className="max-w-none lg:max-w-[46rem]">
               <p className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
                 <span className="block h-px w-8" style={{ background: "#F68B2C" }} />

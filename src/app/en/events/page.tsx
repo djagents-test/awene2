@@ -2,16 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
-import Section from "@/components/ui/Section";
-import Button from "@/components/ui/Button";
+import EventsHub, { type EventItem } from "@/components/ui/EventsHub";
+import NewsletterSignupForm from "@/components/ui/NewsletterSignupForm";
 import { getEvents, type CmsEvent } from "@/lib/cms";
-import { NEWSLETTER_SIGNUP_URL_EN } from "@/lib/newsletter";
 import { breadcrumbSchema, cmsEventSchema, webPageSchema } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
-  title: "AWENE Events | Menopause & Perimenopause Workshops",
+  title: "AWENE Workshops and Events | AWENE",
   description:
-    "Workshops, webinars and gatherings centred on menopause and perimenopause — to understand what's happening, share it with others, and keep moving forward. Subscribe to the newsletter to hear about them first.",
+    "Women engaged in a collaborative workshop focused on learning, shared experiences, health, and wellbeing.",
   keywords: [
     "menopause workshop",
     "MENA menopause events",
@@ -23,12 +22,56 @@ export const metadata: Metadata = {
   ],
 };
 
-function eventImageSrc(event: CmsEvent) {
-  return event.image?.large ?? event.image?.medium ?? event.image?.full ?? event.image?.thumbnail;
+function normalizeStatus(value?: string): EventItem["status"] {
+  const normalized = (value ?? "").toLowerCase();
+  if (normalized.includes("closed") || normalized.includes("fermé")) {
+    return "closed";
+  }
+  if (normalized.includes("complet") || normalized.includes("full") || normalized.includes("sold")) {
+    return "full";
+  }
+  if (normalized.includes("past") || normalized.includes("termin") || normalized.includes("ended")) {
+    return "past";
+  }
+  return "open";
+}
+
+function isPastEvent(event: CmsEvent) {
+  if (event.eventStatus === "past") return true;
+  if (!event.startsAt) return false;
+  const date = new Date(event.startsAt);
+  if (Number.isNaN(date.getTime())) return false;
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  return date.getTime() < midnight;
+}
+
+function normalizeFormat(event: CmsEvent): EventItem["format"] | undefined {
+  const normalized = `${event.locationType ?? event.format ?? ""} ${event.location ?? ""}`.toLowerCase();
+  if (normalized.includes("ligne") || normalized.includes("online")) return "online";
+  if (normalized.includes("présentiel") || normalized.includes("presentiel") || normalized.includes("in person") || normalized.includes("tunis") || normalized.includes("nabeul")) return "in_person";
+  if (normalized.includes("hybride") || normalized.includes("hybrid")) return "hybrid";
+  return undefined;
 }
 
 export default async function EventsPage() {
-  const events = await getEvents();
+  const events = await getEvents({ perPage: 100, language: "en" });
+  const normalizedEvents: EventItem[] = events.map((event) => ({
+    id: String(event.id),
+    title: event.title,
+    date: event.date,
+    location: event.location || "Location to be confirmed",
+    type: event.type || "Workshop",
+    status: normalizeStatus(isPastEvent(event) ? "past" : event.registrationStatus ?? event.status),
+    description: event.shortDescription || event.description || "More details about this event will be shared soon.",
+    ctaLabel: isPastEvent(event) ? "Learn more" : event.ctaLabel || "Register",
+    ctaHref: isPastEvent(event) ? `/en/events/${event.slug}` : event.url ?? "/en/contact",
+    format: normalizeFormat(event),
+    startsAt: event.startsAt,
+    availableSeats: event.availableSeats,
+    capacity: event.capacity,
+    language: event.language,
+  }));
 
   return (
     <>
@@ -40,17 +83,28 @@ export default async function EventsPage() {
           ]),
           webPageSchema({
             path: "/en/events",
-            title: "AWENE Events | Menopause & Perimenopause Workshops",
+            title: "AWENE Workshops and Events | AWENE",
             description:
-              "Workshops, webinars and gatherings centred on menopause and perimenopause — to understand what's happening, share it with others, and keep moving forward. Subscribe to the newsletter to hear about them first.",
+              "Women engaged in a collaborative workshop focused on learning, shared experiences, health, and wellbeing.",
             type: "CollectionPage",
             inLanguage: "en",
           }),
           ...events.map((event) => cmsEventSchema(event, "/en/events")),
         ]}
       />
-      <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
-        <Container className="relative z-10 pt-32 pb-20">
+      <section className="relative min-h-[76vh] overflow-hidden">
+        <Image
+          src="/images/awene-evenement-atelier-participation.jpg"
+          alt=""
+          title="AWENE Workshop and Active Participation"
+          fill
+          priority
+          aria-hidden="true"
+          className="object-cover object-[25%_50%] md:object-[30%_50%] xl:object-[35%_10%]"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-white/70 md:bg-[linear-gradient(90deg,rgba(255,255,255,0.88)_0%,rgba(255,255,255,0.68)_35%,rgba(255,255,255,0.18)_100%)]" />
+        <Container className="relative z-10 flex min-h-[76vh] items-end pt-32 pb-20">
           <div className="max-w-3xl">
             <p className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
               <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
@@ -66,101 +120,78 @@ export default async function EventsPage() {
         </Container>
       </section>
 
-      <Section background="offwhite" size="lg">
-        <Container>
-          <p className="mb-6 text-center text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
-            Upcoming Events
-          </p>
-          <h2 className="mb-6 text-center text-4xl font-bold leading-tight md:text-5xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
-            Upcoming events
-          </h2>
-          <p className="mx-auto mb-12 max-w-xl text-center text-base leading-relaxed md:text-lg" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-            Events coming soon — subscribe to the newsletter to be the first to hear.
-          </p>
-          {events.length > 0 ? (
-            <div className="space-y-4">
-              {events.map((event) => {
-                const imageSrc = eventImageSrc(event);
-
-                return (
-                  <div key={event.id} className="group overflow-hidden rounded-3xl border bg-white transition-all duration-300 hover:-translate-y-1 hover:border-[#D8C7F3] hover:shadow-[0_18px_42px_rgba(75,31,122,0.1)]" style={{ borderColor: "#E8DFF0" }}>
-                    {imageSrc ? (
-                      <div className="relative h-56 md:h-72">
-                        <Image src={imageSrc} alt={event.image?.alt ?? event.title} fill className="object-cover" sizes="(min-width: 768px) 768px, 100vw" />
-                      </div>
-                    ) : null}
-                    <div className="flex flex-col gap-5 p-6 md:flex-row md:items-start md:justify-between md:p-8">
-                      <div>
-                        <div className="mb-4 flex flex-wrap items-center gap-3">
-                          <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: `${event.color}18`, color: event.color, fontFamily: "var(--font-inter)" }}>
-                            {event.type}
-                          </span>
-                          <span className="text-xs font-medium tracking-wide" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-                            {event.date}
-                          </span>
-                          {event.status && event.status !== "upcoming" ? (
-                            <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#FEF3E8", color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
-                              {event.status}
-                            </span>
-                          ) : null}
-                        </div>
-                        <h3 className="mb-3 text-2xl font-bold transition-colors duration-300 group-hover:text-[#6F3FD6] md:text-3xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
-                          {event.title}
-                        </h3>
-                        <p className="max-w-2xl text-sm leading-relaxed md:text-base" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-                          {event.description}
-                        </p>
-                        {event.time || event.location || event.price ? (
-                          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-                            {event.time ? <span>{event.time}</span> : null}
-                            {event.location ? <span>{event.location}</span> : null}
-                            {event.price ? <span>{event.price}</span> : null}
-                          </div>
-                        ) : null}
-                      </div>
-                      <Button href={event.url ?? "/en/contact"} variant="outline" size="sm" external={Boolean(event.url)}>
-                        Keep me informed
-                      </Button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="group mx-auto max-w-3xl rounded-3xl border bg-white px-8 py-12 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D8C7F3] hover:shadow-[0_14px_30px_rgba(75,31,122,0.08)] md:px-12" style={{ borderColor: "#E8DFF0" }}>
-              <p className="text-base leading-relaxed transition-colors duration-300 group-hover:text-[#4B1F7A] md:text-lg" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-                Events coming soon — subscribe to the newsletter to be the first to hear.
-              </p>
-            </div>
-          )}
-        </Container>
-      </Section>
+      <EventsHub
+        locale="en"
+        labels={{
+          filtersTitle: "Filters",
+          upcomingTitle: "Upcoming Events",
+          pastTitle: "Past Events",
+          emptyUpcoming:
+            "No events are scheduled at the moment. Subscribe to the newsletter to be the first to hear.",
+          date: "Date",
+          location: "Location",
+          type: "Type",
+          status: "Status",
+          all: "All",
+          upcoming: "Upcoming",
+          thisMonth: "This month",
+          past: "Past",
+          online: "Online",
+          inPerson: "In person",
+          hybrid: "Hybrid",
+          tunis: "Tunis",
+          nabeul: "Nabeul",
+          workshop: "Workshop",
+          webinar: "Webinar",
+          meetup: "Meetup",
+          discussionCircle: "Discussion Circle",
+          training: "Training",
+          open: "Open",
+          full: "Full",
+          ended: "Ended",
+          register: "Register",
+          closed: "Closed",
+          registrationClosed: "Registration closed",
+          learnMore: "Learn more",
+          firstName: "First name",
+          lastName: "Last name",
+          email: "Email",
+          phone: "Phone",
+          message: "Message",
+          consent: "I agree that my information can be used to process my registration for this event.",
+          submit: "Submit my registration",
+          submitting: "Submitting…",
+          success: "Your registration has been sent. You will receive a confirmation soon.",
+          error: "The registration could not be sent. Please try again.",
+          noPastResults: "No past events match these filters.",
+          seatsLeft: "{count} seats left",
+        }}
+        events={normalizedEvents}
+      />
 
       <section className="relative overflow-x-hidden overflow-y-hidden py-20 md:py-24" style={{ background: "linear-gradient(135deg, #4B1F7A 0%, #6F3FD6 50%, #8B52E8 100%)" }}>
         <Container className="relative z-10">
-          <div className="mx-auto flex max-w-[900px] flex-col items-center justify-center text-center">
+          <div className="mx-auto flex max-w-3xl flex-col items-center justify-center text-center">
             <h2
-              className="mb-4 max-w-full text-center"
+              className="mb-4 text-center"
               style={{
                 fontFamily: "var(--font-playfair)",
-                color: "#F3ECFB",
-                fontSize: "clamp(2.2rem, 5vw, 4.75rem)",
-                lineHeight: 1.05,
-                maxWidth: "min(100%, 1100px)",
+                color: "rgb(243, 236, 251)",
+                fontSize: "clamp(1.875rem, 3vw, 2.25rem)",
+                lineHeight: 1.1,
+                maxWidth: "min(100%, 48rem)",
                 marginInline: "auto",
                 overflowWrap: "normal",
                 wordBreak: "normal",
               }}
             >
-              Subscribe to the newsletter to hear first
+              Sign up for the newsletter to hear first
             </h2>
-            <p className="text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
-              Join the AWENE newsletter to receive event announcements before everyone else.
+            <p className="mb-8 text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
+              Subscribe to the AWENE newsletter to receive event announcements before everyone else.
             </p>
-            <div className="mt-8">
-              <Button href={NEWSLETTER_SIGNUP_URL_EN} variant="light" size="lg" external>
-                Sign me up for the newsletter
-              </Button>
+            <div className="w-full max-w-sm">
+              <NewsletterSignupForm locale="en" variant="dark" />
             </div>
           </div>
         </Container>

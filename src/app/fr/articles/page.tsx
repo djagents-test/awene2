@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import JsonLd from "@/components/seo/JsonLd";
 import Container from "@/components/ui/Container";
+import ArticlesGrid from "@/components/ui/ArticlesGrid";
+import NewsletterSignupForm from "@/components/ui/NewsletterSignupForm";
 import { getArticles } from "@/lib/cms";
 import { absoluteUrl, breadcrumbSchema, itemListSchema, webPageSchema } from "@/lib/jsonld";
 
@@ -57,8 +59,19 @@ export default async function ArticlesPage() {
           ),
         ]}
       />
-      <section className="relative overflow-hidden" style={{ background: "#FCFAF8" }}>
-        <Container className="relative z-10 pt-32 pb-20">
+      <section className="relative min-h-[72vh] overflow-hidden">
+        <Image
+          src="/images/awene-femme-professionnelle-accompagnement.jpg"
+          alt=""
+          title="Accompagnement professionnel et confiance en soi"
+          fill
+          priority
+          aria-hidden="true"
+          className="object-cover object-[50%_6%] md:object-[50%_10%] xl:object-[50%_14%]"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(252,250,248,0.95)_0%,rgba(252,250,248,0.82)_48%,rgba(252,250,248,0.26)_100%)]" />
+        <Container className="relative z-10 flex min-h-[72vh] items-end pt-32 pb-20">
           <div className="max-w-3xl">
             <p className="mb-6 inline-flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: "#F68B2C", fontFamily: "var(--font-inter)" }}>
               <span className="block h-px w-8" style={{ background: "#F68B2C" }} />
@@ -89,32 +102,40 @@ export default async function ArticlesPage() {
                 className="group grid grid-cols-1 items-center gap-8 md:grid-cols-2"
               >
                 <div className="relative flex h-64 items-center justify-center overflow-hidden rounded-3xl bg-[#F3ECFB] md:h-80">
-                  {featured.image && featuredImageSrc ? (
-                    <>
-                      <Image
-                        src={featuredImageSrc}
-                        alt={featured.image.alt}
-                        fill
-                        className="object-cover"
-                        sizes="(min-width: 768px) 50vw, 100vw"
-                      />
-                      <div className="absolute inset-0 bg-[#2E2438]/15" aria-hidden="true" />
-                    </>
-                  ) : null}
+                  <Image
+                    src={featured.image && featuredImageSrc ? featuredImageSrc : "/images/awene-femme-professionnelle-accompagnement.jpg"}
+                    alt={featured.image?.alt ?? "Portrait d’une femme professionnelle dans un environnement de travail"}
+                    title={featured.image?.alt ?? "Accompagnement professionnel et confiance en soi"}
+                    fill
+                    className={`object-cover ${featured.image && featuredImageSrc ? "" : "object-[50%_6%] md:object-[50%_10%] xl:object-[50%_14%]"}`}
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                  />
+                  <div className="absolute inset-0 bg-[#2E2438]/15" aria-hidden="true" />
                 </div>
                 <div>
+                  {featured.categories.length > 0 && (
+                    <div className="mb-3 flex flex-wrap gap-2">
+                      {featured.categories.map((cat) => (
+                        <span key={cat.slug} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#6F3FD6", color: "#fff", fontFamily: "var(--font-inter)" }}>
+                          {cat.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <h2
                     className="mb-4 text-3xl font-bold leading-tight transition-colors group-hover:text-[#6F3FD6] md:text-4xl"
                     style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
                   >
                     {featured.title}
                   </h2>
-                  <p
-                    className="text-base leading-relaxed"
-                    style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
-                  >
+                  <p className="mb-4 text-base leading-relaxed" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
                     {featured.excerpt}
                   </p>
+                  {featured.date && (
+                    <p className="text-xs" style={{ color: "#9B8EA8", fontFamily: "var(--font-inter)" }}>
+                      {featured.date}{featured.readTime ? ` · ${featured.readTime}` : ""}
+                    </p>
+                  )}
                 </div>
               </Link>
             </>
@@ -124,59 +145,7 @@ export default async function ArticlesPage() {
 
       <section className="py-16 md:py-24" style={{ background: "#fff" }}>
         <Container>
-          {rest.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {rest.map((article) => (
-                (() => {
-                  const imageSrc = article.image
-                    ? article.image.thumbnail ??
-                      article.image.medium ??
-                      article.image.large ??
-                      article.image.full
-                    : undefined;
-
-                  return (
-                    <Link
-                      key={article.slug}
-                      href={`/fr/articles/${article.slug}`}
-                      className="group block overflow-hidden rounded-3xl border bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_40px_rgba(110,63,214,0.1)]"
-                      style={{ borderColor: "#E8DFF0" }}
-                    >
-                      {article.image && imageSrc ? (
-                        <div className="relative h-40">
-                          <Image
-                            src={imageSrc}
-                            alt={article.image.alt}
-                            fill
-                            className="object-cover"
-                            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                          />
-                        </div>
-                      ) : null}
-                      <div className="p-6">
-                        <h3
-                          className="mb-3 text-xl font-bold leading-snug transition-colors group-hover:text-[#6F3FD6]"
-                          style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}
-                        >
-                          {article.title}
-                        </h3>
-                        <p
-                          className="text-sm leading-relaxed"
-                          style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}
-                        >
-                          {article.excerpt}
-                        </p>
-                      </div>
-                    </Link>
-                  );
-                })()
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
-              Les articles seront publiés prochainement.
-            </p>
-          )}
+          <ArticlesGrid articles={rest} locale="fr" />
         </Container>
       </section>
 
@@ -187,12 +156,27 @@ export default async function ArticlesPage() {
       >
         <Container className="relative z-10">
           <div className="mx-auto flex max-w-3xl flex-col items-center justify-center text-center">
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl" style={{ fontFamily: "var(--font-playfair)", color: "#F3ECFB" }}>
+            <h2
+              className="mb-4 text-center"
+              style={{
+                fontFamily: "var(--font-playfair)",
+                color: "rgb(243, 236, 251)",
+                fontSize: "clamp(1.875rem, 3vw, 2.25rem)",
+                lineHeight: 1.1,
+                maxWidth: "min(100%, 48rem)",
+                marginInline: "auto",
+                overflowWrap: "normal",
+                wordBreak: "normal",
+              }}
+            >
               Ces articles vous parlent ?
             </h2>
-            <p className="text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
+            <p className="mb-8 text-base leading-relaxed md:text-lg" style={{ color: "rgba(243,236,251,0.8)", fontFamily: "var(--font-inter)" }}>
               Recevez chaque semaine des informations fiables sur la périménopause et la ménopause, directement dans votre boîte mail.
             </p>
+            <div className="w-full max-w-sm">
+              <NewsletterSignupForm locale="fr" variant="dark" />
+            </div>
           </div>
         </Container>
       </section>

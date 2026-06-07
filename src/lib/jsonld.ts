@@ -140,7 +140,7 @@ export function cmsEventSchema(event: CmsEvent, path = "/evenements") {
     "@id": `${absoluteUrl(path)}#event-${event.id}`,
     name: event.title,
     description: event.description,
-    startDate: event.date,
+    startDate: event.startsAt ?? event.date,
     eventAttendanceMode:
       event.format === "online"
         ? "https://schema.org/OnlineEventAttendanceMode"

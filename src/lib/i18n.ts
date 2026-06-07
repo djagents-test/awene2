@@ -118,9 +118,9 @@ export const translations = {
         "AWENE accompagne les femmes en transition avec une approche équilibrée, intentionnelle et profondément humaine.",
       explore: "Explorer",
       support: "Accompagnement",
-      movement: "Le mouvement",
+      movement: "La newsletter",
       movementText:
-        "Rejoins le mouvement AWENE et reçois des nouvelles importantes sur cette transition.",
+        "Inscris-toi à la newsletter AWENE et reçois des informations fiables sur la périménopause et la ménopause.",
       rights: "Tous droits réservés.",
     },
     home: {
@@ -191,9 +191,9 @@ export const translations = {
         "AWENE supports women in transition with a balanced, intentional, deeply human approach.",
       explore: "Explore",
       support: "Support",
-      movement: "The movement",
+      movement: "Newsletter",
       movementText:
-        "Join the AWENE movement and receive meaningful updates about this transition.",
+        "Subscribe to the AWENE newsletter and receive reliable information on perimenopause and menopause.",
       rights: "All rights reserved.",
     },
     home: {
