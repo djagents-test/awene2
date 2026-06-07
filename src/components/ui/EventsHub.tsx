@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import Button from "@/components/ui/Button";
 import Container from "@/components/ui/Container";
@@ -7,6 +9,7 @@ import Section from "@/components/ui/Section";
 
 export type EventItem = {
   id: string;
+  slug?: string;
   title: string;
   date: string;
   location: string;
@@ -64,6 +67,7 @@ type Labels = {
   error: string;
   noPastResults: string;
   seatsLeft: string;
+  seatsToBeConfirmed?: string;
 };
 
 type Props = {
@@ -147,7 +151,20 @@ function emptyState(message: string) {
   );
 }
 
+function SeatsDisplay({ item, labels }: { item: EventItem; labels: Labels }) {
+  if (typeof item.availableSeats === "number") {
+    return (
+      <span>{labels.seatsLeft.replace("{count}", String(item.availableSeats))}</span>
+    );
+  }
+  if (typeof item.capacity === "number" && labels.seatsToBeConfirmed) {
+    return <span>{labels.seatsToBeConfirmed}</span>;
+  }
+  return null;
+}
+
 export default function EventsHub({ locale, labels, events }: Props) {
+  const router = useRouter();
   const [dateFilter, setDateFilter] = useState("all");
   const [locationFilter, setLocationFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -229,6 +246,13 @@ export default function EventsHub({ locale, labels, events }: Props) {
 
   const upcomingEvents = filteredEvents.filter((item) => item.status !== "past");
   const pastEvents = filteredEvents.filter((item) => item.status === "past");
+
+  function buildDetailUrl(item: EventItem): string | null {
+    if (!item.slug) return null;
+    return locale === "fr"
+      ? `/fr/evenements/${item.slug}`
+      : `/en/events/${item.slug}`;
+  }
 
   async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -351,9 +375,15 @@ export default function EventsHub({ locale, labels, events }: Props) {
                 const badge = statusPill(item.status, labels);
                 const isRegisterable = item.status === "open";
                 const isActive = activeRegistrationId === item.id;
+                const detailUrl = buildDetailUrl(item);
 
                 return (
-                  <article key={item.id} className="rounded-3xl border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(75,31,122,0.1)] md:p-8" style={{ borderColor: "#E8DFF0" }}>
+                  <article
+                    key={item.id}
+                    onClick={() => detailUrl && router.push(detailUrl)}
+                    className={`rounded-3xl border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_42px_rgba(75,31,122,0.1)] md:p-8${detailUrl ? " cursor-pointer" : ""}`}
+                    style={{ borderColor: "#E8DFF0" }}
+                  >
                     <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
                       <div className="flex-1">
                         <div className="mb-4 flex flex-wrap items-center gap-3">
@@ -361,14 +391,28 @@ export default function EventsHub({ locale, labels, events }: Props) {
                           <span className="text-xs font-medium tracking-wide" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>{item.date}</span>
                           <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: badge.background, color: badge.color, fontFamily: "var(--font-inter)" }}>{badge.label}</span>
                         </div>
-                        <h3 className="mb-3 text-2xl font-bold md:text-3xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>{item.title}</h3>
+                        <h3 className="mb-3 text-2xl font-bold md:text-3xl" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
+                          {detailUrl ? (
+                            <Link
+                              href={detailUrl}
+                              onClick={(e) => e.stopPropagation()}
+                              className="hover:underline"
+                              style={{ color: "inherit", textDecoration: "none" }}
+                            >
+                              {item.title}
+                            </Link>
+                          ) : item.title}
+                        </h3>
                         <p className="max-w-3xl text-sm leading-relaxed md:text-base" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>{item.description}</p>
                         <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
                           <span>{item.location}</span>
-                          {typeof item.availableSeats === "number" ? <span>{labels.seatsLeft.replace("{count}", String(item.availableSeats))}</span> : null}
+                          <SeatsDisplay item={item} labels={labels} />
                         </div>
                       </div>
-                      <div className="flex flex-col items-start gap-3">
+                      <div
+                        className="flex flex-col items-start gap-3"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {isRegisterable ? (
                           <Button onClick={() => {
                             setActiveRegistrationId(isActive ? null : item.id);
@@ -393,11 +437,22 @@ export default function EventsHub({ locale, labels, events }: Props) {
                             {labels.closed}
                           </Button>
                         )}
+                        {detailUrl && !isRegisterable && (
+                          <Button href={detailUrl} variant="outline" size="sm">
+                            {labels.learnMore}
+                          </Button>
+                        )}
                       </div>
                     </div>
 
                     {isRegisterable && isActive ? (
-                      <form className="mt-6 grid grid-cols-1 gap-4 rounded-[1.75rem] border bg-[#FCFAF8] p-5 md:grid-cols-2" style={{ borderColor: "#E8DFF0" }} onSubmit={handleRegister} noValidate>
+                      <form
+                        className="mt-6 grid grid-cols-1 gap-4 rounded-[1.75rem] border bg-[#FCFAF8] p-5 md:grid-cols-2"
+                        style={{ borderColor: "#E8DFF0" }}
+                        onSubmit={handleRegister}
+                        onClick={(e) => e.stopPropagation()}
+                        noValidate
+                      >
                         <input type="hidden" value={form.website} onChange={() => null} name="website" />
                         <label className="flex flex-col gap-2">
                           <span className="text-sm font-semibold" style={{ color: "#2E2438", fontFamily: "var(--font-inter)" }}>{labels.firstName}</span>
@@ -449,21 +504,40 @@ export default function EventsHub({ locale, labels, events }: Props) {
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               {pastEvents.map((item) => {
                 const badge = statusPill(item.status, labels);
+                const detailUrl = buildDetailUrl(item) ?? item.ctaHref;
                 return (
-                  <article key={item.id} className="rounded-3xl border bg-[#FCFAF8] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_34px_rgba(75,31,122,0.08)] md:p-8" style={{ borderColor: "#E8DFF0" }}>
+                  <article
+                    key={item.id}
+                    onClick={() => detailUrl && router.push(detailUrl)}
+                    className={`rounded-3xl border bg-[#FCFAF8] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_34px_rgba(75,31,122,0.08)] md:p-8${detailUrl ? " cursor-pointer" : ""}`}
+                    style={{ borderColor: "#E8DFF0" }}
+                  >
                     <div className="mb-4 flex flex-wrap items-center gap-3">
                       <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "#F8EEF5", color: "#4B1F7A", fontFamily: "var(--font-inter)" }}>{item.type}</span>
                       <span className="text-xs font-medium tracking-wide" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>{item.date}</span>
                       <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: badge.background, color: badge.color, fontFamily: "var(--font-inter)" }}>{badge.label}</span>
                     </div>
-                    <h3 className="mb-3 text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>{item.title}</h3>
+                    <h3 className="mb-3 text-2xl font-bold" style={{ fontFamily: "var(--font-playfair)", color: "#2E2438" }}>
+                      {detailUrl ? (
+                        <Link
+                          href={detailUrl}
+                          onClick={(e) => e.stopPropagation()}
+                          className="hover:underline"
+                          style={{ color: "inherit", textDecoration: "none" }}
+                        >
+                          {item.title}
+                        </Link>
+                      ) : item.title}
+                    </h3>
                     <p className="mb-5 text-base leading-relaxed" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>{item.description}</p>
                     <div className="mb-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>
                       <span>{item.location}</span>
                     </div>
-                    <Button href={item.ctaHref} variant="outline" size="sm">
-                      {labels.learnMore}
-                    </Button>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Button href={detailUrl} variant="outline" size="sm">
+                        {labels.learnMore}
+                      </Button>
+                    </div>
                   </article>
                 );
               })}

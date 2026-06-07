@@ -210,19 +210,31 @@ type AweneEventApi = {
   format?: string;
   status?: string;
   registrationStatus?: string;
+  registration_status?: string;
   eventStatus?: string;
+  event_status?: string;
   locationType?: string;
+  location_type?: string;
   locationName?: string;
+  location_name?: string;
   locationAddress?: string;
+  location_address?: string;
   onlineUrl?: string;
+  online_url?: string;
   language?: string;
   capacity?: number | string | null;
   availableSeats?: number | string | null;
+  available_seats?: number | string | null;
   ctaLabel?: string;
+  cta_label?: string;
   seoTitle?: string;
+  seo_title?: string;
   metaDescription?: string;
+  meta_description?: string;
   featuredImage?: CmsImage | null;
+  featured_image?: CmsImage | null;
   recapPublished?: boolean;
+  recap_published?: boolean;
   location?: {
     name?: string;
     address?: string;
@@ -429,10 +441,11 @@ async function fetchCms<T>(
 async function fetchCmsRest<T>(
   path: string,
   params: Record<string, string | number> = {},
+  revalidate: number = CMS_REVALIDATE_SECONDS,
 ) {
   const response = await fetch(cmsRestUrl(path, params), {
     next: {
-      revalidate: CMS_REVALIDATE_SECONDS,
+      revalidate,
       tags: ["wordpress-cms"],
     },
   });
@@ -685,6 +698,17 @@ function toArticle(post: WpPost, index: number): CmsArticle {
   };
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 function eventColor(type: string) {
   const normalized = type.toLowerCase();
 
@@ -776,16 +800,24 @@ function normalizeEventStatus(value?: string): CmsEvent["eventStatus"] {
 function toAweneEvent(event: AweneEventApi): CmsEvent {
   const type = eventTypeLabel(event.types);
   const startsAt = event.start_date ?? event.date;
-  const format = normalizeEventFormat(event.locationType ?? event.format);
-  const registrationStatus = normalizeRegistrationStatus(
-    event.registrationStatus ?? event.status,
+  const format = normalizeEventFormat(
+    event.locationType ?? event.location_type ?? event.format,
   );
-  const eventStatus = normalizeEventStatus(event.eventStatus ?? event.status);
+  const registrationStatus = normalizeRegistrationStatus(
+    event.registrationStatus ?? event.registration_status ?? event.status,
+  );
+  const eventStatus = normalizeEventStatus(
+    event.eventStatus ?? event.event_status ?? event.status,
+  );
   const capacity = numberOrUndefined(event.capacity);
-  const availableSeats = numberOrUndefined(event.availableSeats);
-  const locationName = event.locationName ?? event.location?.name;
+  const availableSeats = numberOrUndefined(
+    event.availableSeats ?? event.available_seats,
+  );
+  const locationName =
+    event.locationName ?? event.location_name ?? event.location?.name;
   const locationAddress =
     event.locationAddress ??
+    event.location_address ??
     [event.location?.address, event.location?.city, event.location?.country]
       .filter(Boolean)
       .join(", ");
@@ -793,14 +825,16 @@ function toAweneEvent(event: AweneEventApi): CmsEvent {
     locationName ||
     [event.location?.city, event.location?.country].filter(Boolean).join(", ") ||
     (format === "online" ? "En ligne" : "");
-  const image = event.featuredImage ?? event.image ?? undefined;
+  const image =
+    event.featuredImage ?? event.featured_image ?? event.image ?? undefined;
+  const slug = event.slug || slugify(event.title);
 
-  return {
+  const result: CmsEvent = {
     id: event.id,
-    slug: event.slug,
+    slug,
     title: event.title,
     description: event.description ?? event.content ?? event.excerpt ?? "",
-    shortDescription: event.shortDescription ?? event.excerpt ?? "",
+    shortDescription: renderedText(event.shortDescription ?? event.excerpt ?? ""),
     date: event.date_label ?? "À venir",
     startsAt,
     endDate: event.end_date,
@@ -818,18 +852,24 @@ function toAweneEvent(event: AweneEventApi): CmsEvent {
     locationType: format,
     locationName,
     locationAddress,
-    onlineUrl: event.onlineUrl,
+    onlineUrl: event.onlineUrl ?? event.online_url,
     language: normalizeEventLanguage(event.language),
     capacity,
-    availableSeats: typeof capacity === "number" ? availableSeats : undefined,
+    availableSeats,
     price: event.price,
     image,
     url: event.registration_url,
-    ctaLabel: event.ctaLabel,
-    seoTitle: event.seoTitle,
-    metaDescription: event.metaDescription,
-    recapPublished: event.recapPublished,
+    ctaLabel: event.ctaLabel ?? event.cta_label,
+    seoTitle: event.seoTitle ?? event.seo_title,
+    metaDescription: event.metaDescription ?? event.meta_description,
+    recapPublished: event.recapPublished ?? event.recap_published,
   };
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log("AWENE normalized event", result);
+  }
+
+  return result;
 }
 
 function toEventPv(pv: AweneEventPvApi): CmsEventPv {
@@ -1252,12 +1292,16 @@ export async function getEvents(
       : { perPage: 20, ...options };
 
   try {
-    const events = await fetchCmsRest<AweneEventApi[]>("awene/v1/events", {
-      per_page: resolved.perPage ?? 20,
-      ...(resolved.status ? { status: resolved.status } : {}),
-      ...(resolved.type ? { type: resolved.type } : {}),
-      ...(resolved.language ? { language: resolved.language } : {}),
-    });
+    const events = await fetchCmsRest<AweneEventApi[]>(
+      "awene/v1/events",
+      {
+        per_page: resolved.perPage ?? 20,
+        ...(resolved.status ? { status: resolved.status } : {}),
+        ...(resolved.type ? { type: resolved.type } : {}),
+        ...(resolved.language ? { language: resolved.language } : {}),
+      },
+      60,
+    );
 
     return events.map(toAweneEvent);
   } catch (error) {

@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   ],
 };
 
+function stripHtml(html?: string) {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function normalizeStatus(value?: string): EventItem["status"] {
   const normalized = (value ?? "").toLowerCase();
   if (normalized.includes("closed") || normalized.includes("fermé")) {
@@ -58,12 +63,13 @@ export default async function EventsPage() {
   const events = await getEvents({ perPage: 100, language: "en" });
   const normalizedEvents: EventItem[] = events.map((event) => ({
     id: String(event.id),
+    slug: event.slug,
     title: event.title,
     date: event.date,
     location: event.location || "Location to be confirmed",
     type: event.type || "Workshop",
     status: normalizeStatus(isPastEvent(event) ? "past" : event.registrationStatus ?? event.status),
-    description: event.shortDescription || event.description || "More details about this event will be shared soon.",
+    description: event.shortDescription || stripHtml(event.description) || "More details about this event will be shared soon.",
     ctaLabel: isPastEvent(event) ? "Learn more" : event.ctaLabel || "Register",
     ctaHref: isPastEvent(event) ? `/en/events/${event.slug}` : event.url ?? "/en/contact",
     format: normalizeFormat(event),
@@ -165,6 +171,7 @@ export default async function EventsPage() {
           error: "The registration could not be sent. Please try again.",
           noPastResults: "No past events match these filters.",
           seatsLeft: "{count} seats left",
+          seatsToBeConfirmed: "Seats to be confirmed",
         }}
         events={normalizedEvents}
       />

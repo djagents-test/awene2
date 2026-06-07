@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   ],
 };
 
+function stripHtml(html?: string) {
+  if (!html) return "";
+  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function normalizeStatus(value?: string): EventItem["status"] {
   const normalized = (value ?? "").toLowerCase();
   if (normalized.includes("closed") || normalized.includes("fermé")) {
@@ -58,13 +63,14 @@ export default async function EvenementsPage() {
   const events = await getEvents({ perPage: 100, language: "fr" });
   const normalizedEvents: EventItem[] = events.map((event) => ({
     id: String(event.id),
+    slug: event.slug,
     title: event.title,
     date: event.date,
     location: event.location || "Lieu à confirmer",
     type: event.type || "Atelier",
     status: normalizeStatus(isPastEvent(event) ? "past" : event.registrationStatus ?? event.status),
-    description: event.shortDescription || event.description || "Plus d’informations à venir sur cet événement.",
-    ctaLabel: isPastEvent(event) ? "En savoir plus" : event.ctaLabel || "Je m'inscris",
+    description: event.shortDescription || stripHtml(event.description) || "Plus d’informations à venir sur cet événement.",
+    ctaLabel: isPastEvent(event) ? "En savoir plus" : event.ctaLabel || "Je m’inscris",
     ctaHref: isPastEvent(event) ? `/fr/evenements/${event.slug}` : event.url ?? "/fr/contact",
     format: normalizeFormat(event),
     startsAt: event.startsAt,
@@ -164,6 +170,7 @@ export default async function EvenementsPage() {
           error: "L’inscription n’a pas pu être envoyée. Veuillez réessayer.",
           noPastResults: "Aucun événement passé ne correspond à ces filtres.",
           seatsLeft: "{count} places restantes",
+          seatsToBeConfirmed: "Places à confirmer",
         }}
         events={normalizedEvents}
       />
