@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import Button from "@/components/ui/Button";
@@ -13,6 +14,19 @@ export const metadata: Metadata = {
     "Write to us for a question, a collaboration, or a first conversation about your support journey.",
 };
 
+async function contactApiUrl() {
+  const requestHeaders = await headers();
+  const forwardedProto = requestHeaders.get("x-forwarded-proto");
+  const forwardedHost = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+
+  if (forwardedHost) {
+    const protocol = forwardedProto ?? (forwardedHost.includes("localhost") ? "http" : "https");
+    return `${protocol}://${forwardedHost}/api/contact-submissions`;
+  }
+
+  return `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/api/contact-submissions`;
+}
+
 async function submitContact(formData: FormData) {
   "use server";
 
@@ -26,18 +40,22 @@ async function submitContact(formData: FormData) {
     source_page: "contact",
   };
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/api/contact-submissions`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    cache: "no-store",
-  });
+  try {
+    const response = await fetch(await contactApiUrl(), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      cache: "no-store",
+    });
 
-  if (!response.ok) {
+    if (!response.ok) {
+      redirect("/en/contact?error=1");
+    }
+
+    redirect("/en/thank-you");
+  } catch {
     redirect("/en/contact?error=1");
   }
-
-  redirect("/en/thank-you");
 }
 
 const cards = [
