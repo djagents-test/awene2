@@ -8,6 +8,7 @@ const localizedSlugMaps = {
     "/a-propos/pourquoi-awene": "/about/why-awene",
     "/a-propos/mon-histoire": "/about/my-story",
     "/formations": "/training",
+    "/formations-pv": "/training-recaps",
     "/evenements": "/events",
     "/merci": "/thank-you",
     "/politique-de-confidentialite": "/privacy-policy",

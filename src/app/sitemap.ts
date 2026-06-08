@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getArticles, getFormations } from "@/lib/cms";
+import { getArticles, getFormationPvs, getFormations } from "@/lib/cms";
 import { localizedPath } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
@@ -13,6 +13,7 @@ const staticCanonicalRoutes = [
   "/a-propos/mon-histoire",
   "/articles",
   "/formations",
+  "/formations-pv",
   "/evenements",
   "/contact",
   "/merci",
@@ -26,9 +27,10 @@ function absoluteUrl(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articles, formations] = await Promise.all([
+  const [articles, formations, formationPvs] = await Promise.all([
     getArticles(100).catch(() => []),
     getFormations(100).catch(() => []),
+    getFormationPvs({ limit: 100 }).catch(() => []),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = staticCanonicalRoutes.flatMap((path) => [
@@ -70,5 +72,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]);
 
-  return [...staticEntries, ...articleEntries, ...formationEntries];
+  const formationPvEntries: MetadataRoute.Sitemap = formationPvs.flatMap((pv) => [
+    {
+      url: absoluteUrl(`/fr/formations-pv/${pv.slug}`),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: absoluteUrl(`/en/training-recaps/${pv.slug}`),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+  ]);
+
+  return [...staticEntries, ...articleEntries, ...formationEntries, ...formationPvEntries];
 }
