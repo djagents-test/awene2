@@ -18,6 +18,20 @@ type ContactSubmissionBody = {
   [key: string]: unknown;
 };
 
+function payloadMessage(payload: unknown, fallback: string) {
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "message" in payload &&
+    typeof payload.message === "string" &&
+    payload.message.trim() !== ""
+  ) {
+    return payload.message.trim();
+  }
+
+  return fallback;
+}
+
 function emailShell({
   eyebrow,
   headline,
@@ -220,19 +234,30 @@ export async function POST(request: Request) {
 
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      return NextResponse.json(payload, { status: response.status });
+      return NextResponse.json(
+        { ...payload, message: payloadMessage(payload, "Le message n'a pas pu être envoyé.") },
+        { status: response.status },
+      );
     }
 
-    const emailResult = await sendBrevoConfirmationEmail(body);
+    let emailResult = { ok: false, reason: "skipped" as string | null };
+    try {
+      emailResult = await sendBrevoConfirmationEmail(body);
+    } catch (error) {
+      console.error("Brevo confirmation email failed", error);
+      emailResult = { ok: false, reason: "brevo_request_failed" };
+    }
 
     return NextResponse.json(
       {
         ...payload,
         confirmation_email_sent: emailResult.ok,
+        confirmation_email_error: emailResult.ok ? null : emailResult.reason,
       },
       { status: response.status },
     );
-  } catch {
+  } catch (error) {
+    console.error("Contact submission failed", error);
     return NextResponse.json(
       { message: "Le message n'a pas pu être envoyé." },
       { status: 500 },

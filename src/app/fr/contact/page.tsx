@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
@@ -27,6 +28,16 @@ async function contactApiUrl() {
   return `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/api/contact-submissions`;
 }
 
+function buildErrorRedirect(message?: string) {
+  const params = new URLSearchParams({ erreur: "1" });
+
+  if (message) {
+    params.set("message", message);
+  }
+
+  return `/fr/contact?${params.toString()}`;
+}
+
 async function submitContact(formData: FormData) {
   "use server";
 
@@ -49,12 +60,21 @@ async function submitContact(formData: FormData) {
     });
 
     if (!response.ok) {
-      redirect("/fr/contact?erreur=1");
+      const payload = await response.json().catch(() => null);
+      const message =
+        payload && typeof payload === "object" && "message" in payload && typeof payload.message === "string"
+          ? payload.message
+          : "Le message n'a pas pu être envoyé.";
+      redirect(buildErrorRedirect(message));
     }
 
     redirect("/fr/merci");
-  } catch {
-    redirect("/fr/contact?erreur=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    redirect(buildErrorRedirect("Le message n'a pas pu être envoyé."));
   }
 }
 
@@ -79,9 +99,9 @@ const cards = [
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ formation?: string; sujet?: string; erreur?: string }>;
+  searchParams: Promise<{ formation?: string; sujet?: string; erreur?: string; message?: string }>;
 }) {
-  const { formation, sujet, erreur } = await searchParams;
+  const { formation, sujet, erreur, message: errorMessage } = await searchParams;
   const message = formation
     ? `Bonjour, je souhaite recevoir des informations sur la formation : ${formation}.`
     : "";
@@ -208,7 +228,7 @@ export default async function ContactPage({
                     className="mb-4 rounded-2xl border border-[#F5D4D4] bg-[#FFF6F6] px-4 py-3 text-sm"
                     style={{ color: "#9C3D3D", fontFamily: "var(--font-inter)" }}
                   >
-                    Le message n&apos;a pas pu être envoyé.
+                    {errorMessage || "Le message n'a pas pu être envoyé."}
                   </p>
                 ) : null}
                 <form action={submitContact} className="space-y-5">

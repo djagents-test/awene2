@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
@@ -27,6 +28,16 @@ async function contactApiUrl() {
   return `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/api/contact-submissions`;
 }
 
+function buildErrorRedirect(message?: string) {
+  const params = new URLSearchParams({ error: "1" });
+
+  if (message) {
+    params.set("message", message);
+  }
+
+  return `/en/contact?${params.toString()}`;
+}
+
 async function submitContact(formData: FormData) {
   "use server";
 
@@ -49,12 +60,21 @@ async function submitContact(formData: FormData) {
     });
 
     if (!response.ok) {
-      redirect("/en/contact?error=1");
+      const payload = await response.json().catch(() => null);
+      const message =
+        payload && typeof payload === "object" && "message" in payload && typeof payload.message === "string"
+          ? payload.message
+          : "The message could not be sent.";
+      redirect(buildErrorRedirect(message));
     }
 
     redirect("/en/thank-you");
-  } catch {
-    redirect("/en/contact?error=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    redirect(buildErrorRedirect("The message could not be sent."));
   }
 }
 
@@ -79,9 +99,9 @@ const cards = [
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ training?: string; subject?: string; error?: string }>;
+  searchParams: Promise<{ training?: string; subject?: string; error?: string; message?: string }>;
 }) {
-  const { training, subject, error } = await searchParams;
+  const { training, subject, error, message: errorMessage } = await searchParams;
   const message = training ? `Hello, I would like to receive information about the training: ${training}.` : "";
 
   return (
@@ -161,7 +181,7 @@ export default async function ContactPage({
                 </p>
                 {error ? (
                   <p className="mb-4 rounded-2xl border border-[#F5D4D4] bg-[#FFF6F6] px-4 py-3 text-sm" style={{ color: "#9C3D3D", fontFamily: "var(--font-inter)" }}>
-                    The message could not be sent.
+                    {errorMessage || "The message could not be sent."}
                   </p>
                 ) : null}
                 <form action={submitContact} className="space-y-5">
