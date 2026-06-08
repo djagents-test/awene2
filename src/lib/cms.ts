@@ -192,6 +192,53 @@ export type CmsFormation = {
   url?: string;
 };
 
+export type CmsFormationPv = {
+  id: number;
+  slug: string;
+  pvTitle: string;
+  shortSummary?: string;
+  fullRecap?: string;
+  keyLearnings?: string;
+  topicsCovered?: string;
+  trainerNotes?: string;
+  participantHighlights?: string;
+  challengesEncountered?: string;
+  resultsAchieved?: string;
+  nextSteps?: string;
+  videoRecapUrl?: string;
+  youtubeUrl?: string;
+  vimeoUrl?: string;
+  driveUrl?: string;
+  gallery: string[];
+  carouselImages: string[];
+  presentationPdf?: string;
+  workbookPdf?: string;
+  certificateSamplePdf?: string;
+  formationReportPdf?: string;
+  satisfactionFormId?: number;
+  participationRate?: number;
+  satisfactionScore?: number;
+  averageRating?: number;
+  recommendationRate?: number;
+  publicRecapStatus: "draft" | "published" | "hidden";
+  completionStatus?: string;
+  formationId: number;
+  formationSlug: string;
+  formationTitle: string;
+  formationDate?: string;
+  startDate?: string;
+  duration?: string;
+  trainer?: string;
+  language?: "fr" | "en" | "ar";
+  languageLabel?: string;
+  audience?: "particuliers" | "entreprises" | "professionnels";
+  audienceLabel?: string;
+  participantsCount: number;
+  featured?: boolean;
+  featuredImage?: CmsImage | null;
+  formationPublicUrl?: string;
+};
+
 type AweneEventApi = {
   id: number;
   slug: string;
@@ -384,6 +431,59 @@ type AweneFormationApi = {
   price?: string;
   registration_url?: string;
   registration_link?: string;
+  recap_published?: boolean;
+  recapPublished?: boolean;
+  trainer_name?: string;
+  featured?: boolean;
+  cover_image?: CmsImage | null;
+  public_url?: string;
+};
+
+type AweneFormationPvApi = {
+  id: number;
+  slug: string;
+  pvTitle?: string;
+  shortSummary?: string;
+  fullRecap?: string;
+  keyLearnings?: string;
+  topicsCovered?: string;
+  trainerNotes?: string;
+  participantHighlights?: string;
+  challengesEncountered?: string;
+  resultsAchieved?: string;
+  nextSteps?: string;
+  videoRecapUrl?: string;
+  youtubeUrl?: string;
+  vimeoUrl?: string;
+  driveUrl?: string;
+  gallery?: string[];
+  carouselImages?: string[];
+  presentationPdf?: string;
+  workbookPdf?: string;
+  certificateSamplePdf?: string;
+  formationReportPdf?: string;
+  satisfactionFormId?: number;
+  participationRate?: number | string | null;
+  satisfactionScore?: number | string | null;
+  averageRating?: number | string | null;
+  recommendationRate?: number | string | null;
+  publicRecapStatus?: "draft" | "published" | "hidden";
+  completionStatus?: string;
+  formationId?: number;
+  formationSlug?: string;
+  formationTitle?: string;
+  formationDate?: string;
+  startDate?: string;
+  duration?: string;
+  trainer?: string;
+  language?: string;
+  languageLabel?: string;
+  audience?: string;
+  audienceLabel?: string;
+  participantsCount?: number | string | null;
+  featured?: boolean;
+  featuredImage?: CmsImage | null;
+  formationPublicUrl?: string;
 };
 
 function cmsUrl(path: string, params: Record<string, string | number> = {}) {
@@ -1171,7 +1271,59 @@ function toAweneFormation(formation: AweneFormationApi): CmsFormation {
     ),
     capacityTotal: numberOrUndefined(formation.capacity_total),
     price: formation.price,
-    url: formation.registration_url ?? formation.registration_link,
+    url: formation.public_url ?? formation.registration_url ?? formation.registration_link,
+  };
+}
+
+function toAweneFormationPv(pv: AweneFormationPvApi): CmsFormationPv {
+  const language = normalizeFormationLanguage(pv.language);
+  const audience = normalizeFormationAudience(pv.audience);
+
+  return {
+    id: pv.id,
+    slug: pv.slug,
+    pvTitle: pv.pvTitle ?? "",
+    shortSummary: pv.shortSummary ?? "",
+    fullRecap: pv.fullRecap ?? "",
+    keyLearnings: pv.keyLearnings ?? "",
+    topicsCovered: pv.topicsCovered ?? "",
+    trainerNotes: pv.trainerNotes ?? "",
+    participantHighlights: pv.participantHighlights ?? "",
+    challengesEncountered: pv.challengesEncountered ?? "",
+    resultsAchieved: pv.resultsAchieved ?? "",
+    nextSteps: pv.nextSteps ?? "",
+    videoRecapUrl: pv.videoRecapUrl ?? "",
+    youtubeUrl: pv.youtubeUrl ?? "",
+    vimeoUrl: pv.vimeoUrl ?? "",
+    driveUrl: pv.driveUrl ?? "",
+    gallery: Array.isArray(pv.gallery) ? pv.gallery : [],
+    carouselImages: Array.isArray(pv.carouselImages) ? pv.carouselImages : [],
+    presentationPdf: pv.presentationPdf ?? "",
+    workbookPdf: pv.workbookPdf ?? "",
+    certificateSamplePdf: pv.certificateSamplePdf ?? "",
+    formationReportPdf: pv.formationReportPdf ?? "",
+    satisfactionFormId: pv.satisfactionFormId,
+    participationRate: numberOrUndefined(pv.participationRate),
+    satisfactionScore: numberOrUndefined(pv.satisfactionScore),
+    averageRating: numberOrUndefined(pv.averageRating),
+    recommendationRate: numberOrUndefined(pv.recommendationRate),
+    publicRecapStatus: pv.publicRecapStatus ?? "draft",
+    completionStatus: pv.completionStatus ?? "",
+    formationId: Number(pv.formationId ?? 0),
+    formationSlug: pv.formationSlug ?? "",
+    formationTitle: pv.formationTitle ?? "",
+    formationDate: pv.formationDate ?? "",
+    startDate: pv.startDate ?? "",
+    duration: pv.duration ?? "",
+    trainer: pv.trainer ?? "",
+    language,
+    languageLabel: pv.languageLabel ?? formationLanguageLabel(language),
+    audience,
+    audienceLabel: pv.audienceLabel ?? formationAudienceLabel(audience),
+    participantsCount: numberOrUndefined(pv.participantsCount) ?? 0,
+    featured: Boolean(pv.featured),
+    featuredImage: pv.featuredImage ?? null,
+    formationPublicUrl: pv.formationPublicUrl ?? "",
   };
 }
 
@@ -1412,4 +1564,44 @@ export async function getFormationBySlug(slug: string) {
 
   const formations = await getFormations(100);
   return formations.find((formation) => formation.slug === slug) ?? null;
+}
+
+export async function getFormationPvs(options: {
+  limit?: number;
+  language?: "fr" | "en" | "ar";
+  audience?: "particuliers" | "entreprises" | "professionnels";
+  year?: number;
+  featured?: boolean;
+} = {}) {
+  try {
+    const items = await fetchCmsRest<AweneFormationPvApi[]>("awene/v1/formation-pv", {
+      limit: options.limit ?? 100,
+      ...(options.language ? { language: options.language } : {}),
+      ...(options.audience ? { audience: options.audience } : {}),
+      ...(options.year ? { year: options.year } : {}),
+      ...(typeof options.featured === "boolean" ? { featured: String(options.featured ? 1 : 0) } : {}),
+    });
+
+    return items.map(toAweneFormationPv);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[cms] Failed to fetch AWENE formation PV", { error, options });
+    }
+    return [];
+  }
+}
+
+export async function getFormationPvBySlug(slug: string) {
+  try {
+    const item = await fetchCmsRest<AweneFormationPvApi>(
+      `awene/v1/formation-pv/slug/${encodeURIComponent(slug)}/`,
+    );
+
+    return toAweneFormationPv(item);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[cms] Failed to fetch AWENE formation PV by slug", { slug, error });
+    }
+    return null;
+  }
 }

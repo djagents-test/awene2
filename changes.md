@@ -17,3 +17,24 @@
   - `src/components/sections/CoachingFaq.tsx`
 
 No copy, business logic, routing, or API behavior was changed.
+
+# Formation PV Changes
+
+- Added frontend and CMS client support for `Formation PV` / training recap content.
+- Extended the CMS client in `src/lib/cms.ts` with:
+  - `CmsFormationPv`
+  - `getFormationPvs()`
+  - `getFormationPvBySlug()`
+- Added new public recap routes:
+  - `src/app/fr/formations-pv/page.tsx`
+  - `src/app/fr/formations-pv/[slug]/page.tsx`
+  - `src/app/en/training-recaps/page.tsx`
+  - `src/app/en/training-recaps/[slug]/page.tsx`
+- Added frontend Formation PV features:
+  - featured recap block
+  - search and filters by audience, language and year
+  - case-study detail layout with overview, topics, key learnings, gallery, resources, participant feedback and CTA
+  - dedicated metadata and Open Graph support
+- Updated localization and discovery:
+  - mapped `/formations-pv` to `/training-recaps` in `src/lib/i18n.ts`
+  - added Formation PV listing/detail URLs to `src/app/sitemap.ts`
