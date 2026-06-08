@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
   locale: "fr" | "en";
@@ -10,13 +10,21 @@ type Props = {
 
 type SuccessPayload = {
   registrationId: number;
+  eventId: number;
+  eventSlug: string;
   eventTitle: string;
   eventDate: string;
   startTime: string;
   endTime: string;
+  language: "fr" | "en";
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
   locationLabel: string;
   calendarUrl?: string;
   confirmationEmailSent: boolean;
+  successSource: "wordpress" | "next-fallback";
 };
 
 export default function EventRegistrationForm({ locale, eventId, eventTitle }: Props) {
@@ -30,6 +38,18 @@ export default function EventRegistrationForm({ locale, eventId, eventTitle }: P
   const [state, setState] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [successPayload, setSuccessPayload] = useState<SuccessPayload | null>(null);
   const isFr = locale === "fr";
+
+  useEffect(() => {
+    if (state === "success" && successPayload) {
+      console.info("[AWENE] Success page rendered", {
+        registrationId: successPayload.registrationId,
+        eventId: successPayload.eventId,
+        eventTitle: successPayload.eventTitle,
+        confirmationEmailSent: successPayload.confirmationEmailSent,
+        successSource: successPayload.successSource,
+      });
+    }
+  }, [state, successPayload]);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -51,9 +71,33 @@ export default function EventRegistrationForm({ locale, eventId, eventTitle }: P
           website,
         }),
       });
+      const payload = (await res.json().catch(() => ({}))) as {
+        registration?: SuccessPayload;
+        registrationId?: number;
+        confirmation_email_sent?: boolean;
+      };
       if (!res.ok) throw new Error("submit_failed");
-      const payload = (await res.json()) as { registration?: SuccessPayload };
-      setSuccessPayload(payload.registration ?? null);
+
+      const fallbackPayload: SuccessPayload = {
+        registrationId: Number(payload.registrationId ?? 0),
+        eventId,
+        eventSlug: "",
+        eventTitle,
+        eventDate: "",
+        startTime: "",
+        endTime: "",
+        language: locale,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        locationLabel: isFr ? "Confirmation envoyée par email" : "Confirmation sent by email",
+        calendarUrl: undefined,
+        confirmationEmailSent: Boolean(payload.confirmation_email_sent),
+        successSource: "next-fallback",
+      };
+
+      setSuccessPayload(payload.registration ?? fallbackPayload);
       setState("success");
     } catch {
       setState("error");
@@ -183,7 +227,6 @@ export default function EventRegistrationForm({ locale, eventId, eventTitle }: P
           {isFr ? "J’accepte que mes informations soient utilisées pour traiter mon inscription à cet événement." : "I agree that my information can be used to process my registration for this event."}
         </span>
       </label>
-      {state === "success" ? <div className="md:col-span-2 rounded-[1.15rem] border px-4 py-4" style={{ borderColor: "#DDD0F5", background: "#F7F1FD" }}><p className="text-sm font-semibold" style={{ color: "#4B1F7A", fontFamily: "var(--font-inter)" }}>{isFr ? "Votre inscription est confirmée." : "Your registration is confirmed."}</p><p className="mt-1 text-sm leading-relaxed" style={{ color: "#6E6478", fontFamily: "var(--font-inter)" }}>{isFr ? (phone.trim() ? "Un email de confirmation vient de vous être envoyé. Vous recevrez le lien de la masterclass par email et WhatsApp avant l’événement." : "Un email de confirmation vient de vous être envoyé. Vous recevrez le lien de la masterclass par email avant l’événement.") : (phone.trim() ? "A confirmation email has just been sent to you. You will receive the masterclass link by email and WhatsApp before the event." : "A confirmation email has just been sent to you. You will receive the masterclass link by email before the event.")}</p></div> : null}
       {state === "error" ? <p className="md:col-span-2 text-sm font-medium" style={{ color: "#C0392B", fontFamily: "var(--font-inter)" }}>{isFr ? "L’inscription n’a pas pu être envoyée. Veuillez réessayer." : "The registration could not be sent. Please try again."}</p> : null}
       <div className="md:col-span-2">
         <button type="submit" disabled={state === "submitting"} className="min-h-14 w-full rounded-full px-7 py-4 text-sm font-semibold transition-all duration-200 hover:scale-[1.01] hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto" style={{ background: "linear-gradient(135deg, #F68B2C 0%, #E67520 100%)", color: "#fff", fontFamily: "var(--font-inter)" }}>

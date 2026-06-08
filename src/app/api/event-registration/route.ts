@@ -49,13 +49,21 @@ type EventApiPayload = {
 
 type RegistrationSuccessPayload = {
   registrationId: number;
+  eventId: number;
+  eventSlug: string;
   eventTitle: string;
   eventDate: string;
   startTime: string;
   endTime: string;
+  language: "fr" | "en";
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
   locationLabel: string;
   calendarUrl?: string;
   confirmationEmailSent: boolean;
+  successSource: "wordpress" | "next-fallback";
 };
 
 function restUrl(path: string) {
@@ -304,6 +312,68 @@ async function fetchEvent(eventId: number) {
   return (await response.json()) as EventApiPayload;
 }
 
+function buildRegistrationSuccessPayload({
+  locale,
+  body,
+  event,
+  registrationId,
+  confirmationEmailSent,
+}: {
+  locale: "fr" | "en";
+  body: RegistrationBody;
+  event: EventApiPayload | null;
+  registrationId: number;
+  confirmationEmailSent: boolean;
+}): RegistrationSuccessPayload {
+  const eventId = Number(body.eventId ?? event?.id ?? 0);
+  const firstName = String(body.firstName ?? "").trim();
+  const lastName = String(body.lastName ?? "").trim();
+  const email = String(body.email ?? "").trim();
+  const phone = String(body.phone ?? "").trim();
+
+  if (event) {
+    return {
+      registrationId,
+      eventId: event.id,
+      eventSlug: event.slug ?? "",
+      eventTitle: event.title,
+      eventDate: eventDateLabel(event),
+      startTime: event.start_time ?? "",
+      endTime: event.end_time ?? "",
+      language: locale,
+      firstName,
+      lastName,
+      email,
+      phone,
+      locationLabel: eventLocationLabel(event, locale),
+      calendarUrl: event.start_date && event.start_time
+        ? `${CMS_SITE_BASE.replace(/\/$/, "")}/wp-json/awene/v1/events/${event.id}/calendar.ics`
+        : undefined,
+      confirmationEmailSent,
+      successSource: "wordpress",
+    };
+  }
+
+  return {
+    registrationId,
+    eventId,
+    eventSlug: "",
+    eventTitle: String(body.eventTitle ?? "").trim(),
+    eventDate: "",
+    startTime: "",
+    endTime: "",
+    language: locale,
+    firstName,
+    lastName,
+    email,
+    phone,
+    locationLabel: locale === "en" ? "To be confirmed by email" : "Confirmation envoyée par email",
+    calendarUrl: undefined,
+    confirmationEmailSent,
+    successSource: "next-fallback",
+  };
+}
+
 async function sendConfirmationEmail({
   locale,
   firstName,
@@ -410,6 +480,14 @@ async function sendConfirmationEmail({
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as RegistrationBody;
+    const locale = localeFrom(body.language);
+    const logContext = {
+      eventId: Number(body.eventId ?? 0),
+      email: String(body.email ?? "").trim(),
+      locale,
+    };
+
+    console.info("[AWENE] Registration submitted", logContext);
 
     if (!body.eventId || !body.firstName || !body.lastName || !body.email || !body.consent) {
       return NextResponse.json(
@@ -431,46 +509,95 @@ export async function POST(request: Request) {
       return NextResponse.json(payload, { status: response.status });
     }
 
-    const event = await fetchEvent(Number(body.eventId));
-    let confirmationEmailSent = false;
+    const registrationId = Number(payload.registrationId ?? 0);
+    console.info("[AWENE] Registration saved", {
+      ...logContext,
+      registrationId,
+      wordpressStatus: response.status,
+    });
+    console.info("[AWENE] Registration ID returned", {
+      ...logContext,
+      registrationId,
+    });
 
-    if (event) {
-      const emailResult = await sendConfirmationEmail({
-        locale: localeFrom(body.language),
-        firstName: String(body.firstName ?? "").trim(),
-        email: String(body.email ?? "").trim(),
-        phone: String(body.phone ?? "").trim(),
-        event,
-      });
-      confirmationEmailSent = emailResult.ok;
-    } else {
-      console.error("[AWENE] Event confirmation skipped: event payload unavailable", {
-        eventId: body.eventId,
+    let event: EventApiPayload | null = null;
+    try {
+      event = await fetchEvent(Number(body.eventId));
+    } catch (error) {
+      console.error("[AWENE] Event fetch failed after registration save", {
+        ...logContext,
+        registrationId,
+        error,
       });
     }
+
+    let confirmationEmailSent = false;
+    let confirmationEmailError: string | null = null;
+
+    if (event) {
+      console.info("[AWENE] Confirmation email attempt", {
+        ...logContext,
+        registrationId,
+      });
+
+      try {
+        const emailResult = await sendConfirmationEmail({
+          locale,
+          firstName: String(body.firstName ?? "").trim(),
+          email: String(body.email ?? "").trim(),
+          phone: String(body.phone ?? "").trim(),
+          event,
+        });
+        confirmationEmailSent = emailResult.ok;
+        confirmationEmailError = emailResult.ok ? null : emailResult.reason;
+
+        if (emailResult.ok) {
+          console.info("[AWENE] Confirmation email success", {
+            ...logContext,
+            registrationId,
+          });
+        } else {
+          console.error("[AWENE] Confirmation email failure", {
+            ...logContext,
+            registrationId,
+            reason: emailResult.reason,
+          });
+        }
+      } catch (error) {
+        confirmationEmailSent = false;
+        confirmationEmailError = "email_request_failed";
+        console.error("[AWENE] Confirmation email failure", {
+          ...logContext,
+          registrationId,
+          error,
+        });
+      }
+    } else {
+      console.error("[AWENE] Event confirmation skipped: event payload unavailable", {
+        ...logContext,
+        registrationId,
+      });
+    }
+
+    const registration = buildRegistrationSuccessPayload({
+      locale,
+      body,
+      event,
+      registrationId,
+      confirmationEmailSent,
+    });
 
     return NextResponse.json(
       {
         ...payload,
         confirmation_email_sent: confirmationEmailSent,
-        registration: event
-          ? ({
-              registrationId: Number(payload.registrationId ?? 0),
-              eventTitle: event.title,
-              eventDate: eventDateLabel(event),
-              startTime: event.start_time ?? "",
-              endTime: event.end_time ?? "",
-              locationLabel: eventLocationLabel(event, localeFrom(body.language)),
-              calendarUrl: event.start_date && event.start_time
-                ? `${CMS_SITE_BASE.replace(/\/$/, "")}/wp-json/awene/v1/events/${event.id}/calendar.ics`
-                : undefined,
-              confirmationEmailSent,
-            } satisfies RegistrationSuccessPayload)
-          : undefined,
+        confirmation_email_error: confirmationEmailError,
+        registration,
       },
       { status: response.status },
     );
-  } catch {
+  } catch (error) {
+    console.error("[AWENE] Registration request failed", error);
     return NextResponse.json(
       { message: "The registration could not be sent." },
       { status: 500 },
